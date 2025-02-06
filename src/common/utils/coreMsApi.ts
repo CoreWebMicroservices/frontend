@@ -1,21 +1,10 @@
-import axios, { AxiosResponse } from "axios";
-import { ApiErrorResponse } from "@/common/model/Response";
-import { createAsyncThunk } from "@reduxjs/toolkit";
-
-export interface CoreMsApiConfig {
-  baseURL: string;
-  useAccessToken?: boolean;
-}
-
-export enum HttpMethod {
-  GET = "GET",
-  POST = "POST",
-  PUT = "PUT",
-  DELETE = "DELETE",
-}
-
-export const REFRESH_TOKEN_KEY = "refreshToken";
-export const ACCESS_TOKEN_TOKEN_KEY = "accessToken";
+import {
+  ACCESS_TOKEN_KEY,
+  CoreMsApiConfig,
+  CoreMsApiResonse,
+  HttpMethod,
+} from "@/common/model/CoreMsApiModel";
+import axios, { AxiosError } from "axios";
 
 class CoreMsApi {
   private axios;
@@ -31,35 +20,38 @@ class CoreMsApi {
     url: string,
     data?: unknown,
     headers?: Record<string, string>
-  ) {
-    const response = await this.axios.request<T>({
-      method,
-      url,
-      data,
-      headers: headers ?? this.getDefaultHeaders(),
-    });
+  ): Promise<CoreMsApiResonse<T>> {
+    const response: CoreMsApiResonse<T> = {
+      result: false,
+      response: null as T,
+      errors: [],
+    };
+    try {
+      const res = await this.axios.request<T>({
+        method,
+        url,
+        data,
+        headers: headers ?? this.getDefaultHeaders(),
+      });
 
-    return response.data;
-  }
-
-  public createAsyncThunk<T>(
-    method: HttpMethod,
-    url: string,
-    headers?: Record<string, string>
-  ) {
-    return createAsyncThunk(url, async (data: unknown, { rejectWithValue }) => {
-      try {
-        return await this.apiRequest<T>(method, url, data, headers);
-      } catch (error) {
-        if (axios.isAxiosError(error) && error.response) {
-          console.error("CoreMs api call error:", error.response.data);
-          return rejectWithValue(
-            error.response as AxiosResponse<ApiErrorResponse>
-          );
-        }
-        throw error;
+      response.result = true;
+      response.response = res.data;
+    } catch (error) {
+      if (error instanceof AxiosError && error.response) {
+        response.errors = error.response.data.errors;
+      } else {
+        console.error(error);
+        response.errors = [
+          {
+            reasonCode: "unknown.error",
+            description: "Unknown error. Please try again later.",
+          },
+        ];
       }
-    });
+    }
+
+    console.debug(response);
+    return response;
   }
 
   private getDefaultHeaders(): Record<string, string> {
@@ -67,7 +59,7 @@ class CoreMsApi {
       "Content-Type": "application/json",
     };
 
-    const accessToken = localStorage.getItem(ACCESS_TOKEN_TOKEN_KEY);
+    const accessToken = localStorage.getItem(ACCESS_TOKEN_KEY);
     if (this.config.useAccessToken && accessToken) {
       headers["Authorization"] = `Bearer ${accessToken}`;
     }

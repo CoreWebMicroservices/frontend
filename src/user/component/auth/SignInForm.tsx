@@ -4,10 +4,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
 
-import { signInUser } from "@/user/store/AuthSlice";
+import { signInUser } from "@/user/store/AuthState";
 import { SignInUserRequest } from "@/user/model/Auth";
-import { useAppDispatch } from "@/app/Hooks";
-import { ApiErrorResponse } from "@/common/model/Response";
 import { ROUTE_HOME } from "@/app/Router";
 
 
@@ -19,7 +17,6 @@ const signInSchema = yup.object().shape({
 
 const SignInForm = () => {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
   const {
     register,
     handleSubmit,
@@ -31,20 +28,16 @@ const SignInForm = () => {
 
 
   const onSubmit = async (data: SignInUserRequest) => {
-    try {
-      await dispatch(signInUser(data));
+    const res = await signInUser(data);
+    if (res.result === true) {
       navigate(ROUTE_HOME);
-    } catch (requestError) {
-      const errorResponse = requestError as { data?: ApiErrorResponse };
-      if (errorResponse.data) {
-        const serverErrors = errorResponse.data as ApiErrorResponse;
-        Object.values(serverErrors.errors).forEach((error) => {
-          setError("root", {
-            type: 'server',
-            message: error.details,
-          });
+    } else {
+      Object.values(res.errors).forEach((error) => {
+        setError("root", {
+          type: 'server',
+          message: error.description,
         });
-      }
+      });
     }
   };
 
@@ -60,6 +53,7 @@ const SignInForm = () => {
           placeholder="Enter email"
           size="lg"
           className="border-0 border-bottom rounded-0"
+          autoComplete="email"
           isInvalid={!!errors.email}
           {...register('email')}
         />
@@ -78,6 +72,7 @@ const SignInForm = () => {
           size="lg"
           className="border-0 border-bottom rounded-0"
           required
+          autoComplete="current-password"
           isInvalid={!!errors.password}
           {...register('password')}
         />
@@ -85,7 +80,9 @@ const SignInForm = () => {
           {errors.email?.message}
         </Form.Control.Feedback>
       </FloatingLabel>
-      <span className="error text-danger px-2">{errors.root?.message}</span>
+      <div className="d-grid mb-3">
+        <span className="error text-danger px-2">{errors.root?.message}</span>
+      </div>
       <Row className="justify-content-cenmt mb-3">
         <Col xs={{ span: 6, offset: 6 }} className="text-end">
           <Link to={'forgot_password'} className="link-secondary text-decoration-none">Forgot password?</Link>

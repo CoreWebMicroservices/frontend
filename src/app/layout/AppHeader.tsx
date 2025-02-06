@@ -4,11 +4,10 @@ import Navbar from 'react-bootstrap/Navbar';
 import Container from 'react-bootstrap/Container';
 
 import { ROUTE_HOME, ROUTE_LOGIN, ROUTE_USER, ROUTE_FEATURES, ROUTE_PRICING } from '@/app/Router';
-import { RootState } from '@/app/Store';
-import { useAppSelector } from '@/app/Hooks';
+import { useAuthState, signOut } from '@/user/store/AuthState';
 
 const AppHeader = () => {
-  const auth = useAppSelector((state: RootState) => state.auth);
+  const authState = useAuthState();
 
   return (
     <Navbar expand="lg" className="bg-body-tertiary mb-4" data-bs-theme="dark">
@@ -21,7 +20,14 @@ const AppHeader = () => {
             <Nav.Link as={Link} to={ROUTE_PRICING}>Pricing</Nav.Link>
           </Nav>
           <Nav>
-            {auth.isAuthenticated ? <Nav.Link as={Link} to={ROUTE_USER}>{auth.user?.fullName}</Nav.Link> : <Nav.Link as={Link} to={ROUTE_LOGIN}>Login</Nav.Link>}
+            {authState.isAuthenticated.get() ? (
+              <>
+                <Nav.Link as={Link} to={ROUTE_USER}>{authState.user.get()?.fullName}</Nav.Link>
+                <Nav.Link onClick={signOut}>Logout</Nav.Link>
+              </>
+            ) : (
+              <Nav.Link as={Link} to={ROUTE_LOGIN}>Login</Nav.Link>
+            )}
           </Nav>
         </Navbar.Collapse>
       </Container>
