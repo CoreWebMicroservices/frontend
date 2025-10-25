@@ -150,7 +150,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSignedUp }) => {
         <span className="error text-danger px-2">{errors.root?.message}</span>
       </div>
       <div className="d-grid mb-3">
-        <Button variant="dark" size="lg" type="submit" disabled={isSubmitting} className="rounded-0 fs-6 py-2">
+        <Button size="lg" type="submit" disabled={isSubmitting} className="rounded-1 fs-6 py-2">
           Register new account
         </Button>
       </div>

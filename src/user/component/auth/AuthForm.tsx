@@ -45,16 +45,16 @@ const AuthForm = () => {
         </Col>
         <Col xs={12} lg={4} className="d-flex align-items-center">
           <div className="d-flex gap-3 flex-column w-100">
-            <a href={GOOGLE_AUTH_URL} className="btn btn-outline-dark rounded-0 d-flex align-items-center py-2 px-4">
-              <i className="bi bi-google text-danger"></i>
+            <a href={GOOGLE_AUTH_URL} className="btn btn-outline-primary rounded-1 d-flex align-items-center py-2 px-4">
+              <i className="bi bi-google"></i>
               <span className="ms-2 fs-6 flex-grow-1">Continue with Google</span>
             </a>
-            <a href={GITHUB_AUTH_URL} className="btn btn-outline-dark rounded-0 d-flex align-items-center py-2 px-4">
-              <i className="bi bi-github text-dark"></i>
+            <a href={GITHUB_AUTH_URL} className="btn btn-outline-primary rounded-1 d-flex align-items-center py-2 px-4">
+              <i className="bi bi-github"></i>
               <span className="ms-2 fs-6 flex-grow-1">Continue with GitHub</span>
             </a>
-            <a href={LINKEDIN_AUTH_URL} className="btn btn-outline-dark rounded-0 d-flex align-items-center py-2 px-4">
-              <i className="bi bi-linkedin text-dark"></i>
+            <a href={LINKEDIN_AUTH_URL} className="btn btn-outline-primary rounded-1 d-flex align-items-center py-2 px-4">
+              <i className="bi bi-linkedin"></i>
               <span className="ms-2 fs-6 flex-grow-1">Continue with LinkedIn</span>
             </a>
           </div>
