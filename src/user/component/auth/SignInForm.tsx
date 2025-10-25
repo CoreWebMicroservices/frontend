@@ -89,7 +89,7 @@ const SignInForm = () => {
         </Col>
       </Row>
       <div className="d-grid mb-3">
-        <Button size="lg" type="submit" disabled={isSubmitting} className="rounded-1 fs-6 py-2">Sign In</Button>
+        <Button size="lg" type="submit" disabled={isSubmitting} className="fs-6 py-2">Sign In</Button>
       </div>
     </Form>
   );

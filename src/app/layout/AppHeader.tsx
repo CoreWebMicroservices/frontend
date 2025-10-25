@@ -1,9 +1,12 @@
 
+
 import { Link } from 'react-router-dom';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import Container from 'react-bootstrap/Container';
 import AppTheme from '@/app/layout/AppTheme';
+import AuthNavBar from '@/user/component/auth/AuthNavBar';
+import { BoxArrowInRight } from 'react-bootstrap-icons';
 
 import { ROUTE_HOME, ROUTE_LOGIN, ROUTE_USER, ROUTE_FEATURES, ROUTE_PRICING } from '@/app/Router';
 import { useAuthState, signOut } from '@/user/store/AuthState';
@@ -25,12 +28,11 @@ const AppHeader = () => {
           <Nav className="align-items-center">
             <AppTheme />
             {authState.isAuthenticated.get() ? (
-              <>
-                <Nav.Link as={Link} to={ROUTE_USER}>{authState.user.get()?.fullName}</Nav.Link>
-                <Nav.Link onClick={signOut}>Logout</Nav.Link>
-              </>
+              <AuthNavBar />
             ) : (
-              <Nav.Link as={Link} to={ROUTE_LOGIN}>Login</Nav.Link>
+              <Nav.Link as={Link} to={ROUTE_LOGIN} title="Login">
+                <BoxArrowInRight size={22} />
+              </Nav.Link>
             )}
           </Nav>
         </Navbar.Collapse>

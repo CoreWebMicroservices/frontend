@@ -31,7 +31,7 @@ class CoreMsApi {
         method,
         url,
         data,
-        headers: headers ?? this.getDefaultHeaders(),
+        headers: { ...this.getDefaultHeaders(), ...(headers ?? {}) },
       });
 
       response.result = true;
@@ -60,7 +60,7 @@ class CoreMsApi {
     };
 
     const accessToken = localStorage.getItem(ACCESS_TOKEN_KEY);
-    if (this.config.useAccessToken && accessToken) {
+    if (accessToken) {
       headers["Authorization"] = `Bearer ${accessToken}`;
     }
 

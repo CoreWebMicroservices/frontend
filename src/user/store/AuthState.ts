@@ -89,7 +89,18 @@ export async function signUpUser(
   return res;
 }
 
-export function signOut() {
+export async function signOut() {
+  const res = await userMsApi.apiRequest<ApiSuccessfulResponse>(
+    HttpMethod.POST,
+    "/api/auth/signout",
+    null,
+    { Authorization: `Bearer ${authState.refreshToken.get()}` }
+  );
+
+  if (res.result === false) {
+    console.error("Sign out failed", res.errors);
+  }
+
   authState.merge({
     isAuthenticated: false,
     accessToken: undefined,
@@ -131,7 +142,8 @@ const setRefreshToken = (refreshToken: string | null) => {
     user: {
       id: tokenInfo.sub,
       email: tokenInfo.email,
-      fullName: tokenInfo.user_name,
+      firstName: tokenInfo.first_name,
+      lastName: tokenInfo.last_name,
       roles: tokenInfo.roles,
     } as User,
   });

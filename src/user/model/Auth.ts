@@ -22,8 +22,10 @@ export interface AccessTokenResponse {
 
 export interface Token {
   sub: string; // User ID here
-  user_name: string;
   email: string;
+  user_uuid: string;
+  first_name: string;
+  last_name: string;
   roles: string[];
   exp: number;
   iat: number;

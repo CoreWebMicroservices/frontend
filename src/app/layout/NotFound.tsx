@@ -17,7 +17,7 @@ const NotFound = () => {
             </h2>
             <h3 className="h2 mb-4">Oops! You're lost.</h3>
             <Link to={ROUTE_HOME}>
-              <Button size="lg" type="submit" className="rounded-1 fs-6 p-3">Back To Home</Button>
+              <Button size="lg" type="submit" className="fs-6 p-3">Back To Home</Button>
             </Link>
           </Col>
         </Row>
