@@ -14,4 +14,11 @@ export default defineConfig({
     alias: [{ find: "@", replacement: "/src" }],
   },
   plugins: [react()],
+  css: {
+    preprocessorOptions: {
+      scss: {
+        quietDeps: true,
+      },
+    },
+  },
 });

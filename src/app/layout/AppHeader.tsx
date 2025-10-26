@@ -8,15 +8,15 @@ import AppTheme from '@/app/layout/AppTheme';
 import AuthNavBar from '@/user/component/auth/AuthNavBar';
 import { BoxArrowInRight } from 'react-bootstrap-icons';
 
-import { ROUTE_HOME, ROUTE_LOGIN, ROUTE_USER, ROUTE_FEATURES, ROUTE_PRICING } from '@/app/Router';
-import { useAuthState, signOut } from '@/user/store/AuthState';
+import { ROUTE_HOME, ROUTE_LOGIN, ROUTE_FEATURES, ROUTE_PRICING } from '@/app/Router';
+import { useAuthState } from '@/user/store/AuthState';
 
 
 const AppHeader = () => {
   const authState = useAuthState();
 
   return (
-    <Navbar expand="lg" className="bg-body-tertiary mb-4">
+    <Navbar expand="lg" className="mb-4">
       <Container fluid>
         <Navbar.Brand as={Link} to={ROUTE_HOME}>CoreMs</Navbar.Brand>
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />

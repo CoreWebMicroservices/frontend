@@ -1,12 +1,9 @@
-import NavDropdown from 'react-bootstrap/NavDropdown';
+// No Button import needed
 import { useEffect, useState } from 'react';
+import { Nav } from 'react-bootstrap';
 import { SunFill, MoonStarsFill } from 'react-bootstrap-icons';
 
 const THEME_KEY = 'theme';
-const THEMES = [
-  { value: 'light', label: 'Light', icon: <SunFill className="me-2" /> },
-  { value: 'dark', label: 'Dark', icon: <MoonStarsFill className="me-2" /> },
-];
 
 export const useTheme = () => {
   const [theme, setTheme] = useState(() => localStorage.getItem(THEME_KEY) || 'light');
@@ -21,24 +18,19 @@ export const useTheme = () => {
 
 const AppTheme = () => {
   const { theme, setTheme } = useTheme();
+  const isLight = theme === 'light';
+  const nextTheme = isLight ? 'dark' : 'light';
+  const Icon = isLight ? MoonStarsFill : SunFill;
 
-  const handleThemeChange = (value: string) => {
-    setTheme(value);
+  const handleToggle = () => {
+    setTheme(nextTheme);
   };
 
-  const current = THEMES.find(t => t.value === theme) || THEMES[2];
   return (
-    <NavDropdown align="end" title={current.icon} id="theme-nav-dropdown">
-      {THEMES.map(t => (
-        <NavDropdown.Item
-          key={t.value}
-          active={theme === t.value}
-          onClick={() => handleThemeChange(t.value)}
-        >
-          {t.icon}{t.label}
-        </NavDropdown.Item>
-      ))}
-    </NavDropdown>
+    <Nav.Link onClick={handleToggle} title="Login">
+      <Icon size={20} />
+    </Nav.Link>
+
   );
 };
 

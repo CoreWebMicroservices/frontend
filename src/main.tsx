@@ -1,7 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 
-import './index.scss';
+import '@/app/style/index.scss';
 import AppRouter from '@/app/Router';
 
 createRoot(document.getElementById('root')!).render(
