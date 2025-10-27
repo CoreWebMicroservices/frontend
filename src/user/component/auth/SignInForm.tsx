@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 
 import { signInUser } from "@/user/store/AuthState";
 import { SignInUserRequest } from "@/user/model/Auth";
-import { ROUTE_HOME } from "@/app/Router";
+import { APP_ROUTES } from "@/app/Router";
 
 
 const signInSchema = yup.object().shape({
@@ -30,7 +30,7 @@ const SignInForm = () => {
   const onSubmit = async (data: SignInUserRequest) => {
     const res = await signInUser(data);
     if (res.result === true) {
-      navigate(ROUTE_HOME);
+      navigate(APP_ROUTES.HOME);
     } else {
       Object.values(res.errors).forEach((error) => {
         setError("root", {

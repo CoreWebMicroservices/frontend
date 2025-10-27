@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { Row, Col, Container, Button } from 'react-bootstrap';
 
 import AppLayout from '@/app/layout/AppLayout';
-import { ROUTE_HOME } from '@/app/Router';
+import { APP_ROUTES } from '@/app/Router';
 
 const NotFound = () => {
   return (
@@ -16,7 +16,7 @@ const NotFound = () => {
               <span className="display-1 fw-bold bsb-flip-h">4</span>
             </h2>
             <h3 className="h2 mb-4">Oops! You're lost.</h3>
-            <Link to={ROUTE_HOME}>
+            <Link to={APP_ROUTES.HOME}>
               <Button size="lg" type="submit" className="fs-6 p-3">Back To Home</Button>
             </Link>
           </Col>

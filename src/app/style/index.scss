@@ -6,6 +6,7 @@ $warning: #ffc107;
 $danger: #dc3545;
 $light: #f8f9fa;
 $dark: #000000;
+$white: #fdfdfd;
 
 $theme-colors: (
   "primary": $primary,
@@ -18,7 +19,7 @@ $theme-colors: (
   "dark": $dark
 );
 
-$body-bg: $light;
+$body-bg: $white;
 $body-color: $primary;
 $navbar-bg: $light;
 $navbar-color: $primary;
@@ -33,13 +34,19 @@ $btn-border-radius-lg: 0.20rem;
 @import 'bootstrap-icons/font/bootstrap-icons.css';
 
 :root {
-
   --primary-dark: #ff6f91;
   --primary-dark-hover: #ff6f91;
   --primary-dark-active: #d72660;
   --primary-dark-rgb: 255, 111, 145;
-  --body-dark: #181a1b;
+  --body-dark: #3d444d;
+  --element-bg-dark: #343a40;
   --body-dark-color: #ff6f91;
+}
+
+[data-bs-theme='light'] {
+  .navbar {
+    background-color: $light;
+  }
 }
 
 [data-bs-theme='dark'] {
@@ -48,7 +55,7 @@ $btn-border-radius-lg: 0.20rem;
   --bs-primary-rgb: var(--primary-dark-rgb);
   --bs-body-bg: var(--body-dark);
   --bs-body-color: var(--body-dark-color);
-  --bs-navbar-bg: var(--body-dark);
+  --bs-navbar-bg: var(--element-bg-dark);
   --bs-navbar-color: var(--primary-dark);
   --bs-dark-rgb: var(--primary-dark-rgb);
   --bs-dropdown-link-active-bg: var(--primary-dark);
@@ -58,8 +65,10 @@ $btn-border-radius-lg: 0.20rem;
   }
 
   .navbar {
-    --bs-navbar-bg: var(--body-dark);
+    --bs-navbar-bg: var(--element-bg-dark);
     --bs-navbar-color: var(--primary-dark);
+    
+    background-color: var(--bs-navbar-bg);
 
     .nav-link.active,.nav-link.show {
       color: var(--primary-dark-active);
