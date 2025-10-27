@@ -1,6 +1,8 @@
 import { RouteObject } from "react-router-dom";
 import AuthForm from "@/user/component/auth/AuthForm";
-import UserForm from "@/user/component/user/UserEditForm";
+import UserProfile from "@/user/component/auth/UserProfile";
+import UserList from "@/user/component/user/UserList";
+import UserEdit from "@/user/component/user/UserEdit";
 import { RouteModule } from "@/common/router/RouterTypes";
 import { authGuards } from "@/common/router/AuthGuards";
 
@@ -10,7 +12,15 @@ console.log("User Router Init");
 export const USER_ROUTE_PATHS = {
   LOGIN: "/login",
   USER_PROFILE: "/user",
+  USERS_LIST: "/users",
+  USER_EDIT: "/users/:userId",
 } as const;
+
+
+const redirectIfNotUserMsAdmin = () => {
+
+  return true;
+};
 
 // User routes configuration
 const userRoutes: RouteObject[] = [
@@ -21,8 +31,18 @@ const userRoutes: RouteObject[] = [
   },
   {
     path: USER_ROUTE_PATHS.USER_PROFILE,
-    element: <UserForm />,
+    element: <UserProfile />,
     loader: authGuards.redirectIfNotAuthenticated,
+  },
+  {
+    path: USER_ROUTE_PATHS.USERS_LIST,
+    element: <UserList />,
+    loader: redirectIfNotUserMsAdmin, // TODO: Add admin role check
+  },
+  {
+    path: USER_ROUTE_PATHS.USER_EDIT,
+    element: <UserEdit />,
+    loader: redirectIfNotUserMsAdmin, // TODO: Add admin role check
   },
 ];
 
@@ -30,9 +50,4 @@ const userRoutes: RouteObject[] = [
 export const userRouteModule: RouteModule = {
   routes: userRoutes,
   routePaths: USER_ROUTE_PATHS,
-};
-
-// Legacy export for backward compatibility
-export const getUserRoutes = (): RouteObject[] => {
-  return userRoutes;
 };

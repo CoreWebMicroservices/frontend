@@ -47,3 +47,25 @@ export async function getUserInfo(): Promise<User | undefined> {
   }
   return undefined;
 }
+
+export async function updateUserInfo(
+  userData: Partial<User>
+): Promise<User | undefined> {
+  userState.isInProgress.set(true);
+  try {
+    const res = await userMsApi.apiRequest<User>(
+      HttpMethod.PUT,
+      "/api/user/me",
+      userData
+    );
+    userState.isInProgress.set(false);
+    if (res.result === true && res.response) {
+      userState.user.set(res.response);
+      return res.response;
+    }
+  } catch (error) {
+    userState.isInProgress.set(false);
+    console.error("Failed to update user info", error);
+  }
+  return undefined;
+}

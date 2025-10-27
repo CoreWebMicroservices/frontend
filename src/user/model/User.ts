@@ -1,9 +1,5 @@
-export enum UserRole {
-  Admin = "ADMIN",
-  User = "USER",
-}
-
 export enum AuthProvider {
+  email = "email",
   google = "google",
   github = "github",
   linkedin = "linkedin",
@@ -15,5 +11,5 @@ export interface User {
   firstName: string;
   lastName: string;
   imageUrl?: string;
-  roles: UserRole[];
+  roles: string[];
 }

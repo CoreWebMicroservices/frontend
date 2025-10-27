@@ -1,11 +1,12 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useUserState, getUserInfo } from '@/user/store/UserState';
+import { useUserState, getUserInfo, updateUserInfo } from '@/user/store/UserState';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Container from 'react-bootstrap/Container';
-import { get } from 'node_modules/axios/index.d.cts';
 import Spinner from 'react-bootstrap/Spinner';
+import Alert from 'react-bootstrap/Alert';
+import UserNavBar from '@/user/component/user/UserNavBar';
 
 interface UserFormValues {
   firstName: string;
@@ -13,17 +14,36 @@ interface UserFormValues {
   email: string;
 }
 
-const UserForm = () => {
+const UserProfile = () => {
   const userState = useUserState();
   const user = userState.user.get();
+  const [updateSuccess, setUpdateSuccess] = useState(false);
+  const [updateError, setUpdateError] = useState<string | null>(null);
   const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<UserFormValues>();
 
-
   const onSubmit = async (data: UserFormValues) => {
-    // TODO: Implement update user API call
-    alert('User update not implemented yet!');
-  };
+    setUpdateError(null);
+    setUpdateSuccess(false);
 
+    try {
+      const updatedUser = await updateUserInfo(data);
+      if (updatedUser) {
+        // Refresh tokens to update user data in JWT
+        const refreshToken = localStorage.getItem('refreshToken');
+        if (refreshToken) {
+          // Force token refresh to get updated user data
+          window.location.reload(); // Simple approach to refresh all auth state
+        }
+        setUpdateSuccess(true);
+        setTimeout(() => setUpdateSuccess(false), 5000);
+      } else {
+        setUpdateError('Failed to update user information');
+      }
+    } catch (error) {
+      setUpdateError('An error occurred while updating your profile');
+      console.error('Update error:', error);
+    }
+  };
 
   useEffect(() => {
     getUserInfo().then(user => {
@@ -35,7 +55,7 @@ const UserForm = () => {
         });
       }
     });
-  }, []);
+  }, [reset]);
 
   if (!user) {
     return (
@@ -49,6 +69,20 @@ const UserForm = () => {
 
   return (
     <Container style={{ maxWidth: 480 }}>
+      <UserNavBar />
+
+      {updateSuccess && (
+        <Alert variant="success" className="mb-3">
+          <strong>Success!</strong> Your profile has been updated successfully.
+        </Alert>
+      )}
+
+      {updateError && (
+        <Alert variant="danger" className="mb-3">
+          <strong>Error:</strong> {updateError}
+        </Alert>
+      )}
+
       {user.imageUrl ? (
         <div className="mb-3 text-center">
           <img
@@ -127,4 +161,4 @@ const UserForm = () => {
   );
 };
 
-export default UserForm;
+export default UserProfile;

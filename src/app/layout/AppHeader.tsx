@@ -10,6 +10,7 @@ import { useAuthState } from '@/user/store/AuthState';
 
 import { USER_ROUTE_PATHS } from '@/user/UserRouter';
 import { APP_ROUTES } from '@/app/Router';
+import UserNavBar from '@/user/component/user/UserNavBar';
 
 
 const AppHeader = () => {
@@ -24,6 +25,7 @@ const AppHeader = () => {
           <Nav className="me-auto">
             <Nav.Link as={Link} to={APP_ROUTES.FEATURES}>Features</Nav.Link>
             <Nav.Link as={Link} to={APP_ROUTES.PRICING}>Pricing</Nav.Link>
+            <UserNavBar />
           </Nav>
           <Nav className="align-items-center">
             <AppTheme />
