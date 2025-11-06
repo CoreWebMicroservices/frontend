@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { Container, Row, Col, Card, Button, Table, Spinner, Badge } from 'react-bootstrap';
 import { PencilSquare, PersonFill } from 'react-bootstrap-icons';
 import { User } from '@/user/model/User';
-import UserNavBar from '@/user/component/user/UserNavBar';
 import { AppRoles } from '@/common/AppRoles';
 
 // Mock data for now - replace with actual API call

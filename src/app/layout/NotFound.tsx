@@ -21,7 +21,6 @@ const NotFound = () => {
             </Link>
           </Col>
         </Row>
-
       </Container>
     </AppLayout>
   );

@@ -7,6 +7,8 @@ import { useForm } from 'react-hook-form';
 import { signInUser } from "@/user/store/AuthState";
 import { SignInUserRequest } from "@/user/model/Auth";
 import { APP_ROUTES } from "@/app/Router";
+import { useMessageState } from '@/common/utils/api/ApiResponseHandler';
+import { AlertMessage } from '@/common/utils/api/ApiResponseAlertComponent';
 
 
 const signInSchema = yup.object().shape({
@@ -17,10 +19,10 @@ const signInSchema = yup.object().shape({
 
 const SignInForm = () => {
   const navigate = useNavigate();
+  const { success, initialErrorMessage, errors: apiErrors, handleResponse } = useMessageState();
   const {
     register,
     handleSubmit,
-    setError,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: yupResolver(signInSchema),
@@ -29,15 +31,14 @@ const SignInForm = () => {
 
   const onSubmit = async (data: SignInUserRequest) => {
     const res = await signInUser(data);
+    handleResponse(
+      res,
+      "Successfully signed in!",
+      "Failed to sign in. Please check your credentials."
+    );
+
     if (res.result === true) {
       navigate(APP_ROUTES.HOME);
-    } else {
-      Object.values(res.errors).forEach((error) => {
-        setError("root", {
-          type: 'server',
-          message: error.description,
-        });
-      });
     }
   };
 
@@ -77,12 +78,12 @@ const SignInForm = () => {
           {...register('password')}
         />
         <Form.Control.Feedback type="invalid">
-          {errors.email?.message}
+          {errors.password?.message}
         </Form.Control.Feedback>
       </FloatingLabel>
-      <div className="d-grid mb-3">
-        <span className="error text-danger px-2">{errors.root?.message}</span>
-      </div>
+
+      <AlertMessage success={success} initialErrorMessage={initialErrorMessage} errors={apiErrors} />
+
       <Row className="justify-content-cenmt mb-3">
         <Col xs={{ span: 6, offset: 6 }} className="text-end">
           <Link to={'forgot_password'} className="link-secondary text-decoration-none">Forgot password?</Link>

@@ -1,6 +1,6 @@
 import { RouteObject } from "react-router-dom";
 import AuthForm from "@/user/component/auth/AuthForm";
-import UserProfile from "@/user/component/auth/UserProfile";
+import UserProfile from "@/user/component/profile/UserProfile";
 import UserList from "@/user/component/user/UserList";
 import UserEdit from "@/user/component/user/UserEdit";
 import { RouteModule } from "@/common/router/RouterTypes";
@@ -11,7 +11,7 @@ console.log("User Router Init");
 // User module route paths
 export const USER_ROUTE_PATHS = {
   LOGIN: "/login",
-  USER_PROFILE: "/user",
+  USER_PROFILE: "/profile",
   USERS_LIST: "/users",
   USER_EDIT: "/users/:userId",
 } as const;

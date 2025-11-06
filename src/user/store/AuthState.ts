@@ -3,7 +3,7 @@ import { devtools } from "@hookstate/devtools";
 import { jwtDecode } from "jwt-decode";
 
 import { USER_API_BASE_URL } from "@/user/config";
-import CoreMsApi from "@/common/utils/CoreMsApi";
+import CoreMsApi from "@/common/utils/api/CoreMsApi";
 import {
   ACCESS_TOKEN_KEY,
   ApiSuccessfulResponse,
@@ -67,8 +67,8 @@ export async function signInUser(
       parsedRefreshToken,
     });
 
-    localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
-    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+    setRefreshToken(refreshToken);
+    setAccessToken(accessToken);
   }
 
   return signInReponse;
@@ -111,6 +111,7 @@ export async function signOut() {
 
   localStorage.removeItem(ACCESS_TOKEN_KEY);
   localStorage.removeItem(REFRESH_TOKEN_KEY);
+  window.location.href = "/";
 }
 
 const setRefreshToken = (refreshToken: string | null) => {
@@ -175,6 +176,8 @@ const setAccessToken = async (
       signOut();
       return false;
     }
+  } else {
+    localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
   }
 
   const parsedAccessToken = jwtDecode<Token>(accessToken as string);

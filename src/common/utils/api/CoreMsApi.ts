@@ -8,10 +8,8 @@ import axios, { AxiosError } from "axios";
 
 class CoreMsApi {
   private axios;
-  private config: CoreMsApiConfig;
 
   public constructor(config: CoreMsApiConfig) {
-    this.config = config;
     this.axios = axios.create({ baseURL: config.baseURL });
   }
 

@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form';
 import { Container, Row, Col, Card, Button, Form, Spinner, Alert, Badge } from 'react-bootstrap';
 import { ArrowLeft, PersonFill, Save } from 'react-bootstrap-icons';
 import { User } from '@/user/model/User';
-import UserNavBar from '@/user/component/user/UserNavBar';
 import { AppRoles } from '@/common/AppRoles';
 
 interface UserFormValues {

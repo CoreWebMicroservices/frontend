@@ -5,7 +5,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 
 import { SignUpUserRequest } from "@/user/model/Auth";
 import { signUpUser } from "@/user/store/AuthState";
-import { AuthErrorReasonCode } from '@/common/model/CoreMsApiModel';
+import { useMessageState } from '@/common/utils/api/ApiResponseHandler';
+import { AlertMessage } from '@/common/utils/api/ApiResponseAlertComponent';
 
 const signUpUserSchema = yup.object().shape({
   email: yup.string().email('Invalid email address').required('Email is required'),
@@ -21,10 +22,10 @@ interface SignUpFormProps {
 }
 
 const SignUpForm: React.FC<SignUpFormProps> = ({ onSignedUp }) => {
+  const { success, initialErrorMessage, errors: apiErrors, handleResponse } = useMessageState();
   const {
     register,
     handleSubmit,
-    setError,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: yupResolver(signUpUserSchema),
@@ -32,36 +33,21 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSignedUp }) => {
 
   const onSubmit = async (data: SignUpUserRequest) => {
     const res = await signUpUser(data);
-    console.log(res);
+    handleResponse(
+      res,
+      "Account created successfully! Please check your email to verify your account.",
+      "Failed to create account. Please check the information and try again."
+    );
+
     if (res.result === true) {
       onSignedUp();
-    } else {
-      Object.values(res.errors).forEach((error) => {
-        switch (error.reasonCode) {
-          case AuthErrorReasonCode.PROVIDED_VALUE_INVALID:
-            if (error.details!.indexOf("password ") !== -1) {
-              setError("password", { message: error.details });
-              break;
-            } else if (error.details!.indexOf("confirmPassword ") !== -1) {
-              setError("confirmPassword", { message: error.details });
-              break
-            } else {
-              setError("root", {
-                message: error.description,
-              });
-            }
-            break;
-          default:
-            setError("root", {
-              message: error.description,
-            });
-        }
-      });
     }
   };
 
   return (
     <Form noValidate onSubmit={handleSubmit(onSubmit)} className="needs-validation">
+      <AlertMessage success={success} initialErrorMessage={initialErrorMessage} errors={apiErrors} />
+
       <FloatingLabel
         controlId="floatingEmail"
         label="Email"
@@ -129,7 +115,6 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSignedUp }) => {
           {...register('password')}
         />
       </FloatingLabel>
-      <span className="error text-danger px-2">{errors.password?.message}</span>
       <FloatingLabel
         controlId="floatingConfirmPassword"
         label="Confirm Password"
@@ -145,10 +130,6 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSignedUp }) => {
           {...register('confirmPassword')}
         />
       </FloatingLabel>
-      <span className="error text-danger px-2">{errors.confirmPassword?.message}</span>
-      <div className="d-grid mb-3">
-        <span className="error text-danger px-2">{errors.root?.message}</span>
-      </div>
       <div className="d-grid mb-3">
         <Button size="lg" type="submit" disabled={isSubmitting} className="fs-6 py-2">
           Register new account
