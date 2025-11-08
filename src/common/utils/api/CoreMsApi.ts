@@ -6,8 +6,24 @@ import {
 } from "@/common/model/CoreMsApiModel";
 import axios, { AxiosError } from "axios";
 
+// Request key generator for deduplication
+const generateRequestKey = (
+  method: HttpMethod,
+  url: string,
+  data?: unknown,
+  headers?: Record<string, string>
+): string => {
+  const dataString = data ? JSON.stringify(data) : "";
+  const headersString = headers ? JSON.stringify(headers) : "";
+  return `${method}:${url}:${dataString}:${headersString}`;
+};
+
 class CoreMsApi {
   private axios;
+  private pendingRequests = new Map<
+    string,
+    Promise<CoreMsApiResonse<unknown>>
+  >();
 
   public constructor(config: CoreMsApiConfig) {
     this.axios = axios.create({ baseURL: config.baseURL });
@@ -19,17 +35,54 @@ class CoreMsApi {
     data?: unknown,
     headers?: Record<string, string>
   ): Promise<CoreMsApiResonse<T>> {
+    const requestHeaders = { ...this.getDefaultHeaders(), ...(headers ?? {}) };
+    const requestKey = generateRequestKey(method, url, data, requestHeaders);
+
+    // Check if identical request is already in progress
+    if (this.pendingRequests.has(requestKey)) {
+      console.warn(`🔄 Deduplicating request: ${method} ${url}`);
+      return this.pendingRequests.get(requestKey) as Promise<
+        CoreMsApiResonse<T>
+      >;
+    }
+
+    // Create the request promise
+    const requestPromise = this.executeRequest<T>(
+      method,
+      url,
+      data,
+      requestHeaders
+    );
+
+    // Store the promise in pending requests
+    this.pendingRequests.set(requestKey, requestPromise);
+
+    // Remove from pending requests when completed (success or error)
+    requestPromise.finally(() => {
+      this.pendingRequests.delete(requestKey);
+    });
+
+    return requestPromise;
+  }
+
+  private async executeRequest<T>(
+    method: HttpMethod,
+    url: string,
+    data?: unknown,
+    headers?: Record<string, string>
+  ): Promise<CoreMsApiResonse<T>> {
     const response: CoreMsApiResonse<T> = {
       result: false,
       response: null as T,
       errors: [],
     };
+
     try {
       const res = await this.axios.request<T>({
         method,
         url,
         data,
-        headers: { ...this.getDefaultHeaders(), ...(headers ?? {}) },
+        headers,
       });
 
       response.result = true;
@@ -63,6 +116,29 @@ class CoreMsApi {
     }
 
     return headers;
+  }
+
+  // Method to clear all pending requests (useful for component unmount or navigation)
+  public clearPendingRequests(): void {
+    console.log(`🧹 Clearing ${this.pendingRequests.size} pending requests`);
+    this.pendingRequests.clear();
+  }
+
+  // Method to get pending requests count (useful for debugging)
+  public getPendingRequestsCount(): number {
+    return this.pendingRequests.size;
+  }
+
+  // Method to check if specific request is pending
+  public isRequestPending(
+    method: HttpMethod,
+    url: string,
+    data?: unknown,
+    headers?: Record<string, string>
+  ): boolean {
+    const requestHeaders = { ...this.getDefaultHeaders(), ...(headers ?? {}) };
+    const requestKey = generateRequestKey(method, url, data, requestHeaders);
+    return this.pendingRequests.has(requestKey);
   }
 }
 

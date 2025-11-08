@@ -1,15 +1,41 @@
 export enum AuthProvider {
-  email = "email",
+  local = "local",
   google = "google",
   github = "github",
   linkedin = "linkedin",
 }
 
+// Unified User interface - supports both frontend state and backend API contract
 export interface User {
-  id: string;
-  email: string;
+  userId: string;
+  provider: string;
   firstName: string;
   lastName: string;
+  email: string;
   imageUrl?: string;
-  roles: string[];
+  roles?: string[];
+  createdAt?: string;
+  updatedAt?: string;
+  lastLoginAt?: string;
+}
+
+export interface CreateUserRequest {
+  firstName: string;
+  lastName: string;
+  email: string;
+  imageUrl?: string;
+}
+
+export interface ProfileChangePasswordRequest {
+  newPassword: string;
+  confirmPassword: string;
+}
+
+export interface AdminChangePasswordRequest {
+  newPassword: string;
+  confirmPassword: string;
+}
+
+export interface ChangeEmailRequest {
+  newEmail: string;
 }

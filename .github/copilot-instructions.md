@@ -38,6 +38,45 @@ frontend/
 
 ---
 
+## 🏗️ Backend Architecture (Java Microservices)
+
+The backend is built using **Java Spring Boot** microservices architecture located at: https://github.com/dmitry3325/core-microservices
+
+### Microservice Structure:
+
+Each service follows the pattern:
+
+- **`service-name-api`**: API definitions and OpenAPI/Swagger specifications (in `resources/`)
+- **`service-name-service`**: Main service implementation with controllers, business logic, and data access
+
+### Available Microservices:
+
+- **user-ms**: User Management Service
+
+  - **user-api**: API specifications for authentication and user management endpoints
+  - **user-service**: Implementation of user authentication, profiles, roles, password management
+  - API Endpoints: `/api/auth/*` and `/api/user/*`
+
+- **communication-ms**: Communication Service
+  - **communication-api**: API specifications for messaging and notification endpoints
+  - **communication-service**: Implementation of email, SMS, push notifications, simple chat
+  - API Endpoints: `/api/communication/*`
+
+### API Documentation:
+
+- **API Specifications**: Located in each `-api` module's `resources/` folder
+- **OpenAPI/Swagger**: Use these specs to understand available endpoints, request/response models
+- **Authentication**: All services use JWT tokens for authentication
+- **Database**: PostgreSQL with environment-based configuration
+
+### Frontend Integration:
+
+- Reference the API specifications in `resources/` folders for endpoint definitions
+- Use the established patterns in `CoreMsApi.ts` for API calls
+- Follow the `ApiResponseHandler` pattern for consistent error handling
+
+---
+
 ## 🧩 Coding Guidelines
 
 ### 1. General

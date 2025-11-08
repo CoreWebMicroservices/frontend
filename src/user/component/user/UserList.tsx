@@ -1,162 +1,148 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Container, Row, Col, Card, Button, Table, Spinner, Badge } from 'react-bootstrap';
-import { PencilSquare, PersonFill } from 'react-bootstrap-icons';
-import { User } from '@/user/model/User';
-import { AppRoles } from '@/common/AppRoles';
+import { Button } from 'react-bootstrap';
+import { PencilSquare, Plus } from 'react-bootstrap-icons';
+import { useUserState, getAllUsers, setSearch, setPage, setPageSize, setFilter } from '@/user/store/UserState';
+import { useMessageState } from '@/common/utils/api/ApiResponseHandler';
+import { AlertMessage } from '@/common/utils/api/ApiResponseAlertComponent';
+import { DataTable } from '@/common/component/dataTable';
+import type { DataTableColumn, DataTableFilter } from '@/common/component/dataTable';
+import type { User } from '@/user/model/User';
 
-// Mock data for now - replace with actual API call
-const mockUsers: User[] = [
-  {
-    id: '1',
-    email: 'john.doe@example.com',
-    firstName: 'John',
-    lastName: 'Doe',
-    roles: [AppRoles.UserMsUser],
-  },
-  {
-    id: '2',
-    email: 'jane.admin@example.com',
-    firstName: 'Jane',
-    lastName: 'Admin',
-    roles: [AppRoles.UserMsUser],
-  },
-  {
-    id: '3',
-    email: 'bob.smith@example.com',
-    firstName: 'Bob',
-    lastName: 'Smith',
-    roles: [AppRoles.UserMsUser],
-  },
-];
-
-const UserList = () => {
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Simulate API call
-    setTimeout(() => {
-      setUsers(mockUsers);
-      setLoading(false);
-    }, 1000);
-  }, []);
-
-  const getRoleBadgeVariant = (roles: AppRoles[]) => {
-    return roles.includes(AppRoles.UserMsUser) ? 'danger' : 'primary';
-  };
-
-  const getRoleText = (roles: AppRoles[]) => {
-    return roles.includes(AppRoles.UserMsUser) ? 'Admin' : 'User';
-  };
-
-  if (loading) {
+const UserAvatar = ({ user }: { user: { imageUrl?: string; firstName: string; lastName: string } }) => {
+  if (user.imageUrl) {
     return (
-      <Container>
-        <div className="d-flex justify-content-center align-items-center" style={{ minHeight: 400 }}>
-          <Spinner animation="border" role="status" variant="primary">
-            <span className="visually-hidden">Loading...</span>
-          </Spinner>
-        </div>
-      </Container>
+      <img
+        src={user.imageUrl}
+        alt="Avatar"
+        className="rounded-circle me-3"
+        style={{ width: 32, height: 32, objectFit: 'cover' }}
+      />
     );
   }
 
   return (
-    <Container>
-      <Row className="mb-4">
-        <Col>
-          <h2 className="mb-3">
-            <PersonFill className="me-2" />
-            User Management
-          </h2>
-          <p className="text-muted">Manage and edit user accounts</p>
-        </Col>
-      </Row>
+    <div
+      className="rounded-circle me-3 d-flex align-items-center justify-content-center"
+      style={{
+        width: 32,
+        height: 32,
+        backgroundColor: '#e9ecef',
+        fontSize: 12,
+        fontWeight: 'bold',
+        color: '#6c757d',
+      }}
+    >
+      {user.firstName.charAt(0)}{user.lastName.charAt(0)}
+    </div>
+  );
+};
 
-      <Row>
-        <Col>
-          <Card>
-            <Card.Header>
-              <h5 className="mb-0">All Users ({users.length})</h5>
-            </Card.Header>
-            <Card.Body className="p-0">
-              <Table responsive striped hover className="mb-0">
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users.map((user) => (
-                    <tr key={user.id}>
-                      <td>
-                        <div className="d-flex align-items-center">
-                          {user.imageUrl ? (
-                            <img
-                              src={user.imageUrl}
-                              alt="Avatar"
-                              style={{
-                                width: 32,
-                                height: 32,
-                                borderRadius: '50%',
-                                objectFit: 'cover',
-                                marginRight: 12,
-                              }}
-                            />
-                          ) : (
-                            <div
-                              style={{
-                                width: 32,
-                                height: 32,
-                                borderRadius: '50%',
-                                backgroundColor: '#e9ecef',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                marginRight: 12,
-                                fontSize: 12,
-                                fontWeight: 'bold',
-                                color: '#6c757d',
-                              }}
-                            >
-                              {user.firstName.charAt(0)}{user.lastName.charAt(0)}
-                            </div>
-                          )}
-                          <span className="fw-medium">
-                            {user.firstName} {user.lastName}
-                          </span>
-                        </div>
-                      </td>
-                      <td>{user.email}</td>
-                      <td>
-                        <Badge bg={getRoleBadgeVariant(user.roles as AppRoles[])}>
-                          {getRoleText(user.roles as AppRoles[])}
-                        </Badge>
-                      </td>
-                      <td>
-                        <Link to={`/users/${user.id}`}>
-                          <Button
-                            variant="outline-primary"
-                            size="sm"
-                          >
-                            <PencilSquare className="me-1" />
-                            Edit
-                          </Button>
-                        </Link>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-    </Container>
+const UserList = () => {
+  const userState = useUserState();
+  const users = userState.users.get();
+  const isLoading = userState.isInProgress.get();
+  const queryParams = userState.queryParams.get();
+  const pagedResponse = userState.pagedResponse.get();
+
+  const { initialErrorMessage, errors, handleResponse } = useMessageState();
+
+  // Configuration for DataTable
+  const columns: DataTableColumn[] = [
+    { key: 'name', title: 'Name' },
+    { key: 'email', title: 'Email' },
+    { key: 'provider', title: 'Provider' },
+    { key: 'lastLogin', title: 'Last Login' },
+    { key: 'actions', title: 'Actions' }
+  ];
+
+  const filters: DataTableFilter[] = [
+    {
+      key: 'provider',
+      label: 'Provider',
+      type: 'select',
+      placeholder: 'All Providers',
+      options: [
+        { value: 'google', label: 'Google' },
+        { value: 'github', label: 'GitHub' },
+        { value: 'local', label: 'Local' }
+      ]
+    }
+  ];
+
+
+  // Render row function for DataTable
+  const renderUserRow = (user: User) => (
+    <tr key={user.userId}>
+      <td>
+        <div className="d-flex align-items-center">
+          <UserAvatar user={user} />
+          <span className="fw-medium">
+            {user.firstName} {user.lastName}
+          </span>
+        </div>
+      </td>
+      <td>{user.email}</td>
+      <td>{user.provider}</td>
+      <td>{user.lastLoginAt}</td>
+      <td>
+        <Link to={`/users/${user.userId}`}>
+          <Button variant="outline-primary" size="sm">
+            <PencilSquare className="me-1" />
+            Edit
+          </Button>
+        </Link>
+      </td>
+    </tr>
+  );
+
+  // Actions component
+  const actions = (
+    <Button variant="secondary">
+      <Plus className="me-2" />
+      Add New User
+    </Button>
+  );
+
+  useEffect(() => {
+    getAllUsers();
+  }, []);
+
+  return (
+    <>
+      <AlertMessage initialErrorMessage={initialErrorMessage} errors={errors} />
+
+      <DataTable
+        // Data
+        items={users as User[]}
+        pagination={pagedResponse ? {
+          page: pagedResponse.page,
+          pageSize: pagedResponse.pageSize,
+          totalElements: pagedResponse.totalElements,
+          totalPages: pagedResponse.totalPages
+        } : undefined}
+        isLoading={isLoading}
+
+        // Configuration
+        columns={columns}
+        filters={filters}
+        filterValues={queryParams.filters || {}}
+        searchPlaceholder="Search users by name or email..."
+
+        // Callbacks
+        onSearch={setSearch}
+        onFilter={setFilter}
+        onPageChange={setPage}
+        onPageSizeChange={setPageSize}
+
+        // Render function
+        renderRow={renderUserRow}
+
+        // Customization
+        title="All Users"
+        actions={actions}
+      />
+    </>
   );
 };
 

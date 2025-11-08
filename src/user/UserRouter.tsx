@@ -5,6 +5,7 @@ import UserList from "@/user/component/user/UserList";
 import UserEdit from "@/user/component/user/UserEdit";
 import { RouteModule } from "@/common/router/RouterTypes";
 import { authGuards } from "@/common/router/AuthGuards";
+import { AppRoles } from "@/common/AppRoles";
 
 console.log("User Router Init");
 
@@ -16,11 +17,6 @@ export const USER_ROUTE_PATHS = {
   USER_EDIT: "/users/:userId",
 } as const;
 
-
-const redirectIfNotUserMsAdmin = () => {
-
-  return true;
-};
 
 // User routes configuration
 const userRoutes: RouteObject[] = [
@@ -37,12 +33,12 @@ const userRoutes: RouteObject[] = [
   {
     path: USER_ROUTE_PATHS.USERS_LIST,
     element: <UserList />,
-    loader: redirectIfNotUserMsAdmin, // TODO: Add admin role check
+    loader: authGuards.redirectIfNotAdmin([AppRoles.SuperAdmin, AppRoles.UserMsAdmin]),
   },
   {
     path: USER_ROUTE_PATHS.USER_EDIT,
     element: <UserEdit />,
-    loader: redirectIfNotUserMsAdmin, // TODO: Add admin role check
+    loader: authGuards.redirectIfNotAdmin([AppRoles.SuperAdmin, AppRoles.UserMsAdmin]),
   },
 ];
 

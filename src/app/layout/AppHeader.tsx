@@ -24,7 +24,6 @@ const AppHeader = () => {
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto">
             <Nav.Link as={Link} to={APP_ROUTES.FEATURES}>Features</Nav.Link>
-            <Nav.Link as={Link} to={APP_ROUTES.PRICING}>Pricing</Nav.Link>
             <UserNavBar />
           </Nav>
           <Nav className="align-items-center">

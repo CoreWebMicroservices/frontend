@@ -8,7 +8,7 @@ const UserNavBar = () => {
   const location = useLocation();
   const user = authState.user.get();
 
-  if (!authState.isAuthenticated.get() || (!user?.roles.includes(AppRoles.SuperAdmin) && !user?.roles.includes(AppRoles.UserMsAdmin))) {
+  if (!authState.isAuthenticated.get() || (!user?.roles?.includes(AppRoles.SuperAdmin) && !user?.roles?.includes(AppRoles.UserMsAdmin))) {
     return null;
   }
 

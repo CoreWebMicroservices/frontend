@@ -1,5 +1,6 @@
 import { redirect } from "react-router-dom";
 import { AuthGuards } from "./RouterTypes";
+import { AppRoles } from "@/common/AppRoles";
 
 export const ROUTE_HOME = "/";
 export const ROUTE_LOGIN = "/login";
@@ -24,9 +25,17 @@ export const createAuthGuards = (): AuthGuards => {
     return true;
   };
 
+  const redirectIfNotAdmin = (requiredRole: AppRoles[]) => {
+    return () => {
+      console.log("Checking admin role:", requiredRole);
+      return true;
+    };
+  };
+
   return {
     redirectIfAuthenticated,
     redirectIfNotAuthenticated,
+    redirectIfNotAdmin,
   };
 };
 

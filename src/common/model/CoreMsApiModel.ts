@@ -30,6 +30,11 @@ export enum HttpMethod {
 export const REFRESH_TOKEN_KEY = "refreshToken";
 export const ACCESS_TOKEN_KEY = "accessToken";
 
-export enum AuthErrorReasonCode {
-  PROVIDED_VALUE_INVALID = "provided.value.invalid",
+/// Pagination response interface
+export interface PageResponse<T> {
+  page: number;
+  pageSize: number;
+  totalElements: number;
+  totalPages: number;
+  items: T[];
 }

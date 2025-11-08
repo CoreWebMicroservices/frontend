@@ -18,7 +18,7 @@ import {
   Token,
   TokenResponse,
 } from "@/user/model/Auth";
-import { User } from "@/user/model/User";
+import { User, AuthProvider } from "@/user/model/User";
 
 const userMsApi = new CoreMsApi({ baseURL: USER_API_BASE_URL });
 
@@ -134,14 +134,17 @@ const setRefreshToken = (refreshToken: string | null) => {
   }
 
   const tokenInfo = authState.parsedRefreshToken.get();
-  if (!tokenInfo) return false;
+  if (!tokenInfo) {
+    return false;
+  }
 
   authState.merge({
     isInProgress: false,
     isAuthenticated: true,
     refreshToken,
     user: {
-      id: tokenInfo.sub,
+      userId: tokenInfo.sub,
+      provider: AuthProvider.local, // TODO fix Default to local since we don't have provider info in token
       email: tokenInfo.email,
       firstName: tokenInfo.first_name,
       lastName: tokenInfo.last_name,
@@ -208,5 +211,5 @@ if (token) {
   setAccessToken(null);
 } else {
   setRefreshToken(localStorage.getItem(REFRESH_TOKEN_KEY));
-  setAccessToken(localStorage.getItem(ACCESS_TOKEN_KEY));
+  setAccessToken(null);
 }

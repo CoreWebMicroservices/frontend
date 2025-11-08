@@ -1,3 +1,4 @@
+import { AppRoles } from "@/common/AppRoles";
 import { RouteObject } from "react-router-dom";
 
 // Base interface for all route modules
@@ -10,6 +11,7 @@ export interface RouteModule {
 export interface AuthGuards {
   redirectIfAuthenticated: () => boolean | Response;
   redirectIfNotAuthenticated: () => boolean | Response;
+  redirectIfNotAdmin: (requiredRoles: AppRoles[]) => () => boolean | Response;
 }
 
 // Route configuration for modules

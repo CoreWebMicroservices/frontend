@@ -23,11 +23,6 @@ const AppRouter = () => {
       element: <div>HOME</div>,
     },
     {
-      path: APP_ROUTES.PRICING,
-      element: <div>Pricing</div>,
-      loader: authGuards.redirectIfNotAuthenticated,
-    },
-    {
       path: APP_ROUTES.FEATURES,
       element: <div>Features</div>,
       loader: authGuards.redirectIfNotAuthenticated,

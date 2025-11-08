@@ -17,8 +17,7 @@ export interface UseMessageStateReturn {
   handleResponse: <T>(
     result: CoreMsApiResonse<T>,
     successMessage: string,
-    errorContext: string,
-    autoCleanSuccess?: boolean
+    errorContext: string
   ) => void;
 }
 
@@ -77,8 +76,7 @@ export function useMessageState(): UseMessageStateReturn {
   const handleResponse = <T>(
     result: CoreMsApiResonse<T>,
     successMessage: string,
-    errorContext: string,
-    autoCleanSuccess: boolean = true
+    errorContext: string
   ) => {
     const messageState = ApiResponseHandler.handleApiResponse(
       result,
@@ -89,10 +87,6 @@ export function useMessageState(): UseMessageStateReturn {
     setInitialErrorMessage(messageState.initialErrorMessage);
     setErrors(messageState.errors);
     setSuccess(messageState.success);
-
-    if (autoCleanSuccess && messageState.success) {
-      ApiResponseHandler.createSuccessTimeout(() => setSuccess(null));
-    }
   };
 
   return {
