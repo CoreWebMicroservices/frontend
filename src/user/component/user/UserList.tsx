@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 import { PencilSquare, Plus } from 'react-bootstrap-icons';
-import { useUserState, getAllUsers, setSearch, setPage, setPageSize, setFilter } from '@/user/store/UserState';
+import { useUserState, getAllUsers, setSearch, setPage, setPageSize, setFilter, setSort } from '@/user/store/UserState';
 import { useMessageState } from '@/common/utils/api/ApiResponseHandler';
 import { AlertMessage } from '@/common/utils/api/ApiResponseAlertComponent';
 import { DataTable } from '@/common/component/dataTable';
@@ -45,16 +45,25 @@ const UserList = () => {
   const queryParams = userState.queryParams.get();
   const pagedResponse = userState.pagedResponse.get();
 
-  const { initialErrorMessage, errors, handleResponse } = useMessageState();
+  const { initialErrorMessage, errors } = useMessageState();
 
   // Configuration for DataTable
   const columns: DataTableColumn[] = [
-    { key: 'name', title: 'Name' },
-    { key: 'email', title: 'Email' },
-    { key: 'provider', title: 'Provider' },
-    { key: 'lastLogin', title: 'Last Login' },
+    { key: 'name', title: 'Name', sortable: true },
+    { key: 'email', title: 'Email', sortable: true },
+    { key: 'provider', title: 'Provider', sortable: true },
+    { key: 'lastLogin', title: 'Last Login', sortable: true },
     { key: 'actions', title: 'Actions' }
   ];
+
+  // Helper function to parse current sort
+  const parseCurrentSort = (sort?: string) => {
+    if (!sort) return undefined;
+    const [field, direction] = sort.split(':');
+    return { field, direction: direction as 'asc' | 'desc' };
+  };
+
+  const currentSort = parseCurrentSort(queryParams.sort);
 
   const filters: DataTableFilter[] = [
     {
@@ -127,6 +136,8 @@ const UserList = () => {
         columns={columns}
         filters={filters}
         filterValues={queryParams.filters || {}}
+        sortableFields={columns.filter(col => col.sortable).map(col => col.key)}
+        currentSort={currentSort}
         searchPlaceholder="Search users by name or email..."
 
         // Callbacks
@@ -134,6 +145,7 @@ const UserList = () => {
         onFilter={setFilter}
         onPageChange={setPage}
         onPageSizeChange={setPageSize}
+        onSort={setSort}
 
         // Render function
         renderRow={renderUserRow}

@@ -38,6 +38,8 @@ export interface DataTableProps<T> {
   columns: DataTableColumn[];
   filters?: DataTableFilter[];
   filterValues?: Record<string, string | number | boolean>;
+  sortableFields?: string[];
+  currentSort?: { field: string; direction: "asc" | "desc" };
   searchPlaceholder?: string;
   pageSizeOptions?: number[];
 
@@ -46,7 +48,7 @@ export interface DataTableProps<T> {
   onFilter?: (key: string, value: string | number | boolean | null) => void;
   onPageChange?: (page: number) => void;
   onPageSizeChange?: (pageSize: number) => void;
-  onSort?: (sort?: string) => void;
+  onSort?: (field: string, direction: "asc" | "desc") => void;
 
   // Render functions
   renderRow: (item: T, index: number) => React.ReactNode;

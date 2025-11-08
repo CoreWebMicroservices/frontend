@@ -15,6 +15,8 @@ export function DataTable<T>({
   columns,
   filters = [],
   filterValues = {},
+  sortableFields = [],
+  currentSort,
   searchPlaceholder = "Search...",
   pageSizeOptions = [10, 20, 50, 100],
 
@@ -46,16 +48,39 @@ export function DataTable<T>({
   const renderTableHeader = () => (
     <thead>
       <tr>
-        {columns.map((column) => (
-          <th
-            key={column.key}
-            style={{ width: column.width }}
-            className={column.sortable ? 'cursor-pointer' : ''}
-            onClick={column.sortable && onSort ? () => onSort(column.key) : undefined}
-          >
-            {column.title}
-          </th>
-        ))}
+        {columns.map((column) => {
+          const isSortable = sortableFields.includes(column.key);
+          const isCurrentSort = currentSort?.field === column.key;
+          const sortDirection = isCurrentSort ? currentSort.direction : null;
+
+          return (
+            <th
+              key={column.key}
+              style={{
+                width: column.width,
+                cursor: isSortable ? 'pointer' : 'default'
+              }}
+              className={`${isSortable ? 'user-select-none' : ''}`}
+              onClick={() => {
+                if (isSortable && onSort) {
+                  const newDirection = isCurrentSort && sortDirection === 'desc' ? 'asc' : 'desc';
+                  onSort(column.key, newDirection);
+                }
+              }}
+            >
+              <div className="d-flex align-items-center">
+                {column.title}
+                {isSortable && (
+                  <span className="ms-1">
+                    {!isCurrentSort && <i className="bi bi-arrow-down-up text-muted"></i>}
+                    {isCurrentSort && sortDirection === 'desc' && <i className="bi bi-arrow-down"></i>}
+                    {isCurrentSort && sortDirection === 'asc' && <i className="bi bi-arrow-up"></i>}
+                  </span>
+                )}
+              </div>
+            </th>
+          );
+        })}
       </tr>
     </thead>
   );

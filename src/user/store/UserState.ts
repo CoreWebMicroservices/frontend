@@ -266,9 +266,11 @@ export function setPageSize(pageSize: number): void {
   getAllUsers();
 }
 
-// Update sort
-export function setSort(sort?: string): void {
-  userState.queryParams.sort.set(sort);
+// Handle column sorting with toggle behavior
+export function setSort(field: string, direction: "asc" | "desc"): void {
+  if (field === "name") field = "lastName";
+  const sortValue = `${field}:${direction}`;
+  userState.queryParams.sort.set(sortValue);
   getAllUsers();
 }
 

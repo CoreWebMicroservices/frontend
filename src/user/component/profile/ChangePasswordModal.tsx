@@ -56,8 +56,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ show, onHide 
     handleResponse(
       result,
       'Your password has been changed successfully.',
-      'Failed to change password.',
-      false // Don't auto-clear success, we'll handle it manually
+      'Failed to change password.'
     );
 
     if (result.result) {
