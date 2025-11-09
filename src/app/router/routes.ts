@@ -11,6 +11,7 @@ export const APP_ROUTES = {
 
   // User module routes
   LOGIN: "/login",
+  FORGOT_PASSWORD: "/forgot-password",
   USER_PROFILE: "/profile",
   USERS_LIST: "/users",
   USER_ADD: "/users/add",

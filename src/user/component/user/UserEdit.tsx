@@ -10,6 +10,7 @@ import { AlertMessage } from '@/common/component/ApiResponseAlert';
 import AdminChangePasswordModal from './AdminChangePasswordModal';
 import { AppRoles } from '@/common/AppRoles';
 import Breadcrumb from '@/common/component/Breadcrumb';
+import { ROUTE_PATHS } from '@/app/router/routes';
 
 
 interface UserFormValues {
@@ -114,7 +115,7 @@ const UserEdit = () => {
       <Container>
         <div className="text-center mt-5">
           <h4>User not found</h4>
-          <Button variant="primary" onClick={() => navigate('/users')}>
+          <Button variant="primary" onClick={() => navigate(ROUTE_PATHS.USERS_LIST)}>
             <ArrowLeft className="me-2" />
             Back to Users
           </Button>
@@ -127,7 +128,7 @@ const UserEdit = () => {
     <Container>
       <Breadcrumb
         items={[
-          { label: 'All Users', href: '/users' },
+          { label: 'All Users', href: ROUTE_PATHS.USERS_LIST },
           { label: 'Edit User', active: true }
         ]}
       />

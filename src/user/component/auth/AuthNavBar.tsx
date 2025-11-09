@@ -8,8 +8,6 @@ const AuthNavBar = () => {
   const authState = useAuthState();
   const user = authState.user.get();
 
-  if (!authState.isAuthenticated.get()) return null;
-
   return (
     <NavDropdown
       align="end"

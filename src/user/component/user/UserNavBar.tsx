@@ -1,22 +1,15 @@
 import { Nav } from 'react-bootstrap';
 import { Link, useLocation } from 'react-router-dom';
-import { useAuthState } from '@/user/store/AuthState';
-import { AppRoles } from '@/common/AppRoles';
+import { ROUTE_PATHS } from '@/app/router/routes';
 
 const UserNavBar = () => {
-  const authState = useAuthState();
   const location = useLocation();
-  const user = authState.user.get();
-
-  if (!authState.isAuthenticated.get() || (!user?.roles?.includes(AppRoles.SuperAdmin) && !user?.roles?.includes(AppRoles.UserMsAdmin))) {
-    return null;
-  }
 
   return (
     <Nav.Link
       as={Link}
-      to="/users"
-      active={location.pathname === '/users'}
+      to={ROUTE_PATHS.USERS_LIST}
+      active={location.pathname === ROUTE_PATHS.USERS_LIST}
     >
       Users
     </Nav.Link>

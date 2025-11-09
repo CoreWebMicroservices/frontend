@@ -1,14 +1,14 @@
 import { redirect } from "react-router-dom";
 import { AuthGuards, AuthGuardsConfig } from "./RouterTypes";
 import { AppRoles } from "@/common/AppRoles";
-import { getCurrentUserAuth, hasAnyRole } from "@/user/store/AuthState";
 
 /**
- * Shared authentication guards that can be used by any route module
+ * Shared authentication guards that can be used to validate roles and
+ * authentication status before allowing access to routes.
  */
 export const createAuthGuards = (config: AuthGuardsConfig): AuthGuards => {
   const redirectIfAuthenticated = () => {
-    const { isAuthenticated } = getCurrentUserAuth();
+    const { isAuthenticated } = config.authFunctions.getCurrentUserAuth();
     if (isAuthenticated) {
       return redirect(config.homeRoute);
     }
@@ -16,7 +16,7 @@ export const createAuthGuards = (config: AuthGuardsConfig): AuthGuards => {
   };
 
   const redirectIfNotAuthenticated = () => {
-    const { isAuthenticated } = getCurrentUserAuth();
+    const { isAuthenticated } = config.authFunctions.getCurrentUserAuth();
     if (!isAuthenticated) {
       return redirect(config.loginRoute);
     }
@@ -26,14 +26,14 @@ export const createAuthGuards = (config: AuthGuardsConfig): AuthGuards => {
   const redirectIfNotInRole = (requiredRoles: AppRoles[]) => {
     return () => {
       // Get current user authentication state
-      const { isAuthenticated } = getCurrentUserAuth();
+      const { isAuthenticated } = config.authFunctions.getCurrentUserAuth();
 
       if (!isAuthenticated) {
         return redirect(config.loginRoute);
       }
 
       // Check if user has at least one of the required roles
-      const hasRequiredRole = hasAnyRole(requiredRoles);
+      const hasRequiredRole = config.authFunctions.hasAnyRole(requiredRoles);
 
       if (!hasRequiredRole) {
         console.log("User does not have required role, redirecting to home");
@@ -44,15 +44,21 @@ export const createAuthGuards = (config: AuthGuardsConfig): AuthGuards => {
     };
   };
 
+  // Utility methods for component visibility control
+  const isAuthenticated = (): boolean => {
+    const { isAuthenticated } = config.authFunctions.getCurrentUserAuth();
+    return isAuthenticated;
+  };
+
+  const hasAnyRole = (requiredRoles: AppRoles[]): boolean => {
+    return config.authFunctions.hasAnyRole(requiredRoles);
+  };
+
   return {
     redirectIfAuthenticated,
     redirectIfNotAuthenticated,
     redirectIfNotInRole,
+    isAuthenticated,
+    hasAnyRole,
   };
 };
-
-// Global auth guards instance with default app routes
-export const authGuards = createAuthGuards({
-  homeRoute: "/",
-  loginRoute: "/login",
-});

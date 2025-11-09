@@ -1,7 +1,8 @@
 import { RouteObject } from "react-router-dom";
-import { authGuards } from "@/common/router/AuthGuards";
+import { createAuthGuards } from "@/common/router/AuthGuards";
 import { AppRoles } from "@/common/AppRoles";
 import { ROUTE_PATHS } from "@/app/router/routes";
+import { getCurrentUserAuth, hasAnyRole } from "@/user/store/AuthState";
 
 // Import components directly from modules (no route configuration)
 import AuthForm from "@/user/component/auth/AuthForm";
@@ -9,6 +10,16 @@ import UserProfile from "@/user/component/profile/UserProfile";
 import UserList from "@/user/component/user/UserList";
 import UserEdit from "@/user/component/user/UserEdit";
 import UserAdd from "@/user/component/user/UserAdd";
+
+// Create auth guards with dependency injection
+const authGuards = createAuthGuards({
+  homeRoute: ROUTE_PATHS.HOME,
+  loginRoute: ROUTE_PATHS.LOGIN,
+  authFunctions: {
+    getCurrentUserAuth,
+    hasAnyRole,
+  },
+});
 
 /**
  * Centralized route configuration for the entire application

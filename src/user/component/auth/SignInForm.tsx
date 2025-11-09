@@ -85,7 +85,7 @@ const SignInForm = () => {
 
       <Row className="justify-content-cenmt mb-3">
         <Col xs={{ span: 6, offset: 6 }} className="text-end">
-          <Link to={'forgot_password'} className="link-secondary text-decoration-none">Forgot password?</Link>
+          <Link to={APP_ROUTES.FORGOT_PASSWORD} className="link-secondary text-decoration-none">Forgot password?</Link>
         </Col>
       </Row>
       <div className="d-grid mb-3">

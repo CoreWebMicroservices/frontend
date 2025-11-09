@@ -8,6 +8,7 @@ import { useMessageState } from '@/common/utils/api/ApiResponseHandler';
 import { AlertMessage } from '@/common/component/ApiResponseAlert';
 import { AppRoles } from '@/common/AppRoles';
 import Breadcrumb from '@/common/component/Breadcrumb';
+import { ROUTE_PATHS } from '@/app/router/routes';
 
 interface UserFormValues {
   firstName: string;
@@ -51,7 +52,7 @@ const UserAdd = () => {
     if (result.result) {
       // Redirect to users list after successful creation
       setTimeout(() => {
-        navigate('/users');
+        navigate(ROUTE_PATHS.USERS_LIST);
       }, 2000);
     }
   };
@@ -82,7 +83,7 @@ const UserAdd = () => {
       {/* Breadcrumb Navigation */}
       <Breadcrumb
         items={[
-          { label: 'All Users', href: '/users' },
+          { label: 'All Users', href: ROUTE_PATHS.USERS_LIST },
           { label: 'Add New User', active: true }
         ]}
       />
@@ -215,7 +216,7 @@ const UserAdd = () => {
               <Button variant="primary" type="submit" disabled={isSubmitting}>
                 {isSubmitting ? 'Creating...' : 'Create User'}
               </Button>
-              <Button variant="outline-secondary" onClick={() => navigate('/users')}>
+              <Button variant="outline-secondary" onClick={() => navigate(ROUTE_PATHS.USERS_LIST)}>
                 Cancel
               </Button>
             </div>
