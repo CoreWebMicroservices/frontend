@@ -1,12 +1,14 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { Container, Row, Col, Card, Button, Form, Spinner, Badge } from 'react-bootstrap';
-import { ArrowLeft, PersonFill, Save } from 'react-bootstrap-icons';
+import { Container, Row, Col, Card, Button, Form, Spinner, ButtonGroup, Dropdown } from 'react-bootstrap';
+import { ArrowLeft, Lock, X, Plus } from 'react-bootstrap-icons';
 import { User, AuthProvider } from '@/user/model/User';
 import { useUserState, getUserById, updateUserInfo } from '@/user/store/UserState';
 import { useMessageState } from '@/common/utils/api/ApiResponseHandler';
 import { AlertMessage } from '@/common/utils/api/ApiResponseAlertComponent';
+import AdminChangePasswordModal from './AdminChangePasswordModal';
+import { AppRoles } from '@/common/AppRoles';
 
 
 interface UserFormValues {
@@ -22,38 +24,30 @@ const UserEdit = () => {
   const userState = useUserState();
   const selectedUser = userState.selectedUser.get();
   const isLoading = userState.isInProgress.get();
-
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
 
   const { register, handleSubmit, reset, watch, setValue, formState: { errors, isSubmitting } } = useForm<UserFormValues>();
   const { success: updateSuccess, initialErrorMessage: updateInitialError, errors: updateErrors, handleResponse } = useMessageState();
 
   const roles = watch('roles') || [];
 
-  const loadUser = useCallback(async (id: string) => {
-    const result = await getUserById(id);
-    handleResponse(
-      result,
-      'User loaded successfully.',
-      'Failed to load user information.'
-    );
-  }, []);
-
   useEffect(() => {
     if (userId) {
-      loadUser(userId);
-    }
-  }, [userId, loadUser]);
+      const loadUser = async () => {
+        const result = await getUserById(userId);
 
-  useEffect(() => {
-    if (selectedUser) {
-      reset({
-        firstName: selectedUser.firstName,
-        lastName: selectedUser.lastName,
-        email: selectedUser.email,
-        roles: selectedUser.roles ? [...selectedUser.roles] : [],
-      });
+        if (result.result && result.response) {
+          reset({
+            firstName: result.response.firstName,
+            lastName: result.response.lastName,
+            email: result.response.email,
+            roles: result.response.roles ? [...result.response.roles] : [],
+          });
+        }
+      };
+      loadUser();
     }
-  }, [selectedUser, reset]);
+  }, [userId, reset]);
 
   const onSubmit = async (data: UserFormValues) => {
     if (!userId) return;
@@ -74,20 +68,31 @@ const UserEdit = () => {
     const result = await updateUserInfo(userId, userData);
     handleResponse(
       result,
-      'User information has been updated successfully.',
-      'Failed to update user information.'
+      'Failed to update user information.',
+      'User information has been updated successfully.'
     );
   };
 
-  const toggleRole = (role: string) => {
+  const addRole = (role: string) => {
     const currentRoles = roles || [];
-    const newRoles = currentRoles.includes(role)
-      ? currentRoles.filter(r => r !== role)
-      : [...currentRoles, role];
+    if (!currentRoles.includes(role)) {
+      const newRoles = [...currentRoles, role];
+      setValue('roles', newRoles);
+    }
+  };
+
+  const removeRole = (role: string) => {
+    const currentRoles = roles || [];
+    const newRoles = currentRoles.filter(r => r !== role);
     setValue('roles', newRoles);
   };
 
-  const availableRoles = ['USER', 'ADMIN', 'MODERATOR'];
+  // Get available roles from AppRoles enum that are not already assigned
+  const getAvailableRoles = () => {
+    const allRoles = Object.values(AppRoles);
+    const currentRoles = roles || [];
+    return allRoles.filter(role => !currentRoles.includes(role));
+  };
 
   const handleBack = () => {
     navigate('/users');
@@ -132,51 +137,67 @@ const UserEdit = () => {
 
       <Row>
         <Col md={8}>
-          <h2 className="mb-4 mt-3 text-center">
-            <PersonFill className="me-2" />
-            Edit User
-          </h2>
+          <h2 className="mb-4 mt-3 text-center">Edit User</h2>
 
-          <AlertMessage success={updateSuccess} initialErrorMessage={updateInitialError} errors={updateErrors} />
+          {/* User Avatar Display (Non-editable) */}
+          {selectedUser.imageUrl ? (
+            <div className="mb-3 text-center">
+              <img
+                src={selectedUser.imageUrl}
+                alt="User avatar"
+                style={{ width: 96, height: 96, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--bs-primary)' }}
+              />
+            </div>
+          ) : (
+            <div className="mb-3 text-center">
+              <div style={{
+                width: 96,
+                height: 96,
+                borderRadius: '50%',
+                background: '#e9ecef',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                border: '2px solid var(--bs-primary)',
+                fontSize: 32,
+                fontWeight: 'bold',
+                color: '#6c757d',
+                margin: '0 auto'
+              }}>
+                {selectedUser.firstName?.charAt(0)}{selectedUser.lastName?.charAt(0)}
+              </div>
+            </div>
+          )}
 
-          {/* User Information Form */}
-          <Form onSubmit={handleSubmit(onSubmit)}>
-            <Row>
-              <Col md={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label>First Name</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter first name"
-                    isInvalid={!!errors.firstName}
-                    {...register('firstName', { required: 'First name is required' })}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.firstName?.message}
-                  </Form.Control.Feedback>
-                </Form.Group>
-              </Col>
-              <Col md={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Last Name</Form.Label>
-                  <Form.Control
-                    type="text"
-                    placeholder="Enter last name"
-                    isInvalid={!!errors.lastName}
-                    {...register('lastName', { required: 'Last name is required' })}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.lastName?.message}
-                  </Form.Control.Feedback>
-                </Form.Group>
-              </Col>
-            </Row>
+          <Form className="mb-3" onSubmit={handleSubmit(onSubmit)}>
+            <Form.Group className="mb-3" controlId="firstName">
+              <Form.Label>First Name</Form.Label>
+              <Form.Control
+                type="text"
+                isInvalid={!!errors.firstName}
+                {...register('firstName', { required: 'First name is required' })}
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors.firstName?.message}
+              </Form.Control.Feedback>
+            </Form.Group>
 
-            <Form.Group className="mb-3">
+            <Form.Group className="mb-3" controlId="lastName">
+              <Form.Label>Last Name</Form.Label>
+              <Form.Control
+                type="text"
+                isInvalid={!!errors.lastName}
+                {...register('lastName', { required: 'Last name is required' })}
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors.lastName?.message}
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="email">
               <Form.Label>Email</Form.Label>
               <Form.Control
                 type="email"
-                placeholder="Enter email address"
                 isInvalid={!!errors.email}
                 {...register('email', {
                   required: 'Email is required',
@@ -185,78 +206,101 @@ const UserEdit = () => {
                     message: 'Invalid email address'
                   }
                 })}
+                disabled
               />
               <Form.Control.Feedback type="invalid">
                 {errors.email?.message}
               </Form.Control.Feedback>
             </Form.Group>
 
-            <div className="d-flex justify-content-between">
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                variant="primary"
-              >
-                <Save className="me-2" />
+            {/* Roles Section within the form */}
+            <Form.Group className="mb-3" controlId="roles">
+              <Form.Label>User Roles</Form.Label>
+              <div className="border rounded p-3 bg-light">
+                {/* Current Roles - Button Groups */}
+                <div className="mb-3">
+                  {roles.length > 0 ? (
+                    <div className="d-flex flex-wrap gap-2">
+                      {roles.map((role) => (
+                        <ButtonGroup key={role} size="sm">
+                          <Button variant="outline-primary" disabled>
+                            {role}
+                          </Button>
+                          <Button
+                            variant="outline-danger"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              removeRole(role);
+                            }}
+                            title={`Remove ${role} role`}
+                          >
+                            <X size={14} />
+                          </Button>
+                        </ButtonGroup>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-muted fst-italic mb-2">No roles assigned</div>
+                  )}
+                </div>
+
+                {/* Add Role Dropdown */}
+                {getAvailableRoles().length > 0 && (
+                  <Dropdown>
+                    <Dropdown.Toggle size="sm" variant="outline-success">
+                      Add role
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>
+                      {getAvailableRoles().map((role) => (
+                        <Dropdown.Item
+                          key={role}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            addRole(role);
+                          }}
+                        >
+                          {role}
+                        </Dropdown.Item>
+                      ))}
+                    </Dropdown.Menu>
+                  </Dropdown>
+                )}
+              </div>
+            </Form.Group>
+
+            <div className="d-flex gap-2">
+              <Button variant="primary" type="submit" disabled={isSubmitting}>
                 {isSubmitting ? 'Saving...' : 'Save Changes'}
               </Button>
-
-              {/* <Button 
-                variant="outline-warning"
+              <Button
+                variant="outline-secondary"
                 onClick={() => setShowPasswordModal(true)}
+                disabled={isSubmitting}
               >
-                <Lock className="me-2" />
+                <Lock className="me-1" size={16} />
                 Change Password
-              </Button> */}
+              </Button>
             </div>
           </Form>
+
+          <AlertMessage success={updateSuccess} initialErrorMessage={updateInitialError} errors={updateErrors} />
+
         </Col>
 
         <Col md={4}>
-          <h5 className="mb-3 text-center">User Roles</h5>
+          <h2 className="mb-4 mt-3 text-center">Account Information</h2>
+
+          {/* Account Details Card */}
           <Card>
             <Card.Body>
-              <div className="mb-3">
-                <h6>Current Roles:</h6>
-                <div className="mb-2">
-                  {roles.length > 0 ? (
-                    roles.map((role) => (
-                      <Badge key={role} bg="primary" className="me-2 mb-2">
-                        {role}
-                      </Badge>
-                    ))
-                  ) : (
-                    <span className="text-muted">No roles assigned</span>
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <h6>Available Roles:</h6>
-                {availableRoles.map((role) => (
-                  <Form.Check
-                    key={role}
-                    type="checkbox"
-                    label={role}
-                    checked={roles.includes(role)}
-                    onChange={() => toggleRole(role)}
-                    className="mb-2"
-                  />
-                ))}
-              </div>
-            </Card.Body>
-          </Card>
-
-          <Card className="mt-3">
-            <Card.Body>
-              <h6>Account Information</h6>
-              <p className="mb-1"><strong>User ID:</strong> {selectedUser.userId}</p>
-              <p className="mb-1"><strong>Provider:</strong> {selectedUser.provider}</p>
+              <p className="mb-2"><strong>User ID:</strong> <span className="text-muted">{selectedUser.userId}</span></p>
+              <p className="mb-2"><strong>Provider:</strong> <span className="text-muted">{selectedUser.provider}</span></p>
               {selectedUser.createdAt && (
-                <p className="mb-1"><strong>Created:</strong> {new Date(selectedUser.createdAt).toLocaleDateString()}</p>
+                <p className="mb-2"><strong>Created:</strong> <span className="text-muted">{new Date(selectedUser.createdAt).toLocaleDateString()}</span></p>
               )}
               {selectedUser.lastLoginAt && (
-                <p className="mb-1"><strong>Last Login:</strong> {new Date(selectedUser.lastLoginAt).toLocaleDateString()}</p>
+                <p className="mb-0"><strong>Last Login:</strong> <span className="text-muted">{new Date(selectedUser.lastLoginAt).toLocaleDateString()}</span></p>
               )}
             </Card.Body>
           </Card>
@@ -264,12 +308,12 @@ const UserEdit = () => {
       </Row>
 
       {/* Admin Change Password Modal */}
-      {/* <AdminChangePasswordModal
+      <AdminChangePasswordModal
         show={showPasswordModal}
         onHide={() => setShowPasswordModal(false)}
         userId={userId || ''}
         userName={`${selectedUser.firstName} ${selectedUser.lastName}`}
-      /> */}
+      />
     </Container>
   );
 };

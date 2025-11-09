@@ -5,7 +5,7 @@ import Container from "react-bootstrap/Container";
 import AppHeader from "@/app/layout/AppHeader";
 
 const AppLayout = ({ children }: PropsWithChildren) => (
-  <div>
+  <div className="mb-5">
     <AppHeader />
     <Container fluid className="content">{children ?? <Outlet />}</Container>
   </div>

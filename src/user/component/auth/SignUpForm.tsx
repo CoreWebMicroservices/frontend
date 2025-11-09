@@ -35,8 +35,8 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSignedUp }) => {
     const res = await signUpUser(data);
     handleResponse(
       res,
-      "Account created successfully! Please check your email to verify your account.",
-      "Failed to create account. Please check the information and try again."
+      "Failed to create account. Please check the information and try again.",
+      "Account created successfully! Please check your email to verify your account."
     );
 
     if (res.result === true) {

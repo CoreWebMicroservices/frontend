@@ -16,20 +16,20 @@ export interface UseMessageStateReturn {
   clearAll: () => void;
   handleResponse: <T>(
     result: CoreMsApiResonse<T>,
-    successMessage: string,
-    errorContext: string
+    errorContext: string,
+    successMessage?: string
   ) => void;
 }
 
 export class ApiResponseHandler {
   static handleApiResponse<T>(
     result: CoreMsApiResonse<T>,
-    successMessage: string,
-    errorContext: string
+    errorContext: string,
+    successMessage?: string
   ): MessageState {
     if (result.result) {
       return {
-        success: successMessage,
+        success: successMessage || null,
         initialErrorMessage: null,
         errors: null,
       };
@@ -45,13 +45,6 @@ export class ApiResponseHandler {
         errors: errorDetails.length > 0 ? errorDetails : null,
       };
     }
-  }
-
-  static createSuccessTimeout(
-    clearCallback: () => void,
-    delay: number = 5000
-  ): NodeJS.Timeout {
-    return setTimeout(clearCallback, delay);
   }
 }
 
@@ -75,13 +68,13 @@ export function useMessageState(): UseMessageStateReturn {
 
   const handleResponse = <T>(
     result: CoreMsApiResonse<T>,
-    successMessage: string,
-    errorContext: string
+    errorContext: string,
+    successMessage?: string
   ) => {
     const messageState = ApiResponseHandler.handleApiResponse(
       result,
-      successMessage,
-      errorContext
+      errorContext,
+      successMessage
     );
 
     setInitialErrorMessage(messageState.initialErrorMessage);

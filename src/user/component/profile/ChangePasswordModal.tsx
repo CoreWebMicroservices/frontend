@@ -41,7 +41,6 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ show, onHide 
           response: null,
           errors: [{ reasonCode: 'validation.error', description: 'New passwords do not match' }]
         },
-        '',
         'Password validation failed'
       );
       return;
@@ -55,8 +54,8 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ show, onHide 
 
     handleResponse(
       result,
-      'Your password has been changed successfully.',
-      'Failed to change password.'
+      'Failed to change password.',
+      'Your password has been changed successfully.'
     );
 
     if (result.result) {

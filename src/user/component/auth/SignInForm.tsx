@@ -33,7 +33,6 @@ const SignInForm = () => {
     const res = await signInUser(data);
     handleResponse(
       res,
-      "Successfully signed in!",
       "Failed to sign in. Please check your credentials."
     );
 

@@ -44,8 +44,8 @@ const AdminChangePasswordModal = ({ show, onHide, userId, userName }: AdminChang
 
     handleResponse(
       result,
-      `Password has been changed successfully for ${userName}.`,
-      `Failed to change password for ${userName}.`
+      `Failed to change password for ${userName}.`,
+      `Password has been changed successfully for ${userName}.`
     );
 
     setIsSubmitting(false);

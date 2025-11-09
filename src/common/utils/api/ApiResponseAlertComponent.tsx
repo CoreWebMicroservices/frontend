@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert } from 'react-bootstrap';
 
 export interface AlertMessageProps {
@@ -14,13 +14,27 @@ export const AlertMessage: React.FC<AlertMessageProps> = ({
   errors,
   className = "mb-3"
 }) => {
-  if (!success && !initialErrorMessage && !errors) {
+  const [visible, setVisible] = useState<boolean>(!!success);
+
+  // When success prop changes, show the alert and auto-hide after 5s
+  useEffect(() => {
+    if (!success) {
+      setVisible(false);
+      return;
+    }
+
+    setVisible(true);
+    const t = setTimeout(() => setVisible(false), 5000);
+    return () => clearTimeout(t);
+  }, [success]);
+
+  if (!visible && !initialErrorMessage && (!errors || errors.length === 0)) {
     return null;
   }
 
   return (
     <>
-      {success && (
+      {success && visible && (
         <Alert variant="success" className={className}>
           <strong>Success!</strong> {success}
         </Alert>

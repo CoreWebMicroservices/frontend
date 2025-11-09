@@ -28,8 +28,8 @@ const UserProfile = () => {
     const result = await updateProfileInfo(data);
     handleResponse(
       result,
-      'Your profile has been updated successfully.',
-      'Failed to update user information.'
+      'Failed to update user information.',
+      'Your profile has been updated successfully.'
     );
   };
 
