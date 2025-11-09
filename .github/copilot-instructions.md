@@ -2,7 +2,30 @@
 
 ## 🎯 Project Overview
 
-This project is the **frontend** of the Core Microservices platform. It provides and example of the user interface for authentication, user management, and communication modules. The app is built with **React**, **TypeScript**, and **Vite** for fast development and performance.
+This project is the **frontend** of the Core Microservices platform—a comprehensive demonstration of enterprise-grade **modular architecture** patterns. It showcases how to build scalable, maintainable web applications using React, TypeScript, and modern architectural principles.
+
+### **What This Project Demonstrates:**
+
+🏗️ **Modular & Composable Architecture**: Each business domain (user management, communication, etc.) is implemented as a standalone module that can be reused across different applications.
+
+🎯 **Enterprise Patterns**: Real-world patterns for authentication (JWT + OAuth2), role-based access control, API layer abstraction, and cross-cutting concerns.
+
+🧩 **Component Composition**: Shows how to build complex pages by composing independent components from different modules—enabling maximum flexibility and reusability.
+
+🔧 **Configuration over Convention**: Common components accept configuration parameters instead of hardcoding business logic, making them truly reusable.
+
+### **Key Business Modules:**
+
+- **User Management**: Authentication, user profiles, admin functionality, role management
+- **Communication**: Messaging, notifications, activity feeds (placeholder for future expansion)
+- **Translation**: Internationalization support (placeholder for future expansion)
+
+### **Perfect for:**
+
+- Learning enterprise React architecture patterns
+- Building scalable multi-tenant applications
+- Creating reusable component libraries
+- Understanding modular frontend design principles
 
 ---
 
@@ -23,18 +46,113 @@ This project is the **frontend** of the Core Microservices platform. It provides
 ```
 frontend/
 ├── src/
-│   ├── app/              # App skeleton: layout, header, footer, 404, router, and other
-│   ├── common/           # Shared utilities: axios API controller, error handlers, helpers,
-│   ├── user/             # User core service (auth, profile, etc.)
-│   ├── communication/    # Communication core service (messaging, notifications, etc.)
-│   ├── translation/      # Translation core service (i18n, language tools, etc.)
-│   ├── .../              # Other core service folders as needed
+│   ├── app/              # App-level composition and configuration
+│   │   ├── layout/       # App layout components (header, footer, etc.)
+│   │   ├── router/       # Centralized routing configuration
+│   │   │   ├── AppRouter.tsx    # Main router component
+│   │   │   ├── AppRoutes.tsx    # Route definitions & component composition
+│   │   │   └── routes.ts        # Route paths constants
+│   │   ├── App.tsx       # Main app component
+│   │   └── style/        # Global styles
+│   │
+│   ├── common/           # Shared, reusable utilities & components
+│   │   ├── component/    # Reusable UI components (DataTable, Breadcrumb, etc.)
+│   │   ├── router/       # Configurable auth guards & router utilities
+│   │   ├── model/        # Shared TypeScript interfaces
+│   │   └── utils/        # API layer, error handlers, helpers
+│   │
+│   ├── user/             # User module (standalone & composable)
+│   │   ├── component/    # User-specific components only
+│   │   ├── store/        # User state management (Hookstate)
+│   │   ├── model/        # User TypeScript interfaces
+│   │   └── config.ts     # User module configuration
+│   │
+│   ├── communication/    # Communication module (standalone & composable)
+│   │   ├── component/    # Communication-specific components only
+│   │   ├── store/        # Communication state management
+│   │   ├── model/        # Communication TypeScript interfaces
+│   │   └── config.ts     # Communication module configuration
+│   │
+│   ├── translation/      # Translation module (standalone & composable)
+│   │   └── ...           # Similar modular structure
+│   │
 │   └── main.tsx          # App entry point
 │
 ├── public/               # Static assets
 ├── index.html            # Main HTML template
 └── vite.config.ts        # Vite configuration
 ```
+
+---
+
+## 🏗️ Design Paradigm: Modular & Composable Architecture
+
+### 🎯 Core Principles
+
+**1. Standalone Modules**
+
+- Each module (user, communication, etc.) is **completely independent**
+- Modules contain only business logic components, no routing configuration
+- Modules can be used in different apps or contexts without modification
+- No hardcoded dependencies between modules
+
+**2. App-Level Composition**
+
+- The `/app` layer decides how to **compose modules together**
+- Routes are defined at app-level in `/app/router/AppRoutes.tsx`
+- Pages can mix components from multiple modules:
+  ```tsx
+  // Example: Compose different modules on one page
+  <UsersPage>
+    <UserList /> {/* from user module */}
+    <StatsGraph /> {/* from analytics module */}
+    <ActivityFeed /> {/* from communication module */}
+  </UsersPage>
+  ```
+
+**3. Configurable Common Components**
+
+- Common components (like `AuthGuards`) accept configuration parameters
+- No hardcoded routes or app-specific logic in shared components
+- Enables reuse across different applications
+
+**4. Centralized Route Management**
+
+- All route paths in `/app/router/routes.ts`
+- All route configurations in `/app/router/AppRoutes.tsx`
+- Modules import routes from centralized location: `@/app/router/routes`
+
+**5. Dependency Injection Pattern**
+
+- Modules don't directly import from other modules
+- Cross-module communication via events or dependency injection
+- App layer provides dependencies to modules
+
+### 🔧 Implementation Guidelines
+
+**Module Structure (e.g., `/user/`)**:
+
+- ✅ `component/` - Pure UI components
+- ✅ `store/` - State management with Hookstate
+- ✅ `model/` - TypeScript interfaces
+- ✅ `config.ts` - Module configuration (uses centralized routes)
+- ❌ No router files
+- ❌ No route definitions
+- ❌ No direct imports from other modules
+
+**App Structure (`/app/`)**:
+
+- ✅ `router/` - All routing logic centralized here
+- ✅ `layout/` - App-wide layout components
+- ✅ Composes modules into complete pages
+- ✅ Manages cross-module communication
+
+**Common Structure (`/common/`)**:
+
+- ✅ Configurable, reusable components
+- ✅ No hardcoded app-specific logic
+- ✅ Accepts configuration parameters
+- ✅ Can be used across different apps
 
 ---
 
@@ -85,23 +203,37 @@ Each service follows the pattern:
 - Always type props, hooks, and state.
 - Use **ESLint** and **Prettier** for consistency.
 - Avoid large monolithic components — prefer **modular and reusable** ones.
-- Always use global (alias) imports (e.g., `@/app/layout/Applaout`) instead of relative imports.
+- Always use global (alias) imports (e.g., `@/app/layout/AppLayout`) instead of relative imports.
 
-### 2. API Layer
+### 2. Modular Architecture
+
+- **Modules are standalone**: Each module (user, communication) contains only business components
+- **No routing in modules**: Route definitions belong in `/app/router/AppRoutes.tsx`
+- **Centralized routes**: Import routes from `@/app/router/routes` not from module files
+- **Composable pages**: Mix components from different modules at app-level
+- **Configurable common components**: Pass configuration instead of hardcoding values
+
+### 3. API Layer
 
 - Use a centralized `axiosInstance` from common/utils/CoreMsApi.ts.
 - Handle authentication via **JWT tokens** (stored in `localStorage`).
 - Use **React Query** for requests, caching, and invalidation logic.
 
-### 3. Authentication
+### 4. Authentication
 
 - Support both:
   - **Email/password** login
   - **OAuth2 (Google, GitHub, etc.)** redirect login flow
 - Handle access and refresh tokens automatically (refresh before expiry).
-- Protect routes with an `AuthGuard` component.
+- Use configurable `AuthGuards` for route protection:
+  ```tsx
+  // In AppRoutes.tsx
+  loader: authGuards.redirectIfNotInRole([AppRoles.UserMsAdmin]);
+  ```
+- **SUPER_ADMIN** automatically has access to all endpoints
+- Authentication state managed via Hookstate in `user/store/AuthState.ts`
 
-### 4. State Management
+### 5. State Management
 
 State Management
 
@@ -110,18 +242,18 @@ State Management
 - Each core service/component (e.g., user, communication, translation) should have its own `store/` folder with state files colocated.
 - Avoid Redux and complex global state unless absolutely necessary.
 
-### 5. UI / UX
+### 6. UI / UX
 
 - Use **React Bootstrap** for buttons, modals, forms, inputs, etc.
 - Apply consistent **dark/light theme** handling via context.
 
-### 6. Folder Naming
+### 7. Folder Naming
 
 - Use lowercase and hyphen-separated folder names (e.g., `user-profile/`).
 - Component files: `PascalCase` (e.g., `UserCard.tsx`).
 - Hooks: `useCamelCase.ts`.
 
-### 7. Testing
+### 8. Testing
 
 - Use **Vitest** + **React Testing Library**.
 - Write tests for major components and hooks.
@@ -238,8 +370,8 @@ if (result.result) {
   const result = await someApiCall(data);
   handleResponse(
     result,
-    "Operation completed successfully.",
-    "Failed to complete operation."
+    "Failed to complete operation.",
+    "Operation completed successfully."d
   );
   ```
 
@@ -301,23 +433,38 @@ if (result.result) {
 
 When generating code with GitHub Copilot, follow these rules:
 
-1. **Use the existing structure** — Copilot should suggest code in the appropriate folder.
-2. **Prefer React Query** over manual fetch calls.
-3. **Type everything** (props, state, API responses).
-4. **Use React Bootstrap components** for styling, not inline styles.
-5. **For API calls**, import from `src/api` instead of hardcoding URLs.
-6. **Wrap routes** that require login with `AuthGuard`.
-7. **Error handling**: Always display error messages using shadcn/ui `Alert` components.
-8. **Use environment variables**: `import.meta.env.VITE_API_URL` for backend base URL.
+1. **Follow modular architecture** — Components go in module `/component/` folders, routes go in `/app/router/`
+2. **Use centralized routes** — Import from `@/app/router/routes` not hardcoded paths
+3. **Prefer React Query** over manual fetch calls.
+4. **Type everything** (props, state, API responses).
+5. **Use React Bootstrap components** for styling, not inline styles.
+6. **For API calls**, use patterns from `common/utils/CoreMsApi.ts`.
+7. **Configurable components** — Accept configuration props instead of hardcoding values
+8. **Error handling**: Always display error messages using `ApiResponseAlert` components.
+9. **Use environment variables**: `import.meta.env.VITE_API_URL` for backend base URL.
 
 ---
 
 ## 🧩 Example Copilot Prompts
 
-"Generate a login form with React Hook Form and shadcn/ui."
-"Add React Query mutation for `/api/auth/signin` endpoint."
-"Create a `useCurrentUser` hook using `/api/user/me` endpoint."
-"Implement a protected route component that redirects to /login if user is not authenticated."
+**Modular Component Creation:**
+
+- "Create a user profile component in `/user/component/profile/` using APP_ROUTES"
+- "Generate a reusable DataTable component in `/common/component/` with configuration props"
+
+**API Integration:**
+
+- "Add React Query mutation for `/api/auth/signin` using CoreMsApi patterns"
+- "Create user state management in `/user/store/` with Hookstate"
+
+**Route & Navigation:**
+
+- "Add new route to `/app/router/AppRoutes.tsx` with proper AuthGuard configuration"
+- "Update `/app/router/routes.ts` with new route paths"
+
+**Cross-Module Composition:**
+
+- "Create a dashboard page that combines UserList + ActivityFeed + StatsGraph components"
 
 ---
 

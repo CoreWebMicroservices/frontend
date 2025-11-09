@@ -7,6 +7,12 @@ export interface RouteModule {
   routePaths: Record<string, string>;
 }
 
+// Configuration for AuthGuards
+export interface AuthGuardsConfig {
+  homeRoute: string;
+  loginRoute: string;
+}
+
 // Auth guard functions interface
 export interface AuthGuards {
   redirectIfAuthenticated: () => boolean | Response;

@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { Row, Col, Container, Button } from 'react-bootstrap';
 
 import AppLayout from '@/app/layout/AppLayout';
-import { APP_ROUTES } from '@/app/Router';
+import { APP_ROUTES } from '@/app/router/routes';
 
 const NotFound = () => {
   return (

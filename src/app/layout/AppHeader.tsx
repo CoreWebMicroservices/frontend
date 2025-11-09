@@ -7,9 +7,7 @@ import AppTheme from '@/app/layout/AppTheme';
 import AuthNavBar from '@/user/component/auth/AuthNavBar';
 import { BoxArrowInRight } from 'react-bootstrap-icons';
 import { useAuthState } from '@/user/store/AuthState';
-
-import { USER_ROUTE_PATHS } from '@/user/UserRouter';
-import { APP_ROUTES } from '@/app/Router';
+import { APP_ROUTES } from '@/app/router/routes';
 import UserNavBar from '@/user/component/user/UserNavBar';
 
 
@@ -31,7 +29,7 @@ const AppHeader = () => {
             {authState.isAuthenticated.get() ? (
               <AuthNavBar />
             ) : (
-              <Nav.Link as={Link} to={USER_ROUTE_PATHS.LOGIN} title="Login">
+              <Nav.Link as={Link} to={APP_ROUTES.LOGIN} title="Login">
                 <BoxArrowInRight size={22} />
               </Nav.Link>
             )}

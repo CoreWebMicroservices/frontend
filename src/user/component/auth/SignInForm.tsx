@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 
 import { signInUser } from "@/user/store/AuthState";
 import { SignInUserRequest } from "@/user/model/Auth";
-import { APP_ROUTES } from "@/app/Router";
+import { APP_ROUTES } from "@/app/router/routes";
 import { useMessageState } from '@/common/utils/api/ApiResponseHandler';
 import { AlertMessage } from '@/common/component/ApiResponseAlert';
 

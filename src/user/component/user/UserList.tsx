@@ -8,6 +8,7 @@ import { AlertMessage } from '@/common/component/ApiResponseAlert';
 import { DataTable } from '@/common/component/dataTable';
 import type { DataTableColumn, DataTableFilter } from '@/common/component/dataTable';
 import type { User } from '@/user/model/User';
+import { APP_ROUTES } from '@/app/router/routes';
 
 const UserAvatar = ({ user }: { user: { imageUrl?: string; firstName: string; lastName: string } }) => {
   if (user.imageUrl) {
@@ -96,7 +97,7 @@ const UserList = () => {
       <td>{user.provider}</td>
       <td>{user.lastLoginAt}</td>
       <td>
-        <Link to={`/users/${user.userId}`}>
+        <Link to={APP_ROUTES.USER_EDIT.replace(':userId', user.userId)}>
           <Button variant="outline-primary" size="sm">
             <PencilSquare className="me-1" />
             Edit
@@ -108,7 +109,7 @@ const UserList = () => {
 
   // Actions component
   const actions = (
-    <Button variant="primary" onClick={() => navigate('/users/add')}>
+    <Button variant="primary" onClick={() => navigate(APP_ROUTES.USER_ADD)}>
       <Plus className="me-2" />
       Add New User
     </Button>

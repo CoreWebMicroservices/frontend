@@ -2,7 +2,7 @@ import NavDropdown from 'react-bootstrap/NavDropdown';
 import { Link } from 'react-router-dom';
 import { PersonCircle, PencilSquare, BoxArrowRight } from 'react-bootstrap-icons';
 import { useAuthState, signOut } from '@/user/store/AuthState';
-import { USER_ROUTE_PATHS } from '@/user/UserRouter';
+import { APP_ROUTES } from '@/app/router/routes';
 
 const AuthNavBar = () => {
   const authState = useAuthState();
@@ -21,7 +21,7 @@ const AuthNavBar = () => {
         {user?.firstName} {user?.lastName}
       </NavDropdown.Item>
       <NavDropdown.Divider />
-      <NavDropdown.Item as={Link} to={USER_ROUTE_PATHS.USER_PROFILE}>
+      <NavDropdown.Item as={Link} to={APP_ROUTES.USER_PROFILE}>
         <PencilSquare className="me-2" />Edit Profile
       </NavDropdown.Item>
       <NavDropdown.Divider />
