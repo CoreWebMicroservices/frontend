@@ -9,6 +9,7 @@ import { useMessageState } from '@/common/utils/api/ApiResponseHandler';
 import { AlertMessage } from '@/common/utils/api/ApiResponseAlertComponent';
 import AdminChangePasswordModal from './AdminChangePasswordModal';
 import { AppRoles } from '@/common/AppRoles';
+import Breadcrumb from '@/common/component/Breadcrumb';
 
 
 interface UserFormValues {
@@ -94,11 +95,9 @@ const UserEdit = () => {
     return allRoles.filter(role => !currentRoles.includes(role));
   };
 
-  const handleBack = () => {
-    navigate('/users');
-  };
 
-  if (isLoading && !selectedUser) {
+
+  if (isLoading) {
     return (
       <Container>
         <div className="d-flex justify-content-center align-items-center" style={{ minHeight: 400 }}>
@@ -108,14 +107,12 @@ const UserEdit = () => {
         </div>
       </Container>
     );
-  }
-
-  if (!selectedUser) {
+  } else if (!selectedUser) {
     return (
       <Container>
         <div className="text-center mt-5">
           <h4>User not found</h4>
-          <Button variant="primary" onClick={handleBack}>
+          <Button variant="primary" onClick={() => navigate('/users')}>
             <ArrowLeft className="me-2" />
             Back to Users
           </Button>
@@ -126,14 +123,12 @@ const UserEdit = () => {
 
   return (
     <Container>
-      <Row className="mb-4">
-        <Col>
-          <Button variant="outline-primary" onClick={handleBack} className="mb-3">
-            <ArrowLeft className="me-2" />
-            Back to Users
-          </Button>
-        </Col>
-      </Row>
+      <Breadcrumb
+        items={[
+          { label: 'All Users', href: '/users' },
+          { label: 'Edit User', active: true }
+        ]}
+      />
 
       <Row>
         <Col md={8}>
