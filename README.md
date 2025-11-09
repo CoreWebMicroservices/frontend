@@ -1,21 +1,21 @@
 # Core Microservices Frontend
 
-> 🏗️ **Enterprise-grade React application demonstrating modular architecture patterns and best practices**
+**Enterprise-grade React application demonstrating modular architecture patterns and best practices**
 
 This project showcases a comprehensive **modular and composable frontend architecture** built with React, TypeScript, and Vite. It demonstrates real-world patterns for building scalable, maintainable web applications that can grow with your business needs.
 
-## 🎯 What This Project Is
+## What This Project Is
 
 **Core Microservices Frontend** is a full-featured example application that demonstrates:
 
-- **🧩 Modular Architecture**: Each business domain (user management, communication, etc.) is a standalone, reusable module
-- **🎭 Component Composition**: Build complex pages by mixing components from different modules
-- **🔐 Enterprise Authentication**: JWT + OAuth2 (Google, GitHub, LinkedIn) with role-based access control
-- **📊 Advanced Data Management**: React Query for server state, Hookstate for client state
-- **🛡️ Type Safety**: End-to-end TypeScript with strict type checking
-- **🎨 Professional UI**: React Bootstrap with consistent design system
+- **Modular Architecture**: Each business domain (user management, communication, etc.) is a standalone, reusable module
+- **Component Composition**: Build complex pages by mixing components from different modules
+- **Enterprise Authentication**: JWT + OAuth2 (Google, GitHub, LinkedIn) with role-based access control
+- **Advanced Data Management**: React Query for server state, Hookstate for client state
+- **Type Safety**: End-to-end TypeScript with strict type checking
+- **Professional UI**: React Bootstrap with consistent design system
 
-## 🏗️ Architecture Highlights
+## Architecture Highlights
 
 ### **Modular & Composable Design**
 
@@ -30,20 +30,20 @@ This project showcases a comprehensive **modular and composable frontend archite
 
 ### **Centralized Configuration**
 
-- ✅ All routes defined in `/app/router/`
-- ✅ Configurable auth guards and common components
-- ✅ No hardcoded dependencies between modules
-- ✅ Easy to add/remove modules without breaking changes
+- All routes defined in `/app/router/`
+- Configurable auth guards and common components
+- No hardcoded dependencies between modules
+- Easy to add/remove modules without breaking changes
 
 ### **Enterprise Features**
 
-- 🔑 **Multi-provider OAuth2**: Google, GitHub, LinkedIn integration
-- 👥 **Role-based Access Control**: Admin, user, and service-specific roles
-- 🛠️ **Admin Panel**: User management, role assignment, bulk operations
-- 📊 **Advanced Tables**: Sorting, filtering, pagination, search
-- 🎨 **Responsive Design**: Mobile-first Bootstrap implementation
+- **Multi-provider OAuth2**: Google, GitHub, LinkedIn integration
+- **Role-based Access Control**: Admin, user, and service-specific roles
+- **Admin Panel**: User management, role assignment, bulk operations
+- **Advanced Tables**: Sorting, filtering, pagination, search
+- **Responsive Design**: Mobile-first Bootstrap implementation
 
-## 🚀 Quick Start
+## Quick Start
 
 ```bash
 # Clone the repository
@@ -60,7 +60,7 @@ npm run dev
 npm run build
 ```
 
-## 🧱 Tech Stack
+## Tech Stack
 
 - **Frontend**: React 18+ with TypeScript
 - **Build Tool**: Vite for lightning-fast development
@@ -70,7 +70,7 @@ npm run build
 - **API Layer**: Axios with centralized error handling
 - **Authentication**: JWT tokens with automatic refresh
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 src/
@@ -94,7 +94,7 @@ src/
     └── ...               # Similar modular structure
 ```
 
-## 🔧 Key Features Demonstrated
+## Key Features Demonstrated
 
 ### **Authentication & Authorization**
 
@@ -125,7 +125,7 @@ src/
 - ESLint + Prettier for code consistency
 - Detailed GitHub Copilot instructions for team development
 
-## 🎓 Learning Outcomes
+## Learning Outcomes
 
 This project is perfect for developers who want to learn:
 
@@ -136,24 +136,30 @@ This project is perfect for developers who want to learn:
 - **TypeScript Best Practices**: End-to-end type safety in React applications
 - **Component Composition**: Building flexible UIs through composition over inheritance
 
-## 🔗 Related Projects
+## Related Projects
 
 - **Backend**: [Core Microservices](https://github.com/dmitry3325/core-microservices) - Java Spring Boot microservices architecture
 
-## 📄 License
+## License
 
 This project is open source and available under the [MIT License](LICENSE).
 
 ---
 
-## 📧 Contact
+## Contact
 
 Have questions or want to discuss this architecture? Feel free to reach out:
 
 **Dima Mishchenko** - [dmi.mishchenko@gmail.com](mailto:dmi.mishchenko@gmail.com)
 
-## 🤝 Contributing
+## Contributing
 
 Contributions, issues, and feature requests are welcome! See our [Contributing Guidelines](.github/CONTRIBUTING.md) for details.
 
 Built with ❤️ as a demonstration of modern React architecture patterns.
+
+---
+
+## Keywords
+
+`react` `typescript` `vite` `microservices` `modular-architecture` `enterprise` `scalable` `component-composition` `oauth2` `jwt` `role-based-access-control` `react-query` `hookstate` `bootstrap` `admin-panel` `user-management` `document-management` `authentication` `frontend-architecture` `reusable-components`

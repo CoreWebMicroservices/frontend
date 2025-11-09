@@ -6,13 +6,13 @@ This project is the **frontend** of the Core Microservices platform—a comprehe
 
 ### **What This Project Demonstrates:**
 
-🏗️ **Modular & Composable Architecture**: Each business domain (user management, communication, etc.) is implemented as a standalone module that can be reused across different applications.
+**Modular & Composable Architecture**: Each business domain (user management, communication, etc.) is implemented as a standalone module that can be reused across different applications.
 
-🎯 **Enterprise Patterns**: Real-world patterns for authentication (JWT + OAuth2), role-based access control, API layer abstraction, and cross-cutting concerns.
+**Enterprise Patterns**: Real-world patterns for authentication (JWT + OAuth2), role-based access control, API layer abstraction, and cross-cutting concerns.
 
-🧩 **Component Composition**: Shows how to build complex pages by composing independent components from different modules—enabling maximum flexibility and reusability.
+**Component Composition**: Shows how to build complex pages by composing independent components from different modules—enabling maximum flexibility and reusability.
 
-🔧 **Configuration over Convention**: Common components accept configuration parameters instead of hardcoding business logic, making them truly reusable.
+**Configuration over Convention**: Common components accept configuration parameters instead of hardcoding business logic, making them truly reusable.
 
 ### **Key Business Modules:**
 
