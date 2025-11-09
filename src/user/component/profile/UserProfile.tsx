@@ -9,7 +9,7 @@ import { Col, Row } from 'react-bootstrap';
 import { Lock } from 'react-bootstrap-icons';
 import ChangePasswordModal from './ChangePasswordModal';
 import { useMessageState } from '@/common/utils/api/ApiResponseHandler';
-import { AlertMessage } from '@/common/utils/api/ApiResponseAlertComponent';
+import { AlertMessage } from '@/common/component/ApiResponseAlert';
 
 interface UserFormValues {
   firstName: string;

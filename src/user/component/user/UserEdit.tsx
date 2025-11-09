@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { Container, Row, Col, Card, Button, Form, Spinner, ButtonGroup, Dropdown } from 'react-bootstrap';
-import { ArrowLeft, Lock, X, Plus } from 'react-bootstrap-icons';
+import { ArrowLeft, Lock, X } from 'react-bootstrap-icons';
 import { User, AuthProvider } from '@/user/model/User';
 import { useUserState, getUserById, updateUserInfo } from '@/user/store/UserState';
 import { useMessageState } from '@/common/utils/api/ApiResponseHandler';
-import { AlertMessage } from '@/common/utils/api/ApiResponseAlertComponent';
+import { AlertMessage } from '@/common/component/ApiResponseAlert';
 import AdminChangePasswordModal from './AdminChangePasswordModal';
 import { AppRoles } from '@/common/AppRoles';
 import Breadcrumb from '@/common/component/Breadcrumb';
@@ -107,7 +107,9 @@ const UserEdit = () => {
         </div>
       </Container>
     );
-  } else if (!selectedUser) {
+  }
+
+  if (!selectedUser) {
     return (
       <Container>
         <div className="text-center mt-5">
@@ -209,60 +211,59 @@ const UserEdit = () => {
             </Form.Group>
 
             {/* Roles Section within the form */}
+            <hr />
             <Form.Group className="mb-3" controlId="roles">
               <Form.Label>User Roles</Form.Label>
-              <div className="border rounded p-3 bg-light">
-                {/* Current Roles - Button Groups */}
-                <div className="mb-3">
-                  {roles.length > 0 ? (
-                    <div className="d-flex flex-wrap gap-2">
-                      {roles.map((role) => (
-                        <ButtonGroup key={role} size="sm">
-                          <Button variant="outline-primary" disabled>
-                            {role}
-                          </Button>
-                          <Button
-                            variant="outline-danger"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              removeRole(role);
-                            }}
-                            title={`Remove ${role} role`}
-                          >
-                            <X size={14} />
-                          </Button>
-                        </ButtonGroup>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-muted fst-italic mb-2">No roles assigned</div>
-                  )}
-                </div>
-
-                {/* Add Role Dropdown */}
-                {getAvailableRoles().length > 0 && (
-                  <Dropdown>
-                    <Dropdown.Toggle size="sm" variant="outline-success">
-                      Add role
-                    </Dropdown.Toggle>
-                    <Dropdown.Menu>
-                      {getAvailableRoles().map((role) => (
-                        <Dropdown.Item
-                          key={role}
+              <div className="mb-3">
+                {roles.length > 0 ? (
+                  <div className="d-flex flex-wrap gap-2">
+                    {roles.map((role) => (
+                      <ButtonGroup key={role} size="sm">
+                        <Button variant="outline-primary" disabled>
+                          {role}
+                        </Button>
+                        <Button
+                          variant="outline-danger"
                           onClick={(e) => {
                             e.preventDefault();
-                            addRole(role);
+                            e.stopPropagation();
+                            removeRole(role);
                           }}
+                          title={`Remove ${role} role`}
                         >
-                          {role}
-                        </Dropdown.Item>
-                      ))}
-                    </Dropdown.Menu>
-                  </Dropdown>
+                          <X size={14} />
+                        </Button>
+                      </ButtonGroup>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-muted fst-italic mb-2">No roles assigned</div>
                 )}
               </div>
+
+              {/* Add Role Dropdown */}
+              {getAvailableRoles().length > 0 && (
+                <Dropdown>
+                  <Dropdown.Toggle size="sm" variant="outline-success">
+                    Add role
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu>
+                    {getAvailableRoles().map((role) => (
+                      <Dropdown.Item
+                        key={role}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          addRole(role);
+                        }}
+                      >
+                        {role}
+                      </Dropdown.Item>
+                    ))}
+                  </Dropdown.Menu>
+                </Dropdown>
+              )}
             </Form.Group>
+            <hr />
 
             <div className="d-flex gap-2">
               <Button variant="primary" type="submit" disabled={isSubmitting}>
@@ -309,7 +310,7 @@ const UserEdit = () => {
         userId={userId || ''}
         userName={`${selectedUser.firstName} ${selectedUser.lastName}`}
       />
-    </Container>
+    </Container >
   );
 };
 

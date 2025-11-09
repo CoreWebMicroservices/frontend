@@ -71,15 +71,23 @@ export function useMessageState(): UseMessageStateReturn {
     errorContext: string,
     successMessage?: string
   ) => {
+    // Clear previous messages first
+    setSuccess(null);
+    setInitialErrorMessage(null);
+    setErrors(null);
+
     const messageState = ApiResponseHandler.handleApiResponse(
       result,
       errorContext,
       successMessage
     );
 
-    setInitialErrorMessage(messageState.initialErrorMessage);
-    setErrors(messageState.errors);
-    setSuccess(messageState.success);
+    // Set new messages after a small delay to ensure React sees the change
+    setTimeout(() => {
+      setInitialErrorMessage(messageState.initialErrorMessage);
+      setErrors(messageState.errors);
+      setSuccess(messageState.success);
+    }, 10);
   };
 
   return {

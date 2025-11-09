@@ -56,7 +56,7 @@ export function useUserState() {
   return useHookstate(userState);
 }
 
-// Get all users with pagination (admin only) - uses state parameters
+// Get all users with pagination - uses state parameters
 export async function getAllUsers(): Promise<
   CoreMsApiResonse<UsersPagedResponse>
 > {
@@ -91,11 +91,12 @@ export async function getAllUsers(): Promise<
   return res;
 }
 
-// Get user by ID (admin only) - matches /api/users/{userId}
+// Get user by ID - matches /api/users/{userId}
 export async function getUserById(
-  userId: string
+  userId: string,
+  isBackgroundFetch = false
 ): Promise<CoreMsApiResonse<User>> {
-  userState.isInProgress.set(true);
+  if (!isBackgroundFetch) userState.isInProgress.set(true);
 
   const res = await userMsApi.apiRequest<User>(
     HttpMethod.GET,
@@ -111,7 +112,7 @@ export async function getUserById(
   return res;
 }
 
-// Create new user (admin only) - matches POST /api/users
+// Create new user - matches POST /api/users
 export async function createUser(
   userData: CreateUserRequest
 ): Promise<CoreMsApiResonse<ApiSuccessfulResponse>> {
@@ -133,32 +134,25 @@ export async function createUser(
   return res;
 }
 
-// Update user information (admin only) - matches PUT /api/users/{userId}
+// Update user information  - matches PUT /api/users/{userId}
 export async function updateUserInfo(
   userId: string,
   userData: User
 ): Promise<CoreMsApiResonse<ApiSuccessfulResponse>> {
-  userState.isInProgress.set(true);
-
   const res = await userMsApi.apiRequest<ApiSuccessfulResponse>(
     HttpMethod.PUT,
     `/api/users/${userId}`,
     userData
   );
 
-  userState.isInProgress.set(false);
-
   if (res.result === true) {
-    // Refresh user data after update
-    getUserById(userId);
-    // Refresh the users list
-    getAllUsers();
+    getUserById(userId, true);
   }
 
   return res;
 }
 
-// Delete user (admin only) - matches DELETE /api/users/{userId}
+// Delete user  - matches DELETE /api/users/{userId}
 export async function deleteUser(
   userId: string
 ): Promise<CoreMsApiResonse<ApiSuccessfulResponse>> {
@@ -191,14 +185,10 @@ export async function deleteUser(
 export async function triggerUserPasswordReset(
   userId: string
 ): Promise<CoreMsApiResonse<ApiSuccessfulResponse>> {
-  userState.isInProgress.set(true);
-
   const res = await userMsApi.apiRequest<ApiSuccessfulResponse>(
     HttpMethod.POST,
     `/api/users/${userId}/reset-password`
   );
-
-  userState.isInProgress.set(false);
 
   return res;
 }
@@ -208,15 +198,11 @@ export async function adminChangeUserPassword(
   userId: string,
   passwordData: AdminChangePasswordRequest
 ): Promise<CoreMsApiResonse<ApiSuccessfulResponse>> {
-  userState.isInProgress.set(true);
-
   const res = await userMsApi.apiRequest<ApiSuccessfulResponse>(
     HttpMethod.POST,
     `/api/users/${userId}/change-password`,
     passwordData
   );
-
-  userState.isInProgress.set(false);
 
   return res;
 }
@@ -226,21 +212,14 @@ export async function adminChangeUserEmail(
   userId: string,
   emailData: ChangeEmailRequest
 ): Promise<CoreMsApiResonse<ApiSuccessfulResponse>> {
-  userState.isInProgress.set(true);
-
   const res = await userMsApi.apiRequest<ApiSuccessfulResponse>(
     HttpMethod.POST,
     `/api/users/${userId}/change-email`,
     emailData
   );
 
-  userState.isInProgress.set(false);
-
   if (res.result === true) {
-    // Refresh user data after email change
-    getUserById(userId);
-    // Refresh the users list
-    getAllUsers();
+    getUserById(userId, true);
   }
 
   return res;

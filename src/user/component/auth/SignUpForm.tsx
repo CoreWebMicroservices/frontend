@@ -6,7 +6,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { SignUpUserRequest } from "@/user/model/Auth";
 import { signUpUser } from "@/user/store/AuthState";
 import { useMessageState } from '@/common/utils/api/ApiResponseHandler';
-import { AlertMessage } from '@/common/utils/api/ApiResponseAlertComponent';
+import { AlertMessage } from '@/common/component/ApiResponseAlert';
 
 const signUpUserSchema = yup.object().shape({
   email: yup.string().email('Invalid email address').required('Email is required'),

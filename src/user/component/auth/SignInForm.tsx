@@ -8,7 +8,7 @@ import { signInUser } from "@/user/store/AuthState";
 import { SignInUserRequest } from "@/user/model/Auth";
 import { APP_ROUTES } from "@/app/Router";
 import { useMessageState } from '@/common/utils/api/ApiResponseHandler';
-import { AlertMessage } from '@/common/utils/api/ApiResponseAlertComponent';
+import { AlertMessage } from '@/common/component/ApiResponseAlert';
 
 
 const signInSchema = yup.object().shape({

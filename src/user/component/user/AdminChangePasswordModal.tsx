@@ -4,7 +4,7 @@ import { Modal, Button, Form, Spinner } from 'react-bootstrap';
 import { Key, X } from 'react-bootstrap-icons';
 import { adminChangeUserPassword } from '@/user/store/UserState';
 import { useMessageState } from '@/common/utils/api/ApiResponseHandler';
-import { AlertMessage } from '@/common/utils/api/ApiResponseAlertComponent';
+import { AlertMessage } from '@/common/component/ApiResponseAlert';
 
 interface AdminChangePasswordModalProps {
   show: boolean;

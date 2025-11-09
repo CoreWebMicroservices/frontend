@@ -3,6 +3,7 @@ import AuthForm from "@/user/component/auth/AuthForm";
 import UserProfile from "@/user/component/profile/UserProfile";
 import UserList from "@/user/component/user/UserList";
 import UserEdit from "@/user/component/user/UserEdit";
+import UserAdd from "@/user/component/user/UserAdd";
 import { RouteModule } from "@/common/router/RouterTypes";
 import { authGuards } from "@/common/router/AuthGuards";
 import { AppRoles } from "@/common/AppRoles";
@@ -14,6 +15,7 @@ export const USER_ROUTE_PATHS = {
   LOGIN: "/login",
   USER_PROFILE: "/profile",
   USERS_LIST: "/users",
+  USER_ADD: "/users/add",
   USER_EDIT: "/users/:userId",
 } as const;
 
@@ -33,6 +35,11 @@ const userRoutes: RouteObject[] = [
   {
     path: USER_ROUTE_PATHS.USERS_LIST,
     element: <UserList />,
+    loader: authGuards.redirectIfNotAdmin([AppRoles.SuperAdmin, AppRoles.UserMsAdmin]),
+  },
+  {
+    path: USER_ROUTE_PATHS.USER_ADD,
+    element: <UserAdd />,
     loader: authGuards.redirectIfNotAdmin([AppRoles.SuperAdmin, AppRoles.UserMsAdmin]),
   },
   {

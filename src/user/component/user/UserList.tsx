@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 import { PencilSquare, Plus } from 'react-bootstrap-icons';
 import { useUserState, getAllUsers, setSearch, setPage, setPageSize, setFilter, setSort } from '@/user/store/UserState';
 import { useMessageState } from '@/common/utils/api/ApiResponseHandler';
-import { AlertMessage } from '@/common/utils/api/ApiResponseAlertComponent';
+import { AlertMessage } from '@/common/component/ApiResponseAlert';
 import { DataTable } from '@/common/component/dataTable';
 import type { DataTableColumn, DataTableFilter } from '@/common/component/dataTable';
 import type { User } from '@/user/model/User';
@@ -39,6 +39,7 @@ const UserAvatar = ({ user }: { user: { imageUrl?: string; firstName: string; la
 };
 
 const UserList = () => {
+  const navigate = useNavigate();
   const userState = useUserState();
   const users = userState.users.get();
   const isLoading = userState.isInProgress.get();
@@ -107,7 +108,7 @@ const UserList = () => {
 
   // Actions component
   const actions = (
-    <Button variant="secondary">
+    <Button variant="primary" onClick={() => navigate('/users/add')}>
       <Plus className="me-2" />
       Add New User
     </Button>

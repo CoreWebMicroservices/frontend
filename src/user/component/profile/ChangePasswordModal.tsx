@@ -4,7 +4,7 @@ import { Modal, Button, Form } from 'react-bootstrap';
 import { Lock } from 'react-bootstrap-icons';
 import { updateProfilePassword } from '@/user/store/ProfileState';
 import { useMessageState } from '@/common/utils/api/ApiResponseHandler';
-import { AlertMessage } from '@/common/utils/api/ApiResponseAlertComponent';
+import { AlertMessage } from '@/common/component/ApiResponseAlert';
 
 interface ChangePasswordFormValues {
   oldPassword: string;
