@@ -1,6 +1,7 @@
 import { redirect } from "react-router-dom";
 import { AuthGuards } from "./RouterTypes";
 import { AppRoles } from "@/common/AppRoles";
+import { getCurrentUserAuth, hasAnyRole } from "@/user/store/AuthState";
 
 export const ROUTE_HOME = "/";
 export const ROUTE_LOGIN = "/login";
@@ -10,24 +11,38 @@ export const ROUTE_LOGIN = "/login";
  */
 export const createAuthGuards = (): AuthGuards => {
   const redirectIfAuthenticated = () => {
-    const refreshToken = localStorage.getItem("refreshToken");
-    if (refreshToken) {
+    const { isAuthenticated } = getCurrentUserAuth();
+    if (isAuthenticated) {
       return redirect(ROUTE_HOME);
     }
     return true;
   };
 
   const redirectIfNotAuthenticated = () => {
-    const refreshToken = localStorage.getItem("refreshToken");
-    if (!refreshToken) {
+    const { isAuthenticated } = getCurrentUserAuth();
+    if (!isAuthenticated) {
       return redirect(ROUTE_LOGIN);
     }
     return true;
   };
 
-  const redirectIfNotAdmin = (requiredRole: AppRoles[]) => {
+  const redirectIfNotInRole = (requiredRoles: AppRoles[]) => {
     return () => {
-      console.log("Checking admin role:", requiredRole);
+      // Get current user authentication state
+      const { isAuthenticated } = getCurrentUserAuth();
+
+      if (!isAuthenticated) {
+        return redirect(ROUTE_LOGIN);
+      }
+
+      // Check if user has at least one of the required roles
+      const hasRequiredRole = hasAnyRole(requiredRoles);
+
+      if (!hasRequiredRole) {
+        console.log("User does not have required role, redirecting to home");
+        return redirect(ROUTE_HOME);
+      }
+
       return true;
     };
   };
@@ -35,7 +50,7 @@ export const createAuthGuards = (): AuthGuards => {
   return {
     redirectIfAuthenticated,
     redirectIfNotAuthenticated,
-    redirectIfNotAdmin,
+    redirectIfNotInRole,
   };
 };
 

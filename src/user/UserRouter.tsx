@@ -35,17 +35,17 @@ const userRoutes: RouteObject[] = [
   {
     path: USER_ROUTE_PATHS.USERS_LIST,
     element: <UserList />,
-    loader: authGuards.redirectIfNotAdmin([AppRoles.SuperAdmin, AppRoles.UserMsAdmin]),
+    loader: authGuards.redirectIfNotInRole([AppRoles.UserMsAdmin]),
   },
   {
     path: USER_ROUTE_PATHS.USER_ADD,
     element: <UserAdd />,
-    loader: authGuards.redirectIfNotAdmin([AppRoles.SuperAdmin, AppRoles.UserMsAdmin]),
+    loader: authGuards.redirectIfNotInRole([AppRoles.UserMsAdmin]),
   },
   {
     path: USER_ROUTE_PATHS.USER_EDIT,
     element: <UserEdit />,
-    loader: authGuards.redirectIfNotAdmin([AppRoles.SuperAdmin, AppRoles.UserMsAdmin]),
+    loader: authGuards.redirectIfNotInRole([AppRoles.UserMsAdmin]),
   },
 ];
 

@@ -202,6 +202,31 @@ const setAccessToken = async (
   return true;
 };
 
+// Utility function for route guards to check user authentication and roles
+export function getCurrentUserAuth() {
+  const state = authState.get();
+  return {
+    isAuthenticated: state.isAuthenticated,
+    user: state.user,
+    roles: state.user?.roles || [],
+  };
+}
+
+// Utility function to check if current user has any of the required roles
+export function hasAnyRole(requiredRoles: string[]): boolean {
+  const { isAuthenticated, roles } = getCurrentUserAuth();
+  if (!isAuthenticated || !roles.length) {
+    return false;
+  }
+
+  // SUPER_ADMIN has access to all endpoints by default
+  if (roles.includes("SUPER_ADMIN")) {
+    return true;
+  }
+
+  return requiredRoles.some((role) => roles.includes(role));
+}
+
 const urlParams = new URLSearchParams(window.location.search);
 const token = urlParams.get("token");
 if (token) {

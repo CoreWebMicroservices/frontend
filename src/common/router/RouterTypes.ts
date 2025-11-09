@@ -11,7 +11,7 @@ export interface RouteModule {
 export interface AuthGuards {
   redirectIfAuthenticated: () => boolean | Response;
   redirectIfNotAuthenticated: () => boolean | Response;
-  redirectIfNotAdmin: (requiredRoles: AppRoles[]) => () => boolean | Response;
+  redirectIfNotInRole: (requiredRoles: AppRoles[]) => () => boolean | Response;
 }
 
 // Route configuration for modules
