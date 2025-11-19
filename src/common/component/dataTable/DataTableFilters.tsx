@@ -1,11 +1,15 @@
 import React from "react";
 import { Form } from "react-bootstrap";
-import { DataTableFilter } from "./DataTableTypes";
+import { DataTableFilter, FilterOperator } from "./DataTableTypes";
 
 interface DataTableFiltersProps {
   filters: DataTableFilter[];
   values: Record<string, string | number | boolean>;
-  onFilter: (key: string, value: string | number | boolean | null) => void;
+  onFilter: (
+    key: string,
+    value: string | number | boolean | null,
+    operator?: FilterOperator
+  ) => void;
 }
 
 export const DataTableFilters: React.FC<DataTableFiltersProps> = ({
@@ -22,7 +26,7 @@ export const DataTableFilters: React.FC<DataTableFiltersProps> = ({
           <Form.Select
             key={filter.key}
             value={currentValue?.toString() || ''}
-            onChange={(e) => onFilter(filter.key, e.target.value || null)}
+            onChange={(e) => onFilter(filter.key, e.target.value || null, filter.operator)}
           >
             <option value="">{filter.placeholder || `All ${filter.label}`}</option>
             {filter.options?.map((option) => (
@@ -40,7 +44,7 @@ export const DataTableFilters: React.FC<DataTableFiltersProps> = ({
             type="text"
             placeholder={filter.placeholder || filter.label}
             value={currentValue?.toString() || ''}
-            onChange={(e) => onFilter(filter.key, e.target.value || null)}
+            onChange={(e) => onFilter(filter.key, e.target.value || null, filter.operator)}
           />
         );
 
@@ -51,7 +55,7 @@ export const DataTableFilters: React.FC<DataTableFiltersProps> = ({
             type="date"
             placeholder={filter.placeholder || filter.label}
             value={currentValue?.toString() || ''}
-            onChange={(e) => onFilter(filter.key, e.target.value || null)}
+            onChange={(e) => onFilter(filter.key, e.target.value || null, filter.operator)}
           />
         );
 

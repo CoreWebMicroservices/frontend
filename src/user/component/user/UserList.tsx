@@ -72,6 +72,7 @@ const UserList = () => {
       key: 'provider',
       label: 'Provider',
       type: 'select',
+      operator: 'contains',
       placeholder: 'All Providers',
       options: [
         { value: 'google', label: 'Google' },

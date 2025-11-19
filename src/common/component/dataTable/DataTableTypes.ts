@@ -1,3 +1,14 @@
+export type FilterOperator =
+  | "eq"
+  | "ne"
+  | "like"
+  | "in"
+  | "contains"
+  | "gt"
+  | "lt"
+  | "gte"
+  | "lte";
+
 export interface DataTableColumn {
   key: string;
   title: string;
@@ -9,6 +20,7 @@ export interface DataTableFilter {
   key: string;
   label: string;
   type: "select" | "text" | "date";
+  operator?: FilterOperator;
   options?: { value: string | number; label: string }[];
   placeholder?: string;
 }
@@ -45,7 +57,11 @@ export interface DataTableProps<T> {
 
   // Callbacks
   onSearch?: (search: string) => void;
-  onFilter?: (key: string, value: string | number | boolean | null) => void;
+  onFilter?: (
+    key: string,
+    value: string | number | boolean | null,
+    operator?: FilterOperator
+  ) => void;
   onPageChange?: (page: number) => void;
   onPageSizeChange?: (pageSize: number) => void;
   onSort?: (field: string, direction: "asc" | "desc") => void;

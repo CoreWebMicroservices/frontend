@@ -14,6 +14,7 @@ import {
   AdminChangePasswordRequest,
   ChangeEmailRequest,
 } from "@/user/model/User";
+import { FilterOperator } from "@/common/component/dataTable";
 
 const userMsApi = new CoreMsApi({ baseURL: USER_API_BASE_URL });
 
@@ -26,6 +27,7 @@ interface UserQueryParams {
   search: string;
   sort?: string;
   filters?: Record<string, string | number | boolean>;
+  filterOperators?: Record<string, FilterOperator>;
 }
 
 interface UserManagementState {
@@ -47,6 +49,7 @@ const initialState: UserManagementState = {
     search: "",
     sort: undefined,
     filters: undefined,
+    filterOperators: undefined,
   },
 };
 
@@ -72,7 +75,11 @@ export async function getAllUsers(): Promise<
   if (queryParams.search) params.append("search", queryParams.search);
   if (queryParams.filters) {
     Object.entries(queryParams.filters).forEach(([key, value]) => {
-      params.append("filter", `${key}:${value.toString()}`);
+      const operator = queryParams.filterOperators?.[key];
+      const filterValue = operator
+        ? `${key}:${operator}:${value.toString()}`
+        : `${key}:${value.toString()}`;
+      params.append("filter", filterValue);
     });
   }
 
@@ -256,9 +263,11 @@ export function setSort(field: string, direction: "asc" | "desc"): void {
 // Update filters
 export function setFilter(
   key: string,
-  value: string | number | boolean | null
+  value: string | number | boolean | null,
+  operator?: FilterOperator
 ): void {
   const currentFilters = userState.queryParams.filters.get() || {};
+  const currentOperators = userState.queryParams.filterOperators.get() || {};
 
   if (value === null || value === "" || value === undefined) {
     // Remove filter if value is null/empty
@@ -267,12 +276,27 @@ export function setFilter(
     userState.queryParams.filters.set(
       Object.keys(remainingFilters).length > 0 ? remainingFilters : undefined
     );
+
+    const remainingOperators = { ...currentOperators };
+    delete remainingOperators[key];
+    userState.queryParams.filterOperators.set(
+      Object.keys(remainingOperators).length > 0
+        ? remainingOperators
+        : undefined
+    );
   } else {
     // Set/update filter
     userState.queryParams.filters.set({
       ...currentFilters,
       [key]: value,
     });
+
+    if (operator) {
+      userState.queryParams.filterOperators.set({
+        ...currentOperators,
+        [key]: operator,
+      });
+    }
   }
 
   userState.queryParams.page.set(1); // Reset to first page when filtering
@@ -282,6 +306,7 @@ export function setFilter(
 // Clear all filters
 export function clearFilters(): void {
   userState.queryParams.filters.set(undefined);
+  userState.queryParams.filterOperators.set(undefined);
   userState.queryParams.page.set(1);
   getAllUsers();
 }
@@ -291,6 +316,7 @@ export function setFilters(
   filters?: Record<string, string | number | boolean>
 ): void {
   userState.queryParams.filters.set(filters);
+  // Note: This doesn't handle operators, assuming bulk set is for simple values or reset
 }
 
 // Reset query parameters to defaults
@@ -301,6 +327,7 @@ export function resetQueryParams(): void {
     search: "",
     sort: undefined,
     filters: undefined,
+    filterOperators: undefined,
   });
 }
 
