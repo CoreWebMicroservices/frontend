@@ -18,9 +18,7 @@ export const APP_ROUTES = {
   USER_EDIT: "/users/:userId",
 
   // Communication module routes
-  CHAT: "/chat",
-  MESSAGES: "/messages",
-  NOTIFICATIONS: "/notifications",
+  COMMUNICATION: "/communication",
 } as const;
 
 // Re-export with different name for internal use

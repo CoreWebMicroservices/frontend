@@ -1,7 +1,7 @@
 import { Nav } from 'react-bootstrap';
 import { Link, useLocation } from 'react-router-dom';
 
-const UserNavBar = ({ path }: { path: string }) => {
+const CommunicationNavBar = ({ path }: { path: string }) => {
   const location = useLocation();
 
   return (
@@ -11,10 +11,10 @@ const UserNavBar = ({ path }: { path: string }) => {
         to={path}
         active={location.pathname === path}
       >
-        Users
+        Communication
       </Nav.Link>
     </Nav.Item>
   );
 };
 
-export default UserNavBar;
+export default CommunicationNavBar;

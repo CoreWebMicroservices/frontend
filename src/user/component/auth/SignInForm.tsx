@@ -36,8 +36,9 @@ const SignInForm = () => {
       "Failed to sign in. Please check your credentials."
     );
 
+    // reload on sign in success
     if (res.result === true) {
-      navigate(APP_ROUTES.HOME);
+      window.location.href = APP_ROUTES.HOME;
     }
   };
 

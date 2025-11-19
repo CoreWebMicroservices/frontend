@@ -1,7 +1,7 @@
 import { hookstate, useHookstate } from "@hookstate/core";
 import { devtools } from "@hookstate/devtools";
 import CoreMsApi from "@/common/utils/api/CoreMsApi";
-import { USER_API_BASE_URL } from "@/user/config";
+import { USER_MS_BASE_URL } from "@/user/config";
 import {
   ApiSuccessfulResponse,
   CoreMsApiResonse,
@@ -16,7 +16,7 @@ import {
 } from "@/user/model/User";
 import { FilterOperator } from "@/common/component/dataTable";
 
-const userMsApi = new CoreMsApi({ baseURL: USER_API_BASE_URL });
+const userMsApi = new CoreMsApi({ baseURL: USER_MS_BASE_URL });
 
 // Type alias for users paged response using generic PageResponse
 type UsersPagedResponse = PageResponse<User>;

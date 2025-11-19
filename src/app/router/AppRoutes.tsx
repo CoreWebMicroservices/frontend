@@ -10,6 +10,7 @@ import UserProfile from "@/user/component/profile/UserProfile";
 import UserList from "@/user/component/user/UserList";
 import UserEdit from "@/user/component/user/UserEdit";
 import UserAdd from "@/user/component/user/UserAdd";
+import { MessageList } from "@/communication/component/MessageList";
 
 // Create auth guards with dependency injection
 const authGuards = createAuthGuards({
@@ -71,18 +72,8 @@ export const userRoutes: RouteObject[] = [
 // Communication module routes (using placeholder components from CommunicationRouter)
 export const communicationRoutes: RouteObject[] = [
   {
-    path: ROUTE_PATHS.CHAT,
-    element: <div>Chat Component</div>,
-    loader: authGuards.redirectIfNotAuthenticated,
-  },
-  {
-    path: ROUTE_PATHS.MESSAGES,
-    element: <div>Messages Component</div>,
-    loader: authGuards.redirectIfNotAuthenticated,
-  },
-  {
-    path: ROUTE_PATHS.NOTIFICATIONS,
-    element: <div>Notifications Component</div>,
+    path: ROUTE_PATHS.COMMUNICATION,
+    element: <MessageList />,
     loader: authGuards.redirectIfNotAuthenticated,
   },
 ];

@@ -13,6 +13,7 @@ import UserNavBar from '@/user/component/user/UserNavBar';
 import { getCurrentUserAuth, hasAnyRole } from '@/user/store/AuthState';
 import { createAuthGuards } from '@/common/router/AuthGuards';
 import { AppRoles } from '@/common/AppRoles';
+import CommunicationNavBar from '@/communication/component/CommunicationNavBar';
 
 // Create auth guards for this component
 const authGuards = createAuthGuards({
@@ -33,9 +34,10 @@ const AppHeader = () => {
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link as={Link} to={APP_ROUTES.FEATURES}>Features</Nav.Link>
+            <Nav.Item><Nav.Link as={Link} to={APP_ROUTES.FEATURES}>Features</Nav.Link></Nav.Item>
             {/* App controls component visibility with business logic */}
-            {authGuards.hasAnyRole([AppRoles.UserMsAdmin]) && <UserNavBar />}
+            {authGuards.hasAnyRole([AppRoles.UserMsAdmin]) && <UserNavBar path={APP_ROUTES.USERS_LIST} />}
+            {authGuards.hasAnyRole([AppRoles.CommunicationMsAdmin]) && <CommunicationNavBar path={APP_ROUTES.COMMUNICATION} />}
           </Nav>
           <Nav className="align-items-center">
             <AppTheme />

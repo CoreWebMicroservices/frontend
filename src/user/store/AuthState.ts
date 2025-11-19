@@ -2,7 +2,7 @@ import { hookstate, useHookstate } from "@hookstate/core";
 import { devtools } from "@hookstate/devtools";
 import { jwtDecode } from "jwt-decode";
 
-import { USER_API_BASE_URL } from "@/user/config";
+import { USER_MS_BASE_URL } from "@/user/config";
 import CoreMsApi from "@/common/utils/api/CoreMsApi";
 import {
   ACCESS_TOKEN_KEY,
@@ -20,7 +20,7 @@ import {
 } from "@/user/model/Auth";
 import { User, AuthProvider } from "@/user/model/User";
 
-const userMsApi = new CoreMsApi({ baseURL: USER_API_BASE_URL });
+const userMsApi = new CoreMsApi({ baseURL: USER_MS_BASE_URL });
 
 interface AuthState {
   isAuthenticated: boolean;
