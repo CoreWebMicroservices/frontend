@@ -19,10 +19,14 @@ export interface DataTableColumn {
 export interface DataTableFilter {
   key: string;
   label: string;
-  type: "select" | "text" | "date";
+  type: "select" | "text" | "date" | "async-select";
   operator?: FilterOperator;
   options?: { value: string | number; label: string }[];
   placeholder?: string;
+  loadOptions?: (search: string) => Promise<any[]>;
+  getOptionLabel?: (option: any) => string;
+  getOptionValue?: (option: any) => string | number;
+  getOptionSubtitle?: (option: any) => string;
 }
 
 export interface DataTablePagination {

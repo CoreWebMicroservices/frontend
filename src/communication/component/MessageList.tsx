@@ -1,14 +1,16 @@
 import React, { useEffect } from "react";
-import { Badge, Button, OverlayTrigger, Popover } from "react-bootstrap";
+import { Badge, OverlayTrigger, Popover } from "react-bootstrap";
 import { Envelope, ChatDots, CheckCircle, XCircle, Clock, Eye } from "react-bootstrap-icons";
-import { DataTable } from "@/common/component/dataTable";
+import { DataTable, DataTableFilter } from "@/common/component/dataTable";
 import { useMessagesState } from "@/communication/store/MessageState";
 import { Message, SmsPayload, EmailPayload } from "@/communication/model/Message";
 import { useMessageState } from "@/common/utils/api/ApiResponseHandler";
 import { AlertMessage } from "@/common/component/ApiResponseAlert";
+import { searchUsers } from "@/user/utils/UserApi";
+import { User } from "@/user/model/User";
 
 export const MessageList: React.FC = () => {
-  const { state, fetchMessages, setPage, setPageSize, setSearch, setSort } = useMessagesState();
+  const { state, fetchMessages, setPage, setPageSize, setSearch, setSort, setFilters } = useMessagesState();
   const { initialErrorMessage, errors } = useMessageState();
 
   const messages = state.messages.get();
@@ -18,14 +20,37 @@ export const MessageList: React.FC = () => {
 
   useEffect(() => {
     fetchMessages();
-  }, [queryParams.page, queryParams.pageSize, queryParams.sort, queryParams.search, queryParams.filters]);
+  }, [queryParams.page, queryParams.pageSize, queryParams.sort, queryParams.search, JSON.stringify(queryParams.filters)]);
+
+  const handleFilter = (key: string, value: string | number | undefined) => {
+    const currentFilters = { ...queryParams.filters };
+    if (value === null || value === undefined || value === '') {
+      delete currentFilters[key];
+    } else {
+      currentFilters[key] = value;
+    }
+    setFilters(currentFilters);
+  };
+
+  const filters: DataTableFilter[] = [
+    {
+      key: 'userId',
+      label: 'User',
+      type: 'async-select',
+      placeholder: 'Filter by User',
+      loadOptions: searchUsers,
+      getOptionLabel: (user: User) => `${user.firstName} ${user.lastName}`,
+      getOptionValue: (user: User) => user.userId,
+      getOptionSubtitle: (user: User) => user.email
+    }
+  ];
 
   const columns = [
-    { key: "type", title: "Channel", sortable: true, width: "100px" },
+    { key: "type", title: "Channel", sortable: false, width: "100px" },
     { key: "createdAt", title: "Sent", sortable: true, width: "180px" },
     { key: "recipient", title: "To", sortable: false },
     { key: "content", title: "Content", sortable: false },
-    { key: "status", title: "Status", sortable: true, width: "120px" },
+    { key: "status", title: "Status", sortable: true, width: "80px" },
   ];
 
   const getRecipient = (msg: Message) => {
@@ -90,7 +115,7 @@ export const MessageList: React.FC = () => {
         <Popover.Header as="h3">
           {msg.type === 'email' ? 'Email Content' : 'SMS Content'}
         </Popover.Header>
-        <Popover.Body style={{ maxHeight: '400px', overflowY: 'auto' }}>
+        <Popover.Body style={{ maxHeight: '600px', overflowY: 'auto' }}>
           {isHtml ? (
             <div dangerouslySetInnerHTML={{ __html: content }} />
           ) : (
@@ -108,6 +133,9 @@ export const MessageList: React.FC = () => {
             <div className="d-flex align-items-center text-warning"><ChatDots className="me-2" /> SMS</div>
           }
         </td>
+        <td className="align-middle text-muted small">
+          {msg.createdAt ? formatDate(msg.createdAt) : "-"}
+        </td>
         <td className="align-middle fw-medium">{getRecipient(msg)}</td>
         <td className="align-middle">
           <div className="d-flex align-items-center" style={{ cursor: 'help' }}>
@@ -120,9 +148,6 @@ export const MessageList: React.FC = () => {
         <td className="align-middle">
           {renderStatus(msg.status)}
         </td>
-        <td className="align-middle text-muted small">
-          {msg.createdAt ? formatDate(msg.createdAt) : "-"}
-        </td>
         <td className="align-middle text-end">
           <OverlayTrigger
             trigger={['hover', 'focus']}
@@ -132,6 +157,7 @@ export const MessageList: React.FC = () => {
           >
             <Eye size={18} />
           </OverlayTrigger>
+
         </td>
       </tr>
     );
@@ -151,6 +177,9 @@ export const MessageList: React.FC = () => {
         } : undefined}
         isLoading={isInProgress}
         columns={columns}
+        filters={filters}
+        filterValues={queryParams.filters || {}}
+        onFilter={handleFilter}
         sortableFields={columns.filter(col => col.sortable).map(col => col.key)}
         currentSort={parseCurrentSort(queryParams.sort)}
         onPageChange={setPage}

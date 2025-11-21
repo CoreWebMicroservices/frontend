@@ -1,7 +1,7 @@
 import { Container, Row, Col, Card, Table, Spinner } from 'react-bootstrap';
 import { DataTableProps } from './DataTableTypes';
 import { DataTableSearch } from './DataTableSearch';
-import { DataTableFilters } from './DataTableFilters';
+import { DataTableFilters } from './filter/DataTableFilters';
 import { DataTableHeader } from './DataTableHeader';
 import { DataTablePaginationComponent } from './DataTablePagination';
 

@@ -1,6 +1,7 @@
 import React from "react";
 import { Form } from "react-bootstrap";
-import { DataTableFilter, FilterOperator } from "./DataTableTypes";
+import { DataTableFilter, FilterOperator } from "../DataTableTypes";
+import { AsyncSelect } from "./AsyncSelect";
 
 interface DataTableFiltersProps {
   filters: DataTableFilter[];
@@ -56,6 +57,20 @@ export const DataTableFilters: React.FC<DataTableFiltersProps> = ({
             placeholder={filter.placeholder || filter.label}
             value={currentValue?.toString() || ''}
             onChange={(e) => onFilter(filter.key, e.target.value || null, filter.operator)}
+          />
+        );
+
+      case 'async-select':
+        return (
+          <AsyncSelect
+            key={filter.key}
+            value={currentValue as string | number}
+            onChange={(val) => onFilter(filter.key, val || null, filter.operator)}
+            loadOptions={filter.loadOptions!}
+            getOptionLabel={filter.getOptionLabel!}
+            getOptionValue={filter.getOptionValue!}
+            getOptionSubtitle={filter.getOptionSubtitle}
+            placeholder={filter.placeholder || filter.label}
           />
         );
 
