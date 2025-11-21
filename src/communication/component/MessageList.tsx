@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { Badge, OverlayTrigger, Popover } from "react-bootstrap";
 import { Envelope, ChatDots, CheckCircle, XCircle, Clock, Eye } from "react-bootstrap-icons";
+import { useHookstate } from "@hookstate/core";
 import { DataTable, DataTableFilter } from "@/common/component/dataTable";
 import { useMessagesState } from "@/communication/store/MessageState";
 import { Message, EmailPayload } from "@/communication/model/Message";
@@ -8,22 +9,36 @@ import { useMessageState } from "@/common/utils/api/ApiResponseHandler";
 import { AlertMessage } from "@/common/component/ApiResponseAlert";
 import { searchUsers } from "@/user/utils/UserApi";
 import { User } from "@/user/model/User";
-import { parseCurrentSort } from "@/common/component/dataTable/DataTableState";
+import { parseCurrentSort, getInitialDataTableQueryParams, createDataTableActions } from "@/common/component/dataTable/DataTableState";
 import { formatDate } from "@/common/utils/DateUtils";
 import { getRecipient, getContentPreview, getFullContent } from "@/communication/utils/MessageUtils";
 
 export const MessageList: React.FC = () => {
-  const { state, fetchMessages, setPage, setPageSize, setSearch, setSort, setFilter } = useMessagesState();
+  const { fetchMessages } = useMessagesState();
   const { initialErrorMessage, errors } = useMessageState();
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [messages, setMessages] = React.useState<Message[]>([]);
+  const [pagedResponse, setPagedResponse] = React.useState<any>(undefined);
 
-  const messages = state.messages.get();
-  const pagedResponse = state.pagedResponse.get();
-  const isInProgress = state.isInProgress.get();
-  const queryParams = state.queryParams.get();
+  // Local state for query params
+  const queryParams = useHookstate(getInitialDataTableQueryParams());
+  const {
+    setSearch,
+    setPage,
+    setPageSize,
+    setFilter,
+    setSort
+  } = createDataTableActions(queryParams);
 
   useEffect(() => {
-    fetchMessages();
-  }, [queryParams.page, queryParams.pageSize, queryParams.sort, queryParams.search, JSON.stringify(queryParams.filters)]);
+    setIsLoading(true);
+    fetchMessages(queryParams.get()).then((res) => {
+      if (res.result && res.response) {
+        setMessages(res.response.items);
+        setPagedResponse(res.response);
+      }
+    }).finally(() => setIsLoading(false));
+  }, [JSON.stringify(queryParams.get())]);
 
   const filters: DataTableFilter<User>[] = [
     {
@@ -129,13 +144,13 @@ export const MessageList: React.FC = () => {
           totalElements: pagedResponse.totalElements,
           totalPages: pagedResponse.totalPages
         } : undefined}
-        isLoading={isInProgress}
+        isLoading={isLoading}
         columns={columns}
         filters={filters}
-        filterValues={queryParams.filters || {}}
+        filterValues={queryParams.filters.get() || {}}
         onFilter={setFilter}
         sortableFields={columns.filter(col => col.sortable).map(col => col.key)}
-        currentSort={parseCurrentSort(queryParams.sort)}
+        currentSort={parseCurrentSort(queryParams.sort.get())}
         onPageChange={setPage}
         onPageSizeChange={setPageSize}
         onSearch={setSearch}

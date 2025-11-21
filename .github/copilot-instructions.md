@@ -235,12 +235,12 @@ Each service follows the pattern:
 
 ### 5. State Management
 
-State Management
-
-- Use **React Query** for server state (data fetching, caching, and sync with backend).
-- Use **Hookstate** for local and client state management. Prefer simple, modular state logic.
-- Each core service/component (e.g., user, communication, translation) should have its own `store/` folder with state files colocated.
-- Avoid Redux and complex global state unless absolutely necessary.
+- **Global State (Hookstate)**: Use for truly global data (e.g., authenticated user, theme, shared entities).
+- **Local State (Hookstate/useState)**: Use for component-specific data, especially **DataTables** and lists.
+  - Avoid storing list data (e.g., `users`, `messages`) in global stores to prevent state pollution across tabs.
+  - Use `createDataTableActions` and `getInitialDataTableQueryParams` for local DataTable state.
+- **React Query**: Use for server state caching where appropriate (though current pattern uses direct API calls with local state).
+- Each core service/component should have its own `store/` folder, but API functions should return data rather than setting global state for lists.
 
 ### 6. UI / UX
 
@@ -283,31 +283,58 @@ When working with state management functions, follow these patterns for consiste
 
 #### State Management Function Structure
 
-```typescript
-export async function someStateFunction(
-  data: SomeData
-): Promise<CoreMsApiResonse<ReturnType>> {
-  // Set loading state
-  someState.isInProgress.set(true);
+**Pattern A: Global State (Single Entities/Auth)**
 
-  // Make API call - NO try-catch needed (handled in userMsApi.apiRequest)
-  const res = await userMsApi.apiRequest<ReturnType>(
-    HttpMethod.METHOD,
-    "/api/endpoint",
-    data
+```typescript
+export async function getUserById(
+  userId: string
+): Promise<CoreMsApiResonse<User>> {
+  // API call
+  const res = await userMsApi.apiRequest<User>(
+    HttpMethod.GET,
+    `/api/users/${userId}`
   );
 
-  // Clear loading state
-  someState.isInProgress.set(false);
-
-  // Update state if successful
+  // Update global state if needed (e.g. selected item)
   if (res.result === true && res.response) {
-    someState.data.set(res.response);
+    userState.selectedUser.set(res.response);
   }
 
-  // Return response directly
   return res;
 }
+```
+
+**Pattern B: Local State (Lists/DataTables)**
+
+```typescript
+// In Store File (pure API function)
+export async function getAllUsers(
+  queryParams: DataTableQueryParams
+): Promise<CoreMsApiResonse<UsersPagedResponse>> {
+  const params = buildUrlSearchParams(queryParams);
+  return await userMsApi.apiRequest<UsersPagedResponse>(
+    HttpMethod.GET,
+    `/api/users?${params.toString()}`
+  );
+}
+
+// In Component (Local State)
+const UserList = () => {
+  const [users, setUsers] = useState<User[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const queryParams = useHookstate(getInitialDataTableQueryParams());
+
+  useEffect(() => {
+    setIsLoading(true);
+    getAllUsers(queryParams.get())
+      .then((res) => {
+        if (res.result && res.response) {
+          setUsers(res.response.items);
+        }
+      })
+      .finally(() => setIsLoading(false));
+  }, [JSON.stringify(queryParams.get())]);
+};
 ```
 
 #### Component Response Handling
@@ -345,7 +372,7 @@ if (result.result) {
 ### Key Principles
 
 - **No try-catch blocks** in state functions - error handling is done in `userMsApi.apiRequest`
-- **Consistent loading states** - always set `isInProgress` before/after API calls
+- **Local State for Lists** - avoid global state for paginated lists to prevent cross-tab pollution
 - **Appropriate response types** - use detailed responses for data operations, simple responses for actions
 - **State updates** - update local state when API calls succeed
 - **Direct return** - return API response directly without additional processing

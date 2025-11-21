@@ -25,7 +25,7 @@ const UserEdit = () => {
   const navigate = useNavigate();
   const userState = useUserState();
   const selectedUser = userState.selectedUser.get();
-  const isLoading = userState.isInProgress.get();
+  const [isLoading, setIsLoading] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
 
   const { register, handleSubmit, reset, watch, setValue, formState: { errors, isSubmitting } } = useForm<UserFormValues>();
@@ -36,7 +36,9 @@ const UserEdit = () => {
   useEffect(() => {
     if (userId) {
       const loadUser = async () => {
+        setIsLoading(true);
         const result = await getUserById(userId);
+        setIsLoading(false);
 
         if (result.result && result.response) {
           reset({

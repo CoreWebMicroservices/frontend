@@ -15,11 +15,7 @@ import {
   ChangeEmailRequest,
 } from "@/user/model/User";
 import { DataTableQueryParams } from "@/common/component/dataTable/DataTableTypes";
-import {
-  initialDataTableQueryParams,
-  buildUrlSearchParams,
-  createDataTableActions,
-} from "@/common/component/dataTable/DataTableState";
+import { buildUrlSearchParams } from "@/common/component/dataTable/DataTableState";
 
 const userMsApi = new CoreMsApi({ baseURL: USER_MS_BASE_URL });
 
@@ -27,19 +23,15 @@ const userMsApi = new CoreMsApi({ baseURL: USER_MS_BASE_URL });
 type UsersPagedResponse = PageResponse<User>;
 
 interface UserManagementState {
-  users: User[];
+  // users: User[];
   selectedUser?: User;
-  pagedResponse?: UsersPagedResponse;
-  isInProgress: boolean;
-  queryParams: DataTableQueryParams;
+  // pagedResponse?: UsersPagedResponse;
 }
 
 const initialState: UserManagementState = {
-  users: [],
+  // users: [],
   selectedUser: undefined,
-  pagedResponse: undefined,
-  isInProgress: false,
-  queryParams: initialDataTableQueryParams,
+  // pagedResponse: undefined,
 };
 
 const userState = hookstate(initialState, devtools({ key: "userManagement" }));
@@ -49,12 +41,9 @@ export function useUserState() {
 }
 
 // Get all users with pagination - uses state parameters
-export async function getAllUsers(): Promise<
-  CoreMsApiResonse<UsersPagedResponse>
-> {
-  userState.isInProgress.set(true);
-
-  const queryParams = userState.queryParams.get();
+export async function getAllUsers(
+  queryParams: DataTableQueryParams
+): Promise<CoreMsApiResonse<UsersPagedResponse>> {
   const params = buildUrlSearchParams(queryParams);
 
   const res = await userMsApi.apiRequest<UsersPagedResponse>(
@@ -62,11 +51,9 @@ export async function getAllUsers(): Promise<
     `/api/users?${params.toString()}`
   );
 
-  userState.isInProgress.set(false);
-
   if (res.result === true && res.response) {
-    userState.pagedResponse.set(res.response);
-    userState.users.set(res.response.items);
+    // userState.pagedResponse.set(res.response);
+    // userState.users.set(res.response.items);
   }
 
   return res;
@@ -74,17 +61,12 @@ export async function getAllUsers(): Promise<
 
 // Get user by ID - matches /api/users/{userId}
 export async function getUserById(
-  userId: string,
-  isBackgroundFetch = false
+  userId: string
 ): Promise<CoreMsApiResonse<User>> {
-  if (!isBackgroundFetch) userState.isInProgress.set(true);
-
   const res = await userMsApi.apiRequest<User>(
     HttpMethod.GET,
     `/api/users/${userId}`
   );
-
-  userState.isInProgress.set(false);
 
   if (res.result === true && res.response) {
     userState.selectedUser.set(res.response);
@@ -97,20 +79,16 @@ export async function getUserById(
 export async function createUser(
   userData: CreateUserRequest
 ): Promise<CoreMsApiResonse<ApiSuccessfulResponse>> {
-  userState.isInProgress.set(true);
-
   const res = await userMsApi.apiRequest<ApiSuccessfulResponse>(
     HttpMethod.POST,
     `/api/users`,
     userData
   );
 
-  userState.isInProgress.set(false);
-
   // Refresh the users list after creating
-  if (res.result === true) {
-    getAllUsers();
-  }
+  // if (res.result === true) {
+  //   getAllUsers();
+  // }
 
   return res;
 }
@@ -127,7 +105,7 @@ export async function updateUserInfo(
   );
 
   if (res.result === true) {
-    getUserById(userId, true);
+    getUserById(userId);
   }
 
   return res;
@@ -137,20 +115,16 @@ export async function updateUserInfo(
 export async function deleteUser(
   userId: string
 ): Promise<CoreMsApiResonse<ApiSuccessfulResponse>> {
-  userState.isInProgress.set(true);
-
   const res = await userMsApi.apiRequest<ApiSuccessfulResponse>(
     HttpMethod.DELETE,
     `/api/users/${userId}`
   );
 
-  userState.isInProgress.set(false);
-
   if (res.result === true) {
     // Remove user from the list
-    const users = userState.users.get();
-    const updatedUsers = users.filter((user) => user.userId !== userId);
-    userState.users.set(updatedUsers);
+    // const users = userState.users.get();
+    // const updatedUsers = users.filter((user) => user.userId !== userId);
+    // userState.users.set(updatedUsers);
 
     // Clear selected user if it was the deleted one
     const selectedUser = userState.selectedUser.get();
@@ -200,32 +174,32 @@ export async function adminChangeUserEmail(
   );
 
   if (res.result === true) {
-    getUserById(userId, true);
+    getUserById(userId);
   }
 
   return res;
 }
 
 // Create actions
-const actions = createDataTableActions(userState.queryParams, {
-  fieldMapper: (field) => (field === "name" ? "lastName" : field),
-});
+// const actions = createDataTableActions(userState.queryParams, {
+//   fieldMapper: (field) => (field === "name" ? "lastName" : field),
+// });
 
 // Export actions
-export const {
-  setSearch,
-  setPage,
-  setPageSize,
-  setSort,
-  setFilter,
-  clearFilters,
-  setFilters,
-} = actions;
+// export const {
+//   setSearch,
+//   setPage,
+//   setPageSize,
+//   setSort,
+//   setFilter,
+//   clearFilters,
+//   setFilters,
+// } = actions;
 
 // Reset query parameters to defaults
-export function resetQueryParams(): void {
-  actions.reset();
-}
+// export function resetQueryParams(): void {
+//   actions.reset();
+// }
 
 // Clear selected user
 export function clearSelectedUser(): void {
@@ -234,5 +208,5 @@ export function clearSelectedUser(): void {
 
 // Clear users list
 export function clearUsersList(): void {
-  userState.users.set([]);
+  // userState.users.set([]);
 }

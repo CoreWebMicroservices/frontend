@@ -1,8 +1,9 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 import { PencilSquare, Plus } from 'react-bootstrap-icons';
-import { useUserState, getAllUsers, setSearch, setPage, setPageSize, setFilter, setSort } from '@/user/store/UserState';
+import { useHookstate } from '@hookstate/core';
+import { getAllUsers } from '@/user/store/UserState';
 import { useMessageState } from '@/common/utils/api/ApiResponseHandler';
 import { AlertMessage } from '@/common/component/ApiResponseAlert';
 import { DataTable } from '@/common/component/dataTable';
@@ -10,18 +11,36 @@ import type { DataTableColumn, DataTableFilter } from '@/common/component/dataTa
 import type { User } from '@/user/model/User';
 import { APP_ROUTES } from '@/app/router/routes';
 import { UserAvatar } from '@/user/component/shared/UserAvatar';
-import { parseCurrentSort } from '@/common/component/dataTable/DataTableState';
+import { parseCurrentSort, getInitialDataTableQueryParams, createDataTableActions } from '@/common/component/dataTable/DataTableState';
 import { formatDate } from '@/common/utils/DateUtils';
 
 const UserList = () => {
   const navigate = useNavigate();
-  const userState = useUserState();
-  const users = userState.users.get();
-  const isLoading = userState.isInProgress.get();
-  const queryParams = userState.queryParams.get();
-  const pagedResponse = userState.pagedResponse.get();
+  const [users, setUsers] = useState<User[]>([]);
+  const [pagedResponse, setPagedResponse] = useState<any>(undefined);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Local state for query params
+  const queryParams = useHookstate(getInitialDataTableQueryParams());
+  const {
+    setSearch,
+    setPage,
+    setPageSize,
+    setFilter,
+    setSort
+  } = createDataTableActions(queryParams);
 
   const { initialErrorMessage, errors } = useMessageState();
+
+  useEffect(() => {
+    setIsLoading(true);
+    getAllUsers(queryParams.get()).then((res) => {
+      if (res.result && res.response) {
+        setUsers(res.response.items);
+        setPagedResponse(res.response);
+      }
+    }).finally(() => setIsLoading(false));
+  }, [JSON.stringify(queryParams.get())]);
 
   // Configuration for DataTable
   const columns: DataTableColumn[] = [
@@ -32,7 +51,7 @@ const UserList = () => {
     { key: 'actions', title: 'Actions' }
   ];
 
-  const currentSort = parseCurrentSort(queryParams.sort);
+  const currentSort = parseCurrentSort(queryParams.sort.get());
 
   const filters: DataTableFilter[] = [
     {
@@ -83,10 +102,6 @@ const UserList = () => {
     </Button>
   );
 
-  useEffect(() => {
-    getAllUsers();
-  }, [JSON.stringify(queryParams)]);
-
   return (
     <>
       <AlertMessage initialErrorMessage={initialErrorMessage} errors={errors} />
@@ -105,7 +120,7 @@ const UserList = () => {
         // Configuration
         columns={columns}
         filters={filters}
-        filterValues={queryParams.filters || {}}
+        filterValues={queryParams.filters.get() || {}}
         sortableFields={columns.filter(col => col.sortable).map(col => col.key)}
         currentSort={currentSort}
         searchPlaceholder="Search users by name or email..."

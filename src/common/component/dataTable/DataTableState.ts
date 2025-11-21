@@ -1,14 +1,14 @@
 import { State } from "@hookstate/core";
 import { DataTableQueryParams, FilterOperator } from "./DataTableTypes";
 
-export const initialDataTableQueryParams: DataTableQueryParams = {
+export const getInitialDataTableQueryParams = (): DataTableQueryParams => ({
   page: 1,
   pageSize: 20,
   search: "",
   sort: undefined,
   filters: undefined,
   filterOperators: undefined,
-};
+});
 
 export function buildUrlSearchParams(
   queryParams: DataTableQueryParams
@@ -118,7 +118,7 @@ export function createDataTableActions(
       triggerUpdate();
     },
     reset: () => {
-      state.set(initialDataTableQueryParams);
+      state.set(getInitialDataTableQueryParams());
     },
   };
 }
