@@ -4,7 +4,7 @@ import { DataTableFilter, FilterOperator } from "../DataTableTypes";
 import { AsyncSelect } from "./AsyncSelect";
 
 interface DataTableFiltersProps {
-  filters: DataTableFilter[];
+  filters: DataTableFilter<unknown>[];
   values: Record<string, string | number | boolean>;
   onFilter: (
     key: string,
@@ -18,7 +18,7 @@ export const DataTableFilters: React.FC<DataTableFiltersProps> = ({
   values,
   onFilter
 }) => {
-  const renderFilter = (filter: DataTableFilter) => {
+  const renderFilter = (filter: DataTableFilter<unknown>) => {
     const currentValue = values[filter.key];
 
     switch (filter.type) {

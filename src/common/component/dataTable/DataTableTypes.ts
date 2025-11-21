@@ -16,17 +16,17 @@ export interface DataTableColumn {
   width?: string;
 }
 
-export interface DataTableFilter {
+export interface DataTableFilter<T = unknown> {
   key: string;
   label: string;
   type: "select" | "text" | "date" | "async-select";
   operator?: FilterOperator;
   options?: { value: string | number; label: string }[];
   placeholder?: string;
-  loadOptions?: (search: string) => Promise<any[]>;
-  getOptionLabel?: (option: any) => string;
-  getOptionValue?: (option: any) => string | number;
-  getOptionSubtitle?: (option: any) => string;
+  loadOptions?: (search: string) => Promise<T[]>;
+  getOptionLabel?: (option: T) => string;
+  getOptionValue?: (option: T) => string | number;
+  getOptionSubtitle?: (option: T) => string;
 }
 
 export interface DataTablePagination {
@@ -42,6 +42,7 @@ export interface DataTableQueryParams {
   search: string;
   sort?: string;
   filters?: Record<string, string | number | boolean>;
+  filterOperators?: Record<string, FilterOperator>;
 }
 
 export interface DataTableProps<T> {
@@ -52,7 +53,8 @@ export interface DataTableProps<T> {
 
   // Configuration
   columns: DataTableColumn[];
-  filters?: DataTableFilter[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  filters?: DataTableFilter<any>[];
   filterValues?: Record<string, string | number | boolean>;
   sortableFields?: string[];
   currentSort?: { field: string; direction: "asc" | "desc" };

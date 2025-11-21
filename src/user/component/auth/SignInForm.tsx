@@ -1,6 +1,6 @@
 import * as yup from 'yup';
 import { Button, Col, FloatingLabel, Form, Row } from "react-bootstrap";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
 
@@ -18,7 +18,6 @@ const signInSchema = yup.object().shape({
 
 
 const SignInForm = () => {
-  const navigate = useNavigate();
   const { success, initialErrorMessage, errors: apiErrors, handleResponse } = useMessageState();
   const {
     register,

@@ -3,14 +3,17 @@ import { Badge, OverlayTrigger, Popover } from "react-bootstrap";
 import { Envelope, ChatDots, CheckCircle, XCircle, Clock, Eye } from "react-bootstrap-icons";
 import { DataTable, DataTableFilter } from "@/common/component/dataTable";
 import { useMessagesState } from "@/communication/store/MessageState";
-import { Message, SmsPayload, EmailPayload } from "@/communication/model/Message";
+import { Message, EmailPayload } from "@/communication/model/Message";
 import { useMessageState } from "@/common/utils/api/ApiResponseHandler";
 import { AlertMessage } from "@/common/component/ApiResponseAlert";
 import { searchUsers } from "@/user/utils/UserApi";
 import { User } from "@/user/model/User";
+import { parseCurrentSort } from "@/common/component/dataTable/DataTableState";
+import { formatDate } from "@/common/utils/DateUtils";
+import { getRecipient, getContentPreview, getFullContent } from "@/communication/utils/MessageUtils";
 
 export const MessageList: React.FC = () => {
-  const { state, fetchMessages, setPage, setPageSize, setSearch, setSort, setFilters } = useMessagesState();
+  const { state, fetchMessages, setPage, setPageSize, setSearch, setSort, setFilter } = useMessagesState();
   const { initialErrorMessage, errors } = useMessageState();
 
   const messages = state.messages.get();
@@ -22,17 +25,7 @@ export const MessageList: React.FC = () => {
     fetchMessages();
   }, [queryParams.page, queryParams.pageSize, queryParams.sort, queryParams.search, JSON.stringify(queryParams.filters)]);
 
-  const handleFilter = (key: string, value: string | number | undefined) => {
-    const currentFilters = { ...queryParams.filters };
-    if (value === null || value === undefined || value === '') {
-      delete currentFilters[key];
-    } else {
-      currentFilters[key] = value;
-    }
-    setFilters(currentFilters);
-  };
-
-  const filters: DataTableFilter[] = [
+  const filters: DataTableFilter<User>[] = [
     {
       key: 'userId',
       label: 'User',
@@ -52,45 +45,6 @@ export const MessageList: React.FC = () => {
     { key: "content", title: "Content", sortable: false },
     { key: "status", title: "Status", sortable: true, width: "80px" },
   ];
-
-  const getRecipient = (msg: Message) => {
-    if (msg.type === 'sms') {
-      return (msg.payload as SmsPayload).phoneNumber;
-    } else if (msg.type === 'email') {
-      return (msg.payload as EmailPayload).recipient;
-    }
-    return msg.userId;
-  };
-
-  const getContentPreview = (msg: Message) => {
-    if (msg.type === 'sms') {
-      return (msg.payload as SmsPayload).message;
-    } else if (msg.type === 'email') {
-      return (msg.payload as EmailPayload).subject;
-    }
-    return '';
-  };
-
-  const getFullContent = (msg: Message) => {
-    if (msg.type === 'sms') {
-      return (msg.payload as SmsPayload).message;
-    } else if (msg.type === 'email') {
-      return (msg.payload as EmailPayload).body;
-    }
-    return '';
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString(undefined, {
-      month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-    });
-  };
-
-  const parseCurrentSort = (sort?: string) => {
-    if (!sort) return undefined;
-    const [field, direction] = sort.split(':');
-    return { field, direction: direction as 'asc' | 'desc' };
-  };
 
   const renderStatus = (status: string) => {
     switch (status) {
@@ -179,7 +133,7 @@ export const MessageList: React.FC = () => {
         columns={columns}
         filters={filters}
         filterValues={queryParams.filters || {}}
-        onFilter={handleFilter}
+        onFilter={setFilter}
         sortableFields={columns.filter(col => col.sortable).map(col => col.key)}
         currentSort={parseCurrentSort(queryParams.sort)}
         onPageChange={setPage}

@@ -14,28 +14,24 @@ import {
   AdminChangePasswordRequest,
   ChangeEmailRequest,
 } from "@/user/model/User";
-import { FilterOperator } from "@/common/component/dataTable";
+import { DataTableQueryParams } from "@/common/component/dataTable/DataTableTypes";
+import {
+  initialDataTableQueryParams,
+  buildUrlSearchParams,
+  createDataTableActions,
+} from "@/common/component/dataTable/DataTableState";
 
 const userMsApi = new CoreMsApi({ baseURL: USER_MS_BASE_URL });
 
 // Type alias for users paged response using generic PageResponse
 type UsersPagedResponse = PageResponse<User>;
 
-interface UserQueryParams {
-  page: number;
-  pageSize: number;
-  search: string;
-  sort?: string;
-  filters?: Record<string, string | number | boolean>;
-  filterOperators?: Record<string, FilterOperator>;
-}
-
 interface UserManagementState {
   users: User[];
   selectedUser?: User;
   pagedResponse?: UsersPagedResponse;
   isInProgress: boolean;
-  queryParams: UserQueryParams;
+  queryParams: DataTableQueryParams;
 }
 
 const initialState: UserManagementState = {
@@ -43,14 +39,7 @@ const initialState: UserManagementState = {
   selectedUser: undefined,
   pagedResponse: undefined,
   isInProgress: false,
-  queryParams: {
-    page: 1,
-    pageSize: 20,
-    search: "",
-    sort: undefined,
-    filters: undefined,
-    filterOperators: undefined,
-  },
+  queryParams: initialDataTableQueryParams,
 };
 
 const userState = hookstate(initialState, devtools({ key: "userManagement" }));
@@ -66,22 +55,7 @@ export async function getAllUsers(): Promise<
   userState.isInProgress.set(true);
 
   const queryParams = userState.queryParams.get();
-  const params = new URLSearchParams({
-    page: queryParams.page.toString(),
-    pageSize: queryParams.pageSize.toString(),
-  });
-
-  if (queryParams.sort) params.append("sort", queryParams.sort);
-  if (queryParams.search) params.append("search", queryParams.search);
-  if (queryParams.filters) {
-    Object.entries(queryParams.filters).forEach(([key, value]) => {
-      const operator = queryParams.filterOperators?.[key];
-      const filterValue = operator
-        ? `${key}:${operator}:${value.toString()}`
-        : `${key}:${value.toString()}`;
-      params.append("filter", filterValue);
-    });
-  }
+  const params = buildUrlSearchParams(queryParams);
 
   const res = await userMsApi.apiRequest<UsersPagedResponse>(
     HttpMethod.GET,
@@ -232,103 +206,25 @@ export async function adminChangeUserEmail(
   return res;
 }
 
-// Update search
-export function setSearch(search: string): void {
-  userState.queryParams.search.set(search);
-  userState.queryParams.page.set(1);
-  getAllUsers();
-}
+// Create actions
+const actions = createDataTableActions(userState.queryParams, {
+  fieldMapper: (field) => (field === "name" ? "lastName" : field),
+});
 
-// Update page
-export function setPage(page: number): void {
-  userState.queryParams.page.set(page);
-  getAllUsers();
-}
-
-// Update page size
-export function setPageSize(pageSize: number): void {
-  userState.queryParams.pageSize.set(pageSize);
-  userState.queryParams.page.set(1); // Reset to first page when changing page size
-  getAllUsers();
-}
-
-// Handle column sorting with toggle behavior
-export function setSort(field: string, direction: "asc" | "desc"): void {
-  if (field === "name") field = "lastName";
-  const sortValue = `${field}:${direction}`;
-  userState.queryParams.sort.set(sortValue);
-  getAllUsers();
-}
-
-// Update filters
-export function setFilter(
-  key: string,
-  value: string | number | boolean | null,
-  operator?: FilterOperator
-): void {
-  const currentFilters = userState.queryParams.filters.get() || {};
-  const currentOperators = userState.queryParams.filterOperators.get() || {};
-
-  if (value === null || value === "" || value === undefined) {
-    // Remove filter if value is null/empty
-    const remainingFilters = { ...currentFilters };
-    delete remainingFilters[key];
-    userState.queryParams.filters.set(
-      Object.keys(remainingFilters).length > 0 ? remainingFilters : undefined
-    );
-
-    const remainingOperators = { ...currentOperators };
-    delete remainingOperators[key];
-    userState.queryParams.filterOperators.set(
-      Object.keys(remainingOperators).length > 0
-        ? remainingOperators
-        : undefined
-    );
-  } else {
-    // Set/update filter
-    userState.queryParams.filters.set({
-      ...currentFilters,
-      [key]: value,
-    });
-
-    if (operator) {
-      userState.queryParams.filterOperators.set({
-        ...currentOperators,
-        [key]: operator,
-      });
-    }
-  }
-
-  userState.queryParams.page.set(1); // Reset to first page when filtering
-  getAllUsers();
-}
-
-// Clear all filters
-export function clearFilters(): void {
-  userState.queryParams.filters.set(undefined);
-  userState.queryParams.filterOperators.set(undefined);
-  userState.queryParams.page.set(1);
-  getAllUsers();
-}
-
-// Update filters
-export function setFilters(
-  filters?: Record<string, string | number | boolean>
-): void {
-  userState.queryParams.filters.set(filters);
-  // Note: This doesn't handle operators, assuming bulk set is for simple values or reset
-}
+// Export actions
+export const {
+  setSearch,
+  setPage,
+  setPageSize,
+  setSort,
+  setFilter,
+  clearFilters,
+  setFilters,
+} = actions;
 
 // Reset query parameters to defaults
 export function resetQueryParams(): void {
-  userState.queryParams.set({
-    page: 1,
-    pageSize: 20,
-    search: "",
-    sort: undefined,
-    filters: undefined,
-    filterOperators: undefined,
-  });
+  actions.reset();
 }
 
 // Clear selected user

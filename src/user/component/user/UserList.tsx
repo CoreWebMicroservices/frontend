@@ -9,35 +9,9 @@ import { DataTable } from '@/common/component/dataTable';
 import type { DataTableColumn, DataTableFilter } from '@/common/component/dataTable';
 import type { User } from '@/user/model/User';
 import { APP_ROUTES } from '@/app/router/routes';
-
-const UserAvatar = ({ user }: { user: { imageUrl?: string; firstName: string; lastName: string } }) => {
-  if (user.imageUrl) {
-    return (
-      <img
-        src={user.imageUrl}
-        alt="Avatar"
-        className="rounded-circle me-3"
-        style={{ width: 32, height: 32, objectFit: 'cover' }}
-      />
-    );
-  }
-
-  return (
-    <div
-      className="rounded-circle me-3 d-flex align-items-center justify-content-center"
-      style={{
-        width: 32,
-        height: 32,
-        backgroundColor: '#e9ecef',
-        fontSize: 12,
-        fontWeight: 'bold',
-        color: '#6c757d',
-      }}
-    >
-      {user.firstName.charAt(0)}{user.lastName.charAt(0)}
-    </div>
-  );
-};
+import { UserAvatar } from '@/user/component/shared/UserAvatar';
+import { parseCurrentSort } from '@/common/component/dataTable/DataTableState';
+import { formatDate } from '@/common/utils/DateUtils';
 
 const UserList = () => {
   const navigate = useNavigate();
@@ -57,13 +31,6 @@ const UserList = () => {
     { key: 'lastLogin', title: 'Last Login', sortable: true },
     { key: 'actions', title: 'Actions' }
   ];
-
-  // Helper function to parse current sort
-  const parseCurrentSort = (sort?: string) => {
-    if (!sort) return undefined;
-    const [field, direction] = sort.split(':');
-    return { field, direction: direction as 'asc' | 'desc' };
-  };
 
   const currentSort = parseCurrentSort(queryParams.sort);
 
@@ -88,7 +55,7 @@ const UserList = () => {
     <tr key={user.userId}>
       <td>
         <div className="d-flex align-items-center">
-          <UserAvatar user={user} />
+          <UserAvatar user={user} className="me-3" />
           <span className="fw-medium">
             {user.firstName} {user.lastName}
           </span>
@@ -96,7 +63,7 @@ const UserList = () => {
       </td>
       <td>{user.email}</td>
       <td>{user.provider}</td>
-      <td>{user.lastLoginAt}</td>
+      <td>{formatDate(user.lastLoginAt)}</td>
       <td>
         <Link to={APP_ROUTES.USER_EDIT.replace(':userId', user.userId)}>
           <Button variant="outline-primary" size="sm">
@@ -118,7 +85,7 @@ const UserList = () => {
 
   useEffect(() => {
     getAllUsers();
-  }, []);
+  }, [JSON.stringify(queryParams)]);
 
   return (
     <>

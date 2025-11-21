@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Form, Dropdown, Spinner, InputGroup } from 'react-bootstrap';
+import { Form, Dropdown, Spinner } from 'react-bootstrap';
 import { X } from 'react-bootstrap-icons';
 
 export interface AsyncSelectProps<T> {
