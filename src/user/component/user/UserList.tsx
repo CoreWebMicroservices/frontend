@@ -9,6 +9,7 @@ import { AlertMessage } from '@/common/component/ApiResponseAlert';
 import { DataTable } from '@/common/component/dataTable';
 import type { DataTableColumn, DataTableFilter } from '@/common/component/dataTable';
 import type { User } from '@/user/model/User';
+import { PageResponse } from "@/common/model/CoreMsApiModel";
 import { APP_ROUTES } from '@/app/router/routes';
 import { UserAvatar } from '@/user/component/shared/UserAvatar';
 import { parseCurrentSort, getInitialDataTableQueryParams, createDataTableActions } from '@/common/component/dataTable/DataTableState';
@@ -17,7 +18,7 @@ import { formatDate } from '@/common/utils/DateUtils';
 const UserList = () => {
   const navigate = useNavigate();
   const [users, setUsers] = useState<User[]>([]);
-  const [pagedResponse, setPagedResponse] = useState<any>(undefined);
+  const [pagedResponse, setPagedResponse] = useState<PageResponse<User> | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
 
   // Local state for query params

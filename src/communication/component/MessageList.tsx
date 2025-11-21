@@ -12,13 +12,14 @@ import { User } from "@/user/model/User";
 import { parseCurrentSort, getInitialDataTableQueryParams, createDataTableActions } from "@/common/component/dataTable/DataTableState";
 import { formatDate } from "@/common/utils/DateUtils";
 import { getRecipient, getContentPreview, getFullContent } from "@/communication/utils/MessageUtils";
+import { PageResponse } from "@/common/model/CoreMsApiModel";
 
 export const MessageList: React.FC = () => {
   const { fetchMessages } = useMessagesState();
   const { initialErrorMessage, errors } = useMessageState();
   const [isLoading, setIsLoading] = React.useState(false);
   const [messages, setMessages] = React.useState<Message[]>([]);
-  const [pagedResponse, setPagedResponse] = React.useState<any>(undefined);
+  const [pagedResponse, setPagedResponse] = React.useState<PageResponse<Message> | undefined>(undefined);
 
   // Local state for query params
   const queryParams = useHookstate(getInitialDataTableQueryParams());
