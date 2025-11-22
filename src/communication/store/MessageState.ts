@@ -44,8 +44,40 @@ export const useMessagesState = () => {
     return response;
   };
 
+  const sendEmailMessage = async (data: {
+    userId?: string; // target user (if selected)
+    recipient: string; // direct email if not using userId or for explicit overrides
+    subject: string;
+    body: string;
+    emailType: "html" | "txt";
+    cc?: string[];
+    bcc?: string[];
+  }) => {
+    const response = await communicationMsApi.apiRequest<Message>(
+      HttpMethod.POST,
+      `/api/messages/email`,
+      data
+    );
+    return response;
+  };
+
+  const sendSmsMessage = async (data: {
+    userId?: string;
+    phoneNumber: string;
+    message: string;
+  }) => {
+    const response = await communicationMsApi.apiRequest<Message>(
+      HttpMethod.POST,
+      `/api/messages/sms`,
+      data
+    );
+    return response;
+  };
+
   return {
     state,
     fetchMessages,
+    sendEmailMessage,
+    sendSmsMessage,
   };
 };

@@ -19,6 +19,9 @@ export interface Message {
   type: "sms" | "email";
   status: "created" | "enqueued" | "sent" | "failed";
   userId: string;
+  // New metadata for identifying who initiated the message
+  sentById?: string;
+  sentByType?: "user" | "system";
   createdAt: string;
   payload: SmsPayload | EmailPayload;
 }

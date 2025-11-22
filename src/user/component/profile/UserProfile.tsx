@@ -15,6 +15,7 @@ interface UserFormValues {
   firstName: string;
   lastName: string;
   email: string;
+  phoneNumber?: string;
 }
 
 const UserProfile = () => {
@@ -40,6 +41,7 @@ const UserProfile = () => {
           firstName: result.response.firstName,
           lastName: result.response.lastName,
           email: result.response.email,
+          phoneNumber: result.response.phoneNumber,
         });
       }
     });
@@ -128,6 +130,18 @@ const UserProfile = () => {
               />
               <Form.Control.Feedback type="invalid">
                 {errors.email?.message}
+              </Form.Control.Feedback>
+            </Form.Group>
+            <Form.Group className="mb-3" controlId="phoneNumber">
+              <Form.Label>Phone Number</Form.Label>
+              <Form.Control
+                type="text"
+                isInvalid={!!errors.phoneNumber}
+                {...register('phoneNumber')}
+                placeholder="+123456789"
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors.phoneNumber?.message}
               </Form.Control.Feedback>
             </Form.Group>
             <div className="d-flex gap-2">

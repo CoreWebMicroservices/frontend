@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Badge, OverlayTrigger, Popover } from "react-bootstrap";
-import { Envelope, ChatDots, CheckCircle, XCircle, Clock, Eye } from "react-bootstrap-icons";
+import { Envelope, ChatDots, CheckCircle, XCircle, Clock, Eye, Send } from "react-bootstrap-icons";
 import { useHookstate } from "@hookstate/core";
 import { DataTable, DataTableFilter } from "@/common/component/dataTable";
 import { useMessagesState } from "@/communication/store/MessageState";
@@ -13,6 +13,11 @@ import { parseCurrentSort, getInitialDataTableQueryParams, createDataTableAction
 import { formatDate } from "@/common/utils/DateUtils";
 import { getRecipient, getContentPreview, getFullContent } from "@/communication/utils/MessageUtils";
 import { PageResponse } from "@/common/model/CoreMsApiModel";
+import { resolveUserNames } from "@/user/utils/UserApi";
+import { Link } from "react-router-dom";
+import SendMessageModal from "@/communication/component/SendMessageModal";
+import { Container } from "react-bootstrap";
+import { APP_ROUTES } from "@/app/router/routes";
 
 export const MessageList: React.FC = () => {
   const { fetchMessages } = useMessagesState();
@@ -20,6 +25,9 @@ export const MessageList: React.FC = () => {
   const [isLoading, setIsLoading] = React.useState(false);
   const [messages, setMessages] = React.useState<Message[]>([]);
   const [pagedResponse, setPagedResponse] = React.useState<PageResponse<Message> | undefined>(undefined);
+  const [userNames, setUserNames] = React.useState<Record<string, string>>({});
+  const [isResolvingNames, setIsResolvingNames] = React.useState(false); // loading state for user name resolution
+  const [showSendModal, setShowSendModal] = React.useState(false);
 
   // Local state for query params
   const queryParams = useHookstate(getInitialDataTableQueryParams());
@@ -41,6 +49,19 @@ export const MessageList: React.FC = () => {
     }).finally(() => setIsLoading(false));
   }, [JSON.stringify(queryParams.get())]);
 
+  const refreshMessages = async () => {
+    setIsLoading(true);
+    const res = await fetchMessages(queryParams.get());
+    if (res.result && res.response) {
+      setMessages(res.response.items);
+      setPagedResponse(res.response);
+    }
+    setIsLoading(false);
+  };
+  useEffect(() => {
+    if (messages.length === 0) return;
+  }, [messages]);
+
   const filters: DataTableFilter<User>[] = [
     {
       key: 'userId',
@@ -60,6 +81,8 @@ export const MessageList: React.FC = () => {
     { key: "recipient", title: "To", sortable: false },
     { key: "content", title: "Content", sortable: false },
     { key: "status", title: "Status", sortable: true, width: "80px" },
+    { key: "sentBy", title: "Sent By", sortable: false },
+    { key: "actions", title: "", sortable: false, width: "80px" },
   ];
 
   const renderStatus = (status: string) => {
@@ -106,7 +129,13 @@ export const MessageList: React.FC = () => {
         <td className="align-middle text-muted small">
           {msg.createdAt ? formatDate(msg.createdAt) : "-"}
         </td>
-        <td className="align-middle fw-medium">{getRecipient(msg)}</td>
+        <td className="align-middle fw-medium">
+          {(isResolvingNames && !userNames[msg.userId])
+            ? 'Loading...'
+            : (userNames[msg.userId]
+              ? <Link to={`${APP_ROUTES.USER_EDIT.replace(':userId', msg.userId)}`}>{userNames[msg.userId]}</Link>
+              : getRecipient(msg))}
+        </td>
         <td className="align-middle">
           <div className="d-flex align-items-center" style={{ cursor: 'help' }}>
             <div className="text-truncate" style={{ maxWidth: '300px' }}>
@@ -117,6 +146,11 @@ export const MessageList: React.FC = () => {
         </td>
         <td className="align-middle">
           {renderStatus(msg.status)}
+        </td>
+        <td className="align-middle">
+          {msg.sentByType === 'user' && msg.sentById
+            ? ((isResolvingNames && !userNames[msg.sentById]) ? 'Loading...' : <Link to={`${APP_ROUTES.USER_EDIT.replace(':userId', msg.sentById)}`}>{userNames[msg.sentById] || '—'}</Link>)
+            : 'System'}
         </td>
         <td className="align-middle text-end">
           <OverlayTrigger
@@ -133,12 +167,21 @@ export const MessageList: React.FC = () => {
     );
   };
 
+  const actions = (
+    <button className="btn btn-outline-primary d-flex align-items-center" onClick={() => setShowSendModal(true)}>
+      <Send className="me-2" /> Send Message
+    </button>
+  );
+
   return (
-    <>
+
+    <Container>
       <AlertMessage initialErrorMessage={initialErrorMessage} errors={errors} />
+
+      <NameResolutionEffect messages={messages} setUserNames={setUserNames} setIsResolving={setIsResolvingNames} />
       <DataTable
-        title="Messages"
-        items={messages as unknown as Message[]}
+        title=""
+        items={messages as Message[]}
         pagination={pagedResponse ? {
           page: pagedResponse.page,
           pageSize: pagedResponse.pageSize,
@@ -146,6 +189,7 @@ export const MessageList: React.FC = () => {
           totalPages: pagedResponse.totalPages
         } : undefined}
         isLoading={isLoading}
+        actions={actions}
         columns={columns}
         filters={filters}
         filterValues={queryParams.filters.get() || {}}
@@ -158,6 +202,25 @@ export const MessageList: React.FC = () => {
         onSort={(field, direction) => setSort(field, direction)}
         renderRow={renderRow}
       />
-    </>
+      <SendMessageModal show={showSendModal} onClose={() => setShowSendModal(false)} onSent={() => { setShowSendModal(false); refreshMessages(); }} />
+    </Container>
   );
+};
+
+// Side-effect component for resolving user names with loading state
+const NameResolutionEffect: React.FC<{ messages: Message[]; setUserNames: React.Dispatch<React.SetStateAction<Record<string, string>>>; setIsResolving: React.Dispatch<React.SetStateAction<boolean>> }> = ({ messages, setUserNames, setIsResolving }) => {
+  useEffect(() => {
+    const idsSet = new Set<string>();
+    messages.forEach(m => {
+      if (m.userId) idsSet.add(m.userId);
+      if (m.sentByType === 'user' && m.sentById) idsSet.add(m.sentById);
+    });
+    const ids = Array.from(idsSet);
+    if (ids.length === 0) return;
+    setIsResolving(true);
+    resolveUserNames(ids).then(names => {
+      setUserNames(prev => ({ ...prev, ...names }));
+    }).finally(() => setIsResolving(false));
+  }, [messages]);
+  return null;
 };

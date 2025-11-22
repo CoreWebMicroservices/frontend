@@ -1,4 +1,4 @@
-import { Container, Row, Col, Card, Table, Spinner } from 'react-bootstrap';
+import { Row, Col, Card, Table, Spinner } from 'react-bootstrap';
 import { DataTableProps } from './DataTableTypes';
 import { DataTableSearch } from './DataTableSearch';
 import { DataTableFilters } from './filter/DataTableFilters';
@@ -37,11 +37,11 @@ export function DataTable<T>({
 
   if (isLoading && items.length === 0) {
     return (
-      <Container className="d-flex justify-content-center align-items-center" style={{ minHeight: 400 }}>
+      <div className="d-flex justify-content-center align-items-center" style={{ minHeight: 400 }}>
         <Spinner animation="border" variant="primary">
           <span className="visually-hidden">Loading...</span>
         </Spinner>
-      </Container>
+      </div>
     );
   }
 
@@ -86,7 +86,7 @@ export function DataTable<T>({
   );
 
   return (
-    <Container>
+    <>
       {/* Actions Row */}
       {actions && (
         <Row className="mb-3">
@@ -154,6 +154,6 @@ export function DataTable<T>({
           </Card.Footer>
         )}
       </Card>
-    </Container>
+    </>
   );
 }

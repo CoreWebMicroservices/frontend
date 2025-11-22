@@ -1,20 +1,6 @@
-// No Button import needed
-import { useEffect, useState } from 'react';
 import { Nav } from 'react-bootstrap';
 import { SunFill, MoonStarsFill } from 'react-bootstrap-icons';
-
-const THEME_KEY = 'theme';
-
-export const useTheme = () => {
-  const [theme, setTheme] = useState(() => localStorage.getItem(THEME_KEY) || 'light');
-
-  useEffect(() => {
-    document.body.setAttribute('data-bs-theme', theme);
-    localStorage.setItem(THEME_KEY, theme);
-  }, [theme]);
-
-  return { theme, setTheme };
-};
+import { useTheme } from './useTheme';
 
 const AppTheme = () => {
   const { theme, setTheme } = useTheme();
@@ -27,10 +13,9 @@ const AppTheme = () => {
   };
 
   return (
-    <Nav.Link onClick={handleToggle} title="Login">
+    <Nav.Link onClick={handleToggle} title="Toggle theme">
       <Icon size={20} />
     </Nav.Link>
-
   );
 };
 

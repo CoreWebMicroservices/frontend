@@ -12,6 +12,7 @@ export interface User {
   firstName: string;
   lastName: string;
   email: string;
+  phoneNumber?: string;
   imageUrl?: string;
   roles?: string[];
   createdAt?: string;
@@ -24,6 +25,7 @@ export interface CreateUserRequest {
   lastName: string;
   email: string;
   imageUrl?: string;
+  phoneNumber?: string;
 }
 
 export interface ProfileChangePasswordRequest {

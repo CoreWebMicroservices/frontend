@@ -18,6 +18,7 @@ interface UserFormValues {
   lastName: string;
   email: string;
   roles: string[];
+  phoneNumber?: string;
 }
 
 const UserEdit = () => {
@@ -46,6 +47,7 @@ const UserEdit = () => {
             lastName: result.response.lastName,
             email: result.response.email,
             roles: result.response.roles ? [...result.response.roles] : [],
+            phoneNumber: result.response.phoneNumber,
           });
         }
       };
@@ -62,6 +64,7 @@ const UserEdit = () => {
       firstName: data.firstName,
       lastName: data.lastName,
       email: data.email,
+      phoneNumber: data.phoneNumber,
       roles: data.roles,
       imageUrl: selectedUser?.imageUrl,
       createdAt: selectedUser?.createdAt,
@@ -213,7 +216,19 @@ const UserEdit = () => {
               </Form.Control.Feedback>
             </Form.Group>
 
-            {/* Roles Section within the form */}
+            <Form.Group className="mb-3" controlId="phoneNumber">
+              <Form.Label>Phone Number</Form.Label>
+              <Form.Control
+                type="text"
+                isInvalid={!!errors.phoneNumber}
+                {...register('phoneNumber')}
+                placeholder="+123456789"
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors.phoneNumber?.message}
+              </Form.Control.Feedback>
+            </Form.Group>
+
             <hr />
             <Form.Group className="mb-3" controlId="roles">
               <Form.Label>User Roles</Form.Label>

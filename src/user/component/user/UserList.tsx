@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Button } from 'react-bootstrap';
+import { Button, Container } from 'react-bootstrap';
 import { PencilSquare, Plus } from 'react-bootstrap-icons';
 import { useHookstate } from '@hookstate/core';
 import { getAllUsers } from '@/user/store/UserState';
@@ -49,7 +49,8 @@ const UserList = () => {
     { key: 'email', title: 'Email', sortable: true },
     { key: 'provider', title: 'Provider', sortable: true },
     { key: 'lastLogin', title: 'Last Login', sortable: true },
-    { key: 'actions', title: 'Actions' }
+    { key: 'actions', title: 'Actions' },
+    { key: 'message', title: '' }
   ];
 
   const currentSort = parseCurrentSort(queryParams.sort.get());
@@ -95,16 +96,15 @@ const UserList = () => {
     </tr>
   );
 
-  // Actions component
   const actions = (
-    <Button variant="primary" onClick={() => navigate(APP_ROUTES.USER_ADD)}>
+    <Button variant="btn btn-outline-primary d-flex align-items-center" onClick={() => navigate(APP_ROUTES.USER_ADD)}>
       <Plus className="me-2" />
       Add New User
     </Button>
   );
 
   return (
-    <>
+    <Container>
       <AlertMessage initialErrorMessage={initialErrorMessage} errors={errors} />
 
       <DataTable
@@ -140,7 +140,7 @@ const UserList = () => {
         title="All Users"
         actions={actions}
       />
-    </>
+    </Container>
   );
 };
 

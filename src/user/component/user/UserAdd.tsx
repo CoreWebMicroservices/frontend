@@ -15,6 +15,7 @@ interface UserFormValues {
   lastName: string;
   email: string;
   roles: string[];
+  phoneNumber?: string;
 }
 
 const UserAdd = () => {
@@ -38,6 +39,7 @@ const UserAdd = () => {
       firstName: data.firstName,
       lastName: data.lastName,
       email: data.email,
+      phoneNumber: data.phoneNumber,
       roles: data.roles,
       provider: AuthProvider.local
     };
@@ -153,6 +155,19 @@ const UserAdd = () => {
               />
               <Form.Control.Feedback type="invalid">
                 {errors.email?.message}
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group className="mb-3" controlId="phoneNumber">
+              <Form.Label>Phone Number</Form.Label>
+              <Form.Control
+                type="text"
+                isInvalid={!!errors.phoneNumber}
+                {...register('phoneNumber')}
+                placeholder="+123456789"
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors.phoneNumber?.message}
               </Form.Control.Feedback>
             </Form.Group>
 
