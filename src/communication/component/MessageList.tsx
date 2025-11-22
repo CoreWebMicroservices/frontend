@@ -19,7 +19,7 @@ import SendMessageModal from "@/communication/component/SendMessageModal";
 import { Container } from "react-bootstrap";
 import { APP_ROUTES } from "@/app/router/routes";
 
-export const MessageList: React.FC = () => {
+export const MessageList: React.FC<{ userId?: string }> = ({ userId }) => {
   const { fetchMessages } = useMessagesState();
   const { initialErrorMessage, errors } = useMessageState();
   const [isLoading, setIsLoading] = React.useState(false);
@@ -52,12 +52,22 @@ export const MessageList: React.FC = () => {
     setFilter,
     setSort
   } = createDataTableActions(queryParams, { onUpdate: refreshMessagesCb });
+
+  // If a userId prop is provided, apply it as a filter so the message list is scoped to that user
+  useEffect(() => {
+    if (userId) {
+      setFilter('userId', userId);
+    }
+  }, [userId]);
   useEffect(() => {
     if (messages.length === 0) return;
   }, [messages]);
 
-  const filters: DataTableFilter<User>[] = [
-    {
+
+  const filters: DataTableFilter<User>[] = [];
+
+  if (!userId) {
+    filters.push({
       key: 'userId',
       label: 'User',
       type: 'async-select',
@@ -66,8 +76,8 @@ export const MessageList: React.FC = () => {
       getOptionLabel: (user: User) => `${user.firstName} ${user.lastName}`,
       getOptionValue: (user: User) => user.userId,
       getOptionSubtitle: (user: User) => user.email
-    }
-  ];
+    });
+  }
 
   filters.push({
     key: 'type',
@@ -213,7 +223,7 @@ export const MessageList: React.FC = () => {
         onSort={(field, direction) => setSort(field, direction)}
         renderRow={renderRow}
       />
-      <SendMessageModal show={showSendModal} onClose={() => setShowSendModal(false)} onSent={() => { setShowSendModal(false); refreshMessages(); }} />
+      <SendMessageModal show={showSendModal} userId={userId} onClose={() => setShowSendModal(false)} onSent={() => { setShowSendModal(false); refreshMessages(); }} />
     </Container>
   );
 };

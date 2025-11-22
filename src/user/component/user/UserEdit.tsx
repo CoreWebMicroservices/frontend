@@ -9,7 +9,6 @@ import { useMessageState } from '@/common/utils/api/ApiResponseHandler';
 import { AlertMessage } from '@/common/component/ApiResponseAlert';
 import AdminChangePasswordModal from './AdminChangePasswordModal';
 import { AppRoles } from '@/common/AppRoles';
-import Breadcrumb from '@/common/component/Breadcrumb';
 import { ROUTE_PATHS } from '@/app/router/routes';
 
 
@@ -130,14 +129,7 @@ const UserEdit = () => {
   }
 
   return (
-    <Container>
-      <Breadcrumb
-        items={[
-          { label: 'All Users', href: ROUTE_PATHS.USERS_LIST },
-          { label: 'Edit User', active: true }
-        ]}
-      />
-
+    <>
       <Row>
         <Col md={8}>
           <h2 className="mb-4 mt-3 text-center">Edit User</h2>
@@ -328,7 +320,7 @@ const UserEdit = () => {
         userId={userId || ''}
         userName={`${selectedUser.firstName} ${selectedUser.lastName}`}
       />
-    </Container >
+    </>
   );
 };
 

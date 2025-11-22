@@ -8,7 +8,7 @@ import { getCurrentUserAuth, hasAnyRole } from "@/user/store/AuthState";
 import AuthForm from "@/user/component/auth/AuthForm";
 import UserProfile from "@/user/component/profile/UserProfile";
 import UserList from "@/user/component/user/UserList";
-import UserEdit from "@/user/component/user/UserEdit";
+import AppUserEdit from "@/app/layout/components/UserEdit";
 import UserAdd from "@/user/component/user/UserAdd";
 import { MessageList } from "@/communication/component/MessageList";
 
@@ -32,6 +32,11 @@ export const coreRoutes: RouteObject[] = [
   {
     path: ROUTE_PATHS.HOME,
     element: <div>HOME</div>,
+  },
+  {
+    path: ROUTE_PATHS.FEATURES,
+    element: <div>Features</div>,
+    loader: authGuards.redirectIfNotAuthenticated,
   },
 ];
 
@@ -59,7 +64,7 @@ export const userRoutes: RouteObject[] = [
   },
   {
     path: ROUTE_PATHS.USER_EDIT,
-    element: <UserEdit />,
+    element: <AppUserEdit />,
     loader: authGuards.redirectIfNotInRole([AppRoles.SuperAdmin, AppRoles.UserMsAdmin]),
   },
 ];

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Form, Row, Col, Alert, Button, ButtonGroup } from 'react-bootstrap';
 import { AsyncSelect } from '@/common/component/dataTable/filter/AsyncSelect';
 import { ModalDialog } from '@/common/component/ModalDialog';
-import { searchUsers } from '@/user/utils/UserApi';
+import { searchUsers, fetchUsersByIds } from '@/user/utils/UserApi';
 import { useMessagesState } from '@/communication/store/MessageState';
 import { useMessageState } from '@/common/utils/api/ApiResponseHandler';
 import { AlertMessage } from '@/common/component/ApiResponseAlert';
@@ -85,13 +85,15 @@ export const SendMessageModal: React.FC<SendMessageModalProps> = ({ show, onClos
       setSuccessMessage('Message sent successfully');
       if (onSent) onSent();
       // Clear form after successful send
-      setSelectedUserId(undefined);
-      setRecipientEmail('');
+      if (!userId) {
+        setSelectedUserId(undefined);
+        setRecipientEmail('');
+        setPhoneNumber('');
+      }
       setSubject('');
       setBody('');
       setCc('');
       setBcc('');
-      setPhoneNumber('');
       setSmsMessage('');
       setShowValidation(false);
     }
@@ -106,10 +108,28 @@ export const SendMessageModal: React.FC<SendMessageModalProps> = ({ show, onClos
     }
   }, [successMessage]);
 
+  // If a preset userId is provided, load the user's contact details to prefill recipient fields
+  useEffect(() => {
+    let mounted = true;
+    if (userId && show) {
+      fetchUsersByIds([userId]).then(users => {
+        if (!mounted) return;
+        const u = users && users.length > 0 ? users[0] : undefined;
+        if (u) {
+          if (u.email) setRecipientEmail(u.email);
+          if (u.phoneNumber) setPhoneNumber(u.phoneNumber || '');
+        }
+      }).catch(() => {
+        // ignore errors
+      });
+    }
+    return () => { mounted = false; };
+  }, [userId, show]);
+
   const handleCancel = () => {
     setShowValidation(false);
     setSuccessMessage(null);
-    setSelectedUserId(undefined);
+    if (!userId) setSelectedUserId(undefined);
     onClose();
   };
 
