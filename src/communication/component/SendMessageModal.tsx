@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Row, Col, Alert, ToggleButtonGroup, ToggleButton } from 'react-bootstrap';
+import { Form, Row, Col, Alert, Button, ButtonGroup } from 'react-bootstrap';
 import { AsyncSelect } from '@/common/component/dataTable/filter/AsyncSelect';
 import { ModalDialog } from '@/common/component/ModalDialog';
 import { searchUsers } from '@/user/utils/UserApi';
@@ -157,10 +157,10 @@ export const SendMessageModal: React.FC<SendMessageModalProps> = ({ show, onClos
 
         <div className="mb-3 mt-2">
           <Form.Label>Channel</Form.Label><br />
-          <ToggleButtonGroup type="radio" name="channel" value={channel} onChange={(val) => setChannel(val)}>
-            <ToggleButton id="channel-email" value={'email'} variant="outline-primary" size="sm">Email</ToggleButton>
-            <ToggleButton id="channel-sms" value={'sms'} variant="outline-secondary" size="sm">SMS</ToggleButton>
-          </ToggleButtonGroup>
+          <ButtonGroup aria-label="Channel selection">
+            <Button id="channel-email" className={channel === 'email' ? 'active' : ''} onClick={() => setChannel('email')} variant="outline-primary" size="sm">Email</Button>
+            <Button id="channel-sms" className={channel === 'sms' ? 'active' : ''} onClick={() => setChannel('sms')} variant="outline-primary" size="sm">SMS</Button>
+          </ButtonGroup>
         </div>
 
         {channel === 'email' && (

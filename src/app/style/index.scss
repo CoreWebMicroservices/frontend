@@ -97,6 +97,24 @@ $btn-border-radius-lg: 0.20rem;
     }
   }
 
+  /* Active list items: li.active, nav-item, list-group items */
+  li.active,
+  .nav-item.active,
+  .list-group-item.active {
+    background-color: rgba(var(--bs-primary-rgb), 0.14);
+    border-color: rgba(var(--bs-primary-rgb), 0.36);
+    color: #fff;
+  }
+
+  /* Links inside active list items should reflect the active color */
+  li.active > a,
+  .nav-item.active > .nav-link,
+  .list-group-item.active {
+    color: var(--primary-dark) !important;
+    background-color: rgba(var(--bs-primary-rgb), 0.14) !important;
+    border-color: rgba(var(--bs-primary-rgb), 0.36) !important;
+  }
+
   .navbar-brand, .navbar-brand:focus, .navbar-brand:hover {
     --bs-navbar-brand-color: var(--primary-dark-active);
   }
@@ -137,6 +155,45 @@ $btn-border-radius-lg: 0.20rem;
     border-color: rgba(203,213,225,0.08);
     background-color: transparent;
     opacity: 1; /* keep visible instead of Bootstrap's reduced opacity */
+  }
+
+  /* Active states: stronger blue background and border for visibility */
+  .btn-primary:active, .btn-primary.active {
+    background-color: var(--primary-dark-active) !important;
+    border-color: rgba(var(--bs-primary-rgb), 0.36) !important;
+    color: #fff !important;
+    box-shadow: 0 0 0 0.12rem rgba(var(--bs-primary-rgb), 0.16) !important;
+  }
+
+  .btn-outline-primary:active, .btn-outline-primary.active {
+    background-color: rgba(var(--bs-primary-rgb), 0.14) !important;
+    border-color: rgba(var(--bs-primary-rgb), 0.36) !important;
+    color: var(--primary-dark) !important;
+  }
+
+  /* Pagination (pager) styles */
+  .pagination {
+    .page-link {
+      color: var(--bs-body-color);
+      background-color: transparent;
+      border-color: rgba(203,213,225,0.04);
+    }
+
+    .page-link:hover, .page-link:focus {
+      background-color: rgba(var(--bs-primary-rgb), 0.08);
+      border-color: rgba(var(--bs-primary-rgb), 0.18);
+      color: var(--primary-dark);
+    }
+
+    .page-item.active .page-link {
+      background-color: rgba(var(--bs-primary-rgb), 0.16) !important;
+      border-color: rgba(var(--bs-primary-rgb), 0.36) !important;
+      color: #fff !important;
+    }
+
+    .page-item.disabled .page-link {
+      color: rgba(203,213,225,0.5);
+    }
   }
 }
 

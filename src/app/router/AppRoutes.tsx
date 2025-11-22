@@ -33,11 +33,6 @@ export const coreRoutes: RouteObject[] = [
     path: ROUTE_PATHS.HOME,
     element: <div>HOME</div>,
   },
-  {
-    path: ROUTE_PATHS.FEATURES,
-    element: <div>Features</div>,
-    loader: authGuards.redirectIfNotAuthenticated,
-  },
 ];
 
 // User module routes (moved from UserRouter)
