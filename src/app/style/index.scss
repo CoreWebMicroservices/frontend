@@ -38,9 +38,23 @@ $btn-border-radius-lg: 0.20rem;
   --primary-dark-hover: #ff6f91;
   --primary-dark-active: #d72660;
   --primary-dark-rgb: 255, 111, 145;
-  --body-dark: #3d444d;
+  --body-dark: rgb(61, 68, 77);
   --element-bg-dark: #343a40;
   --body-dark-color: #ff6f91;
+}
+
+/* DataTable filter focus styles: remove default focus outline, use subtle shadow */
+.data-table-filters .form-select:focus,
+.data-table-filters .form-control:focus,
+.data-table-filters .form-control:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 0.1rem rgba(61, 68, 77, 0.4) !important;
+  border-color: rgba(61, 68, 77, 0.6) !important;
+}
+
+/* Slightly increase z-index for dropdowns inside filters so they appear above the table */
+.data-table-filters .dropdown-menu {
+  z-index: 1200;
 }
 
 [data-bs-theme='light'] {
@@ -50,27 +64,31 @@ $btn-border-radius-lg: 0.20rem;
 }
 
 [data-bs-theme='dark'] {
+  /* GitHub-inspired soft dark theme (lighter overall) */
+  --bs-body-bg: #21272e; /* slightly lighter near-black */
+  --bs-body-color: #c9d1d9; /* muted text */
+  --bs-navbar-bg: #151920; /* header slightly lighter than body */
+  --bs-navbar-color: #d1d9e0;
+
+  --primary-dark: #58a6ff; /* GitHub blue */
+  --primary-dark-hover: #4197ff;
+  --primary-dark-active: #1f6feb;
+  --primary-dark-rgb: 88,166,255;
+
   --bs-primary: var(--primary-dark);
-  --bs-body-color: var(--body-dark-color);
   --bs-primary-rgb: var(--primary-dark-rgb);
-  --bs-body-bg: var(--body-dark);
-  --bs-body-color: var(--body-dark-color);
-  --bs-navbar-bg: var(--element-bg-dark);
-  --bs-navbar-color: var(--primary-dark);
-  --bs-dark-rgb: var(--primary-dark-rgb);
-  --bs-dropdown-link-active-bg: var(--primary-dark);
+  --bs-dropdown-link-active-bg: rgba(88,166,255,0.12);
 
   .border-bottom {
-    border-color: var(--primary-dark-rgb);;
+    border-color: rgba(203,213,225,0.05);
   }
 
   .navbar {
-    --bs-navbar-bg: var(--element-bg-dark);
-    --bs-navbar-color: var(--primary-dark);
-    
+    --bs-navbar-bg: #161b22;
+    --bs-navbar-color: var(--bs-navbar-color);
     background-color: var(--bs-navbar-bg);
 
-    .nav-link.active,.nav-link.show {
+    .nav-link.active, .nav-link.show {
       color: var(--primary-dark-active);
     }
 
@@ -79,30 +97,46 @@ $btn-border-radius-lg: 0.20rem;
     }
   }
 
-
   .navbar-brand, .navbar-brand:focus, .navbar-brand:hover {
     --bs-navbar-brand-color: var(--primary-dark-active);
   }
 
   .dropdown-item.active,
   .dropdown-item:active {
-    --bs-dropdown-link-active-bg: var(--primary-dark-active);
+    --bs-dropdown-link-active-bg: rgba(31,111,235,0.12);
   }
 
   .btn-primary {
     --bs-btn-bg: var(--primary-dark);
-    --bs-btn-border-color: var(--primary-dark);
+    --bs-btn-border-color: rgba(var(--bs-primary-rgb), 0.12);
     --bs-btn-hover-bg: var(--primary-dark-hover);
-    --bs-btn-hover-border-color: var(--primary-dark-hover);
+    --bs-btn-hover-border-color: rgba(var(--bs-primary-rgb), 0.16);
     --bs-btn-active-bg: var(--primary-dark-active);
-    --bs-btn-active-border-color: var(--primary-dark-active);
+    --bs-btn-active-border-color: rgba(var(--bs-primary-rgb), 0.2);
   }
 
   .btn-outline-primary {
     --bs-btn-color: var(--primary-dark);
-    --bs-btn-border-color: var(--primary-dark);
-    --bs-btn-hover-bg: var(--primary-dark);
-    --bs-btn-hover-border-color: var(--primary-dark);
+    /* Lighter, more visible outline */
+    --bs-btn-border-color: rgba(var(--bs-primary-rgb), 0.28);
+    --bs-btn-hover-bg: rgba(var(--bs-primary-rgb), 0.04);
+    --bs-btn-hover-border-color: rgba(var(--bs-primary-rgb), 0.16);
+
+    /* Focus ring for accessibility */
+    box-shadow: none;
+  }
+
+  .btn-outline-primary:focus, .btn-outline-primary.focus {
+    outline: none !important;
+    box-shadow: 0 0 0 0.2rem rgba(var(--bs-primary-rgb), 0.12) !important;
+  }
+
+  /* Ensure disabled outline buttons remain visible */
+  .btn-outline-primary:disabled, .btn-outline-primary.disabled {
+    color: rgba(203,213,225,0.6);
+    border-color: rgba(203,213,225,0.08);
+    background-color: transparent;
+    opacity: 1; /* keep visible instead of Bootstrap's reduced opacity */
   }
 }
 

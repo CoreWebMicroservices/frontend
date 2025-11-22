@@ -80,8 +80,8 @@ export const DataTableFilters: React.FC<DataTableFiltersProps> = ({
   };
 
   return (
-    <>
+    <div className="data-table-filters d-flex align-items-center gap-2">
       {filters.map(renderFilter)}
-    </>
+    </div>
   );
 };

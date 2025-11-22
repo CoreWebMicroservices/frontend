@@ -31,23 +31,7 @@ export const MessageList: React.FC = () => {
 
   // Local state for query params
   const queryParams = useHookstate(getInitialDataTableQueryParams());
-  const {
-    setSearch,
-    setPage,
-    setPageSize,
-    setFilter,
-    setSort
-  } = createDataTableActions(queryParams);
-
-  useEffect(() => {
-    setIsLoading(true);
-    fetchMessages(queryParams.get()).then((res) => {
-      if (res.result && res.response) {
-        setMessages(res.response.items);
-        setPagedResponse(res.response);
-      }
-    }).finally(() => setIsLoading(false));
-  }, [JSON.stringify(queryParams.get())]);
+  // actions will be created after refreshMessages so we can provide an onUpdate hook
 
   const refreshMessages = async () => {
     setIsLoading(true);
@@ -58,6 +42,16 @@ export const MessageList: React.FC = () => {
     }
     setIsLoading(false);
   };
+  // stable callback for actions to call when query params change
+  const refreshMessagesCb = React.useCallback(refreshMessages, [fetchMessages, JSON.stringify(queryParams.get())]);
+
+  const {
+    setSearch,
+    setPage,
+    setPageSize,
+    setFilter,
+    setSort
+  } = createDataTableActions(queryParams, { onUpdate: refreshMessagesCb });
   useEffect(() => {
     if (messages.length === 0) return;
   }, [messages]);
@@ -74,6 +68,18 @@ export const MessageList: React.FC = () => {
       getOptionSubtitle: (user: User) => user.email
     }
   ];
+
+  filters.push({
+    key: 'type',
+    label: 'Channel',
+    type: 'select',
+    placeholder: 'Filter by Channel',
+    operator: 'eq',
+    options: [
+      { value: 'email', label: 'Email' },
+      { value: 'sms', label: 'SMS' }
+    ]
+  });
 
   const columns = [
     { key: "type", title: "Channel", sortable: false, width: "100px" },
@@ -172,6 +178,11 @@ export const MessageList: React.FC = () => {
       <Send className="me-2" /> Send Message
     </button>
   );
+
+  // Fetch messages on mount
+  useEffect(() => {
+    refreshMessages();
+  }, []);
 
   return (
 

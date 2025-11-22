@@ -98,9 +98,8 @@ export function DataTable<T>({
 
       {/* Filters and Search Row */}
       <Row className="mb-3">
-        {/* Filters */}
         {filters.length > 0 && (
-          <Col md={2} className="d-flex align-items-center">
+          <Col md={8} className="d-flex align-items-center gap-2">
             <DataTableFilters
               filters={filters}
               values={filterValues}
@@ -109,8 +108,6 @@ export function DataTable<T>({
           </Col>
         )}
 
-        {/* Empty space */}
-        <Col md={filters.length > 0 ? 6 : 8}></Col>
 
         {/* Search */}
         {onSearch && (
