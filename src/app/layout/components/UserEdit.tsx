@@ -21,11 +21,9 @@ const UserEdit: React.FC = () => {
 
       <Tabs activeKey={activeKey} onSelect={(k) => k && setActiveKey(k)} className="mb-3">
         <Tab eventKey="edit" title="Edit">
-          {/* Render the existing user edit form (it uses useParams internally) */}
           <UserEditForm />
         </Tab>
         <Tab eventKey="messages" title="Messages">
-          {/* Show messages filtered by userId when available */}
           <div style={{ marginTop: 8 }}>
             <MessageList userId={userId} />
           </div>

@@ -33,33 +33,41 @@ $btn-border-radius-lg: 0.20rem;
 @import "bootstrap/scss/bootstrap";
 @import 'bootstrap-icons/font/bootstrap-icons.css';
 
-:root {
-  --primary-dark: #ff6f91;
-  --primary-dark-hover: #ff6f91;
-  --primary-dark-active: #d72660;
-  --primary-dark-rgb: 255, 111, 145;
-  --body-dark: rgb(61, 68, 77);
-  --element-bg-dark: #343a40;
-  --body-dark-color: #ff6f91;
-}
-
-/* DataTable filter focus styles: remove default focus outline, use subtle shadow */
-.data-table-filters .form-select:focus,
-.data-table-filters .form-control:focus,
-.data-table-filters .form-control:focus-visible {
-  outline: none !important;
-  box-shadow: 0 0 0 0.1rem rgba(61, 68, 77, 0.4) !important;
-  border-color: rgba(61, 68, 77, 0.6) !important;
-}
-
 /* Slightly increase z-index for dropdowns inside filters so they appear above the table */
 .data-table-filters .dropdown-menu {
   z-index: 1200;
 }
 
+/* DataTable filter focus styles: remove default focus outline, use subtle shadow */
+
+
 [data-bs-theme='light'] {
   .navbar {
     background-color: $light;
+  }
+
+  .form-select:focus,
+  .form-control:focus,
+  .form-control:focus-visible {
+    outline: none !important;
+    box-shadow: 0 0 0 0.1rem rgba(61, 68, 77, 0.4) !important;
+    border-color: rgba(61, 68, 77, 0.6) !important;
+  }
+
+  /* Ensure dropdown/select highlights in filters are neutral (gray) in light theme */
+  .data-table-filters {
+    /* Custom dropdown items (used by AsyncSelect's menu) */
+    .dropdown-menu {
+      .dropdown-item:hover,
+      .dropdown-item:focus,
+      .dropdown-item.active {
+        background-color: #c1c1c1 !important;
+        color: #212529 !important;
+      }
+      .dropdown-item .small {
+        color: #4d545a !important;
+      }
+    }
   }
 }
 
@@ -95,6 +103,14 @@ $btn-border-radius-lg: 0.20rem;
     .nav-link:focus, .nav-link:hover {
       color: var(--primary-dark-hover);
     }
+  }
+
+  .form-select:focus,
+  .form-control:focus,
+  .form-control:focus-visible {
+    outline: none !important;
+    box-shadow: 0 0 0 0.1rem rgba(var(--bs-primary-rgb), 0.4) !important;
+    border-color: rgba(var(--bs-primary-rgb), 0.6) !important;
   }
 
   /* Active list items: li.active, nav-item, list-group items */
@@ -165,11 +181,27 @@ $btn-border-radius-lg: 0.20rem;
     box-shadow: 0 0 0 0.12rem rgba(var(--bs-primary-rgb), 0.16) !important;
   }
 
-  .btn-outline-primary:active, .btn-outline-primary.active {
-    background-color: rgba(var(--bs-primary-rgb), 0.14) !important;
-    border-color: rgba(var(--bs-primary-rgb), 0.36) !important;
-    color: var(--primary-dark) !important;
-  }
+    /* Make outline primary buttons visibly highlight on hover/focus across themes */
+    .btn-outline-primary {
+      transition: background-color 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+    }
+  
+    .btn-outline-primary:hover,
+    .btn-outline-primary:focus {
+      /* Use primary color and its rgb when available; provide fallbacks for light theme */
+      color: var(--bs-primary, #0d6efd) !important;
+      background-color: rgba(var(--bs-primary-rgb, 13, 110, 253), 0.5) !important;
+      border-color: rgba(var(--bs-primary-rgb, 13, 110, 253), 0.5) !important;
+    }
+  
+    /* Slightly stronger hover for active/pressed outline buttons */
+    .btn-outline-primary:active,
+    .btn-outline-primary.active {
+      background-color: rgba(var(--bs-primary-rgb, 13, 110, 253), 0.2) !important;
+      border-color: rgba(var(--bs-primary-rgb, 13, 110, 253), 0.28) !important;
+      color: var(--bs-primary, #0d6efd) !important;
+    }
+  
 
   /* Pagination (pager) styles */
   .pagination {
