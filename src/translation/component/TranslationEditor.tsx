@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Form, Button, ButtonGroup, Alert, Card, InputGroup } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Save, Trash, Search, Plus } from 'react-bootstrap-icons';
+import { useTranslation } from 'react-i18next';
 import AceEditor from 'react-ace';
 import 'ace-builds/src-noconflict/mode-json';
 import 'ace-builds/src-noconflict/theme-github';
@@ -20,6 +21,7 @@ interface TranslationEntry {
 }
 
 export const TranslationEditor: React.FC = () => {
+  const { t } = useTranslation();
   const { realm, lang } = useParams<{ realm: string; lang: string }>();
   const navigate = useNavigate();
   const { getTranslation, updateTranslation, deleteTranslation } = useTranslationState();
@@ -51,7 +53,7 @@ export const TranslationEditor: React.FC = () => {
 
   const loadTranslations = async () => {
     if (!realm || !lang) return;
-    
+
     setIsLoading(true);
     const result = await getTranslation(realm, lang);
     setIsLoading(false);
@@ -71,20 +73,20 @@ export const TranslationEditor: React.FC = () => {
   const handleSave = async () => {
     if (!effectiveRealm || !effectiveLang) {
       handleResponse(
-        { result: false, response: null, errors: [{ reasonCode: 'VALIDATION', description: 'Realm and language are required' }] },
-        'Realm and language are required'
+        { result: false, response: null, errors: [{ reasonCode: 'VALIDATION', description: t('translation.realmLanguageRequired', 'Realm and language are required') }] },
+        t('translation.realmLanguageRequired', 'Realm and language are required')
       );
       return;
     }
 
     let translations: Record<string, string>;
-    
+
     if (viewMode === 'json') {
       try {
         translations = JSON.parse(jsonText);
         setJsonError(null);
       } catch {
-        setJsonError('Invalid JSON format. Please fix the syntax errors.');
+        setJsonError(t('translation.invalidJsonFormat', 'Invalid JSON format'));
         return;
       }
     } else {
@@ -98,8 +100,8 @@ export const TranslationEditor: React.FC = () => {
 
     if (Object.keys(translations).length === 0) {
       handleResponse(
-        { result: false, response: null, errors: [{ reasonCode: 'VALIDATION', description: 'At least one translation is required' }] },
-        'At least one translation is required'
+        { result: false, response: null, errors: [{ reasonCode: 'VALIDATION', description: t('translation.atLeastOneRequired', 'At least one translation is required') }] },
+        t('translation.atLeastOneRequired', 'At least one translation is required')
       );
       return;
     }
@@ -110,8 +112,8 @@ export const TranslationEditor: React.FC = () => {
 
     handleResponse(
       result,
-      'Failed to save translations.',
-      `Translations for ${effectiveRealm}/${effectiveLang} saved successfully!`
+      t('translation.saveFailed', 'Failed to save translations'),
+      t('translation.saveSuccess', 'Translations saved successfully for {{realm}}/{{lang}}', { realm: effectiveRealm, lang: effectiveLang })
     );
 
     if (result.result) {
@@ -128,8 +130,8 @@ export const TranslationEditor: React.FC = () => {
 
     handleResponse(
       result,
-      'Failed to delete translations.',
-      `Translations for ${realm}/${lang} deleted successfully!`
+      t('translation.deleteFailed', 'Failed to delete translations'),
+      t('translation.deleteSuccess', 'Translations deleted successfully for {{realm}}/{{lang}}', { realm, lang })
     );
 
     if (result.result) {
@@ -163,7 +165,7 @@ export const TranslationEditor: React.FC = () => {
       setEntries(newEntries.length > 0 ? newEntries : [{ key: '', value: '' }]);
       setJsonError(null);
     } catch {
-      setJsonError('Invalid JSON format. Cannot sync to form view.');
+      setJsonError(t('translation.invalidJsonCannotSync', 'Invalid JSON - cannot sync to form'));
     }
   };
 
@@ -196,44 +198,44 @@ export const TranslationEditor: React.FC = () => {
   if (isLoading) {
     return (
       <Container className="mt-4">
-        <div className="text-center py-5">Loading translations...</div>
+        <div className="text-center py-5">{t('translation.loadingTranslations', 'Loading translations...')}</div>
       </Container>
     );
   }
 
   return (
     <Container className="mt-4">
-      <Breadcrumb 
+      <Breadcrumb
         items={[
-          { label: 'Translations', href: APP_ROUTES.TRANSLATIONS },
-          { label: isNewTranslation ? 'New Translation' : `${effectiveRealm} / ${effectiveLang}`, active: true }
-        ]} 
+          { label: t('nav.translations', 'Translations'), href: APP_ROUTES.TRANSLATIONS },
+          { label: isNewTranslation ? t('translation.newTranslation', 'New Translation') : `${effectiveRealm} / ${effectiveLang}`, active: true }
+        ]}
       />
 
       <Row className="mb-4">
         <Col>
           <div className="d-flex justify-content-between align-items-center">
             <h3>
-              {isNewTranslation 
-                ? 'New Translation' 
-                : `Edit - Realm: ${effectiveRealm}, Language: ${effectiveLang}`}
+              {isNewTranslation
+                ? t('translation.newTranslation', 'New Translation')
+                : t('translation.editTitle', 'Edit {{realm}} / {{lang}}', { realm: effectiveRealm, lang: effectiveLang })}
             </h3>
             <div className="d-flex gap-2">
               {!isNewTranslation && (
-                <Button 
-                  variant="outline-danger" 
+                <Button
+                  variant="outline-danger"
                   onClick={() => setShowDeleteConfirm(true)}
                   disabled={isSaving}
                 >
-                  <Trash className="me-1" /> Delete
+                  <Trash className="me-1" /> {t('common.delete', 'Delete')}
                 </Button>
               )}
-              <Button 
-                variant="primary" 
+              <Button
+                variant="primary"
                 onClick={handleSave}
                 disabled={isSaving}
               >
-                <Save className="me-1" /> {isSaving ? 'Saving...' : 'Save'}
+                <Save className="me-1" /> {isSaving ? t('common.saving', 'Saving...') : t('common.save', 'Save')}
               </Button>
             </div>
           </div>
@@ -244,11 +246,11 @@ export const TranslationEditor: React.FC = () => {
 
       {showDeleteConfirm && (
         <Alert variant="danger" className="mb-3">
-          <Alert.Heading>Confirm Deletion</Alert.Heading>
-          <p>Are you sure you want to delete all translations for <strong>{effectiveRealm}/{effectiveLang}</strong>?</p>
+          <Alert.Heading>{t('translation.confirmDeletion', 'Confirm Deletion')}</Alert.Heading>
+          <p>{t('translation.confirmDeleteMessage', 'Are you sure you want to delete translations for {{realm}}/{{lang}}?', { realm: effectiveRealm, lang: effectiveLang })}</p>
           <div className="d-flex gap-2">
-            <Button variant="danger" size="sm" onClick={handleDelete}>Yes, Delete</Button>
-            <Button variant="outline-secondary" size="sm" onClick={() => setShowDeleteConfirm(false)}>Cancel</Button>
+            <Button variant="danger" size="sm" onClick={handleDelete}>{t('translation.yesDelete', 'Yes, Delete')}</Button>
+            <Button variant="outline-secondary" size="sm" onClick={() => setShowDeleteConfirm(false)}>{t('common.cancel', 'Cancel')}</Button>
           </div>
         </Alert>
       )}
@@ -257,20 +259,20 @@ export const TranslationEditor: React.FC = () => {
         <Card.Body>
           <Row className="mb-3">
             <Col md={6}>
-              <Form.Label>Realm</Form.Label>
-              <Form.Control 
-                value={effectiveRealm} 
-                onChange={(e) => isNewTranslation && setNewRealm(e.target.value)} 
-                placeholder="e.g., app, admin, public"
+              <Form.Label>{t('translation.realm', 'Realm')}</Form.Label>
+              <Form.Control
+                value={effectiveRealm}
+                onChange={(e) => isNewTranslation && setNewRealm(e.target.value)}
+                placeholder={t('translation.realmPlaceholder', 'e.g., default, admin')}
                 disabled={!isNewTranslation}
               />
             </Col>
             <Col md={6}>
-              <Form.Label>Language</Form.Label>
-              <Form.Control 
-                value={effectiveLang} 
+              <Form.Label>{t('translation.language', 'Language')}</Form.Label>
+              <Form.Control
+                value={effectiveLang}
                 onChange={(e) => isNewTranslation && setNewLang(e.target.value)}
-                placeholder="e.g., en, es, fr"
+                placeholder={t('translation.languagePlaceholder', 'e.g., en, no')}
                 disabled={!isNewTranslation}
               />
             </Col>
@@ -283,7 +285,7 @@ export const TranslationEditor: React.FC = () => {
                   <Search size={16} />
                 </InputGroup.Text>
                 <Form.Control
-                  placeholder="Search keys or values..."
+                  placeholder={t('translation.searchPlaceholder', 'Search keys or values...')}
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
                   size="sm"
@@ -295,24 +297,24 @@ export const TranslationEditor: React.FC = () => {
             <div className="d-flex gap-2 align-items-center">
               {viewMode === 'form' && (
                 <Button variant="outline-primary" size="sm" onClick={addEntry}>
-                  <Plus size={16} /> Add
+                  <Plus size={16} /> {t('common.add', 'Add')}
                 </Button>
               )}
 
               <ButtonGroup>
-                <Button 
+                <Button
                   variant={viewMode === 'form' ? 'primary' : 'outline-primary'}
                   onClick={() => handleViewModeChange('form')}
                   size="sm"
                 >
-                  Form View
+                  {t('translation.formView', 'Form View')}
                 </Button>
-                <Button 
+                <Button
                   variant={viewMode === 'json' ? 'primary' : 'outline-primary'}
                   onClick={() => handleViewModeChange('json')}
                   size="sm"
                 >
-                  JSON View
+                  {t('translation.jsonView', 'JSON View')}
                 </Button>
               </ButtonGroup>
             </div>
@@ -321,7 +323,7 @@ export const TranslationEditor: React.FC = () => {
           {viewMode === 'form' ? (
             <div style={{ maxHeight: '500px', overflowY: 'auto', overflowX: 'hidden' }}>
               {filteredEntries.length === 0 ? (
-                <Alert variant="info">No translations match your search.</Alert>
+                <Alert variant="info">{t('translation.noMatchingTranslations', 'No matching translations found')}</Alert>
               ) : (
                 filteredEntries.map((entry) => {
                   const actualIndex = entries.indexOf(entry);
@@ -329,7 +331,7 @@ export const TranslationEditor: React.FC = () => {
                     <Row key={actualIndex} className="mb-2 g-2">
                       <Col md={4}>
                         <Form.Control
-                          placeholder="Key"
+                          placeholder={t('translation.key', 'Key')}
                           value={entry.key}
                           onChange={e => updateEntry(actualIndex, 'key', e.target.value)}
                           size="sm"
@@ -337,7 +339,7 @@ export const TranslationEditor: React.FC = () => {
                       </Col>
                       <Col md={7}>
                         <Form.Control
-                          placeholder="Value"
+                          placeholder={t('translation.value', 'Value')}
                           value={entry.value}
                           onChange={e => updateEntry(actualIndex, 'value', e.target.value)}
                           size="sm"
@@ -386,7 +388,7 @@ export const TranslationEditor: React.FC = () => {
                 </Alert>
               )}
               <Alert variant="info" className="mt-2">
-                <small>Edit the JSON directly. Changes will be validated when you save.</small>
+                <small>{t('translation.jsonEditHint', 'Edit JSON directly. Changes will be synced when switching views.')}</small>
               </Alert>
             </div>
           )}

@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button, Container } from 'react-bootstrap';
 import { PencilSquare, Plus } from 'react-bootstrap-icons';
 import { useHookstate } from '@hookstate/core';
+import { useTranslation } from 'react-i18next';
 import { getAllUsers } from '@/user/store/UserState';
 import { useMessageState } from '@/common/utils/api/ApiResponseHandler';
 import { AlertMessage } from '@/common/component/ApiResponseAlert';
@@ -16,6 +17,7 @@ import { parseCurrentSort, getInitialDataTableQueryParams, createDataTableAction
 import { formatDate } from '@/common/utils/DateUtils';
 
 const UserList = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [users, setUsers] = useState<User[]>([]);
   const [pagedResponse, setPagedResponse] = useState<PageResponse<User> | undefined>(undefined);
@@ -45,11 +47,11 @@ const UserList = () => {
 
   // Configuration for DataTable
   const columns: DataTableColumn[] = [
-    { key: 'name', title: 'Name', sortable: true },
-    { key: 'email', title: 'Email', sortable: true },
-    { key: 'provider', title: 'Provider', sortable: true },
-    { key: 'lastLogin', title: 'Last Login', sortable: true },
-    { key: 'actions', title: 'Actions' },
+    { key: 'name', title: t('user.name', 'Name'), sortable: true },
+    { key: 'email', title: t('form.email', 'Email'), sortable: true },
+    { key: 'provider', title: t('user.provider', 'Provider'), sortable: true },
+    { key: 'lastLoginAt', title: t('user.lastLogin', 'Last Login'), sortable: true },
+    { key: 'actions', title: t('common.actions', 'Actions') },
     { key: 'message', title: '' }
   ];
 
@@ -58,14 +60,14 @@ const UserList = () => {
   const filters: DataTableFilter[] = [
     {
       key: 'provider',
-      label: 'Provider',
+      label: t('user.provider', 'Provider'),
       type: 'select',
       operator: 'contains',
-      placeholder: 'All Providers',
+      placeholder: t('user.allProviders', 'All Providers'),
       options: [
         { value: 'google', label: 'Google' },
         { value: 'github', label: 'GitHub' },
-        { value: 'local', label: 'Local' }
+        { value: 'local', label: t('user.localProvider', 'Local') }
       ]
     }
   ];
@@ -89,7 +91,7 @@ const UserList = () => {
         <Link to={APP_ROUTES.USER_EDIT.replace(':userId', user.userId)}>
           <Button variant="outline-primary" size="sm">
             <PencilSquare className="me-1" />
-            Edit
+            {t('common.edit', 'Edit')}
           </Button>
         </Link>
       </td>
@@ -99,7 +101,7 @@ const UserList = () => {
   const actions = (
     <Button variant="btn btn-outline-primary d-flex align-items-center" onClick={() => navigate(APP_ROUTES.USER_ADD)}>
       <Plus className="me-2" />
-      Add New User
+      {t('user.addNewUser', 'Add New User')}
     </Button>
   );
 
@@ -124,7 +126,7 @@ const UserList = () => {
         filterValues={queryParams.filters.get() || {}}
         sortableFields={columns.filter(col => col.sortable).map(col => col.key)}
         currentSort={currentSort}
-        searchPlaceholder="Search users by name or email..."
+        searchPlaceholder={t('user.searchPlaceholder', 'Search users by name or email...')}
 
         // Callbacks
         onSearch={setSearch}
@@ -137,7 +139,7 @@ const UserList = () => {
         renderRow={renderUserRow}
 
         // Customization
-        title="All Users"
+        title={t('user.allUsers', 'All Users')}
         actions={actions}
       />
     </Container>

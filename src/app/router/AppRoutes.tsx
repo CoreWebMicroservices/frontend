@@ -11,6 +11,8 @@ import UserList from "@/user/component/user/UserList";
 import AppUserEdit from "@/app/layout/components/UserEdit";
 import UserAdd from "@/user/component/user/UserAdd";
 import { MessageList } from "@/communication/component/MessageList";
+import TranslationEditor from "@/translation/component/TranslationEditor";
+import { TranslationList } from "@/translation/component/TranslationList";
 
 // Create auth guards with dependency injection
 const authGuards = createAuthGuards({
@@ -78,9 +80,28 @@ export const communicationRoutes: RouteObject[] = [
   },
 ];
 
+export const translationRoutes: RouteObject[] = [
+  {
+    path: ROUTE_PATHS.TRANSLATIONS,
+    element: <TranslationList />,
+    loader: authGuards.redirectIfNotAuthenticated,
+  },
+  {
+    path: ROUTE_PATHS.TRANSLATION_EDIT,
+    element: <TranslationEditor />,
+    loader: authGuards.redirectIfNotAuthenticated,
+  },
+  {
+    path: ROUTE_PATHS.TRANSLATION_NEW,
+    element: <TranslationEditor />,
+    loader: authGuards.redirectIfNotAuthenticated,
+  },
+];
+
 // Combined routes for the entire application
 export const allApplicationRoutes: RouteObject[] = [
   ...coreRoutes,
   ...userRoutes,
   ...communicationRoutes,
+  ...translationRoutes,
 ];

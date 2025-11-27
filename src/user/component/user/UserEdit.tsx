@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { Container, Row, Col, Card, Button, Form, Spinner, ButtonGroup, Dropdown } from 'react-bootstrap';
 import { ArrowLeft, Lock, X } from 'react-bootstrap-icons';
+import { useTranslation } from 'react-i18next';
 import { User, AuthProvider } from '@/user/model/User';
 import { useUserState, getUserById, updateUserInfo } from '@/user/store/UserState';
 import { useMessageState } from '@/common/utils/api/ApiResponseHandler';
@@ -21,6 +22,7 @@ interface UserFormValues {
 }
 
 const UserEdit = () => {
+  const { t } = useTranslation();
   const { userId } = useParams<{ userId: string }>();
   const navigate = useNavigate();
   const userState = useUserState();
@@ -74,8 +76,8 @@ const UserEdit = () => {
     const result = await updateUserInfo(userId, userData);
     handleResponse(
       result,
-      'Failed to update user information.',
-      'User information has been updated successfully.'
+      t('user.updateFailed', 'Failed to update user information.'),
+      t('user.updateSuccess', 'User information has been updated successfully.')
     );
   };
 
@@ -107,7 +109,7 @@ const UserEdit = () => {
       <Container>
         <div className="d-flex justify-content-center align-items-center" style={{ minHeight: 400 }}>
           <Spinner animation="border" role="status" variant="primary">
-            <span className="visually-hidden">Loading...</span>
+            <span className="visually-hidden">{t('common.loading', 'Loading...')}</span>
           </Spinner>
         </div>
       </Container>
@@ -118,10 +120,10 @@ const UserEdit = () => {
     return (
       <Container>
         <div className="text-center mt-5">
-          <h4>User not found</h4>
+          <h4>{t('user.notFound', 'User not found')}</h4>
           <Button variant="primary" onClick={() => navigate(ROUTE_PATHS.USERS_LIST)}>
             <ArrowLeft className="me-2" />
-            Back to Users
+            {t('user.backToUsers', 'Back to Users')}
           </Button>
         </div>
       </Container>
@@ -132,14 +134,14 @@ const UserEdit = () => {
     <>
       <Row>
         <Col md={8}>
-          <h2 className="mb-4 mt-3 text-center">Edit User</h2>
+          <h2 className="mb-4 mt-3 text-center">{t('user.editUser', 'Edit User')}</h2>
 
           {/* User Avatar Display (Non-editable) */}
           {selectedUser.imageUrl ? (
             <div className="mb-3 text-center">
               <img
                 src={selectedUser.imageUrl}
-                alt="User avatar"
+                alt={t('user.avatar', 'User avatar')}
                 style={{ width: 96, height: 96, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--bs-primary)' }}
               />
             </div>
@@ -166,11 +168,11 @@ const UserEdit = () => {
 
           <Form className="mb-3" onSubmit={handleSubmit(onSubmit)}>
             <Form.Group className="mb-3" controlId="firstName">
-              <Form.Label>First Name</Form.Label>
+              <Form.Label>{t('form.firstName', 'First Name')}</Form.Label>
               <Form.Control
                 type="text"
                 isInvalid={!!errors.firstName}
-                {...register('firstName', { required: 'First name is required' })}
+                {...register('firstName', { required: t('validation.firstNameRequired', 'First name is required') })}
               />
               <Form.Control.Feedback type="invalid">
                 {errors.firstName?.message}
@@ -178,11 +180,11 @@ const UserEdit = () => {
             </Form.Group>
 
             <Form.Group className="mb-3" controlId="lastName">
-              <Form.Label>Last Name</Form.Label>
+              <Form.Label>{t('form.lastName', 'Last Name')}</Form.Label>
               <Form.Control
                 type="text"
                 isInvalid={!!errors.lastName}
-                {...register('lastName', { required: 'Last name is required' })}
+                {...register('lastName', { required: t('validation.lastNameRequired', 'Last name is required') })}
               />
               <Form.Control.Feedback type="invalid">
                 {errors.lastName?.message}
@@ -190,15 +192,15 @@ const UserEdit = () => {
             </Form.Group>
 
             <Form.Group className="mb-3" controlId="email">
-              <Form.Label>Email</Form.Label>
+              <Form.Label>{t('form.email', 'Email')}</Form.Label>
               <Form.Control
                 type="email"
                 isInvalid={!!errors.email}
                 {...register('email', {
-                  required: 'Email is required',
+                  required: t('validation.emailRequired', 'Email is required'),
                   pattern: {
                     value: /^\S+@\S+$/i,
-                    message: 'Invalid email address'
+                    message: t('validation.invalidEmail', 'Invalid email format')
                   }
                 })}
                 disabled
@@ -209,7 +211,7 @@ const UserEdit = () => {
             </Form.Group>
 
             <Form.Group className="mb-3" controlId="phoneNumber">
-              <Form.Label>Phone Number</Form.Label>
+              <Form.Label>{t('form.phoneNumber', 'Phone Number')}</Form.Label>
               <Form.Control
                 type="text"
                 isInvalid={!!errors.phoneNumber}
@@ -223,7 +225,7 @@ const UserEdit = () => {
 
             <hr />
             <Form.Group className="mb-3" controlId="roles">
-              <Form.Label>User Roles</Form.Label>
+              <Form.Label>{t('user.roles', 'Roles')}</Form.Label>
               <div className="mb-3">
                 {roles.length > 0 ? (
                   <div className="d-flex flex-wrap gap-2">
@@ -239,7 +241,7 @@ const UserEdit = () => {
                             e.stopPropagation();
                             removeRole(role);
                           }}
-                          title={`Remove ${role} role`}
+                          title={t('user.removeRole', 'Remove role: {{role}}', { role })}
                         >
                           <X size={14} />
                         </Button>
@@ -247,7 +249,7 @@ const UserEdit = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-muted fst-italic mb-2">No roles assigned</div>
+                  <div className="text-muted fst-italic mb-2">{t('user.noRolesAssigned', 'No roles assigned')}</div>
                 )}
               </div>
 
@@ -255,7 +257,7 @@ const UserEdit = () => {
               {getAvailableRoles().length > 0 && (
                 <Dropdown>
                   <Dropdown.Toggle size="sm" variant="outline-success">
-                    Add role
+                    {t('user.addRole', 'Add Role')}
                   </Dropdown.Toggle>
                   <Dropdown.Menu>
                     {getAvailableRoles().map((role) => (
@@ -277,7 +279,7 @@ const UserEdit = () => {
 
             <div className="d-flex gap-2">
               <Button variant="primary" type="submit" disabled={isSubmitting}>
-                {isSubmitting ? 'Saving...' : 'Save Changes'}
+                {isSubmitting ? t('common.saving', 'Saving...') : t('common.saveChanges', 'Save Changes')}
               </Button>
               <Button
                 variant="outline-secondary"
@@ -285,7 +287,7 @@ const UserEdit = () => {
                 disabled={isSubmitting}
               >
                 <Lock className="me-1" size={16} />
-                Change Password
+                {t('password.changePassword', 'Change Password')}
               </Button>
             </div>
           </Form>
@@ -295,18 +297,18 @@ const UserEdit = () => {
         </Col>
 
         <Col md={4}>
-          <h2 className="mb-4 mt-3 text-center">Account Information</h2>
+          <h2 className="mb-4 mt-3 text-center">{t('user.accountInfo', 'Account Info')}</h2>
 
           {/* Account Details Card */}
           <Card>
             <Card.Body>
-              <p className="mb-2"><strong>User ID:</strong> <span className="text-muted">{selectedUser.userId}</span></p>
-              <p className="mb-2"><strong>Provider:</strong> <span className="text-muted">{selectedUser.provider}</span></p>
+              <p className="mb-2"><strong>{t('user.userId', 'User ID')}:</strong> <span className="text-muted">{selectedUser.userId}</span></p>
+              <p className="mb-2"><strong>{t('user.provider', 'Provider')}:</strong> <span className="text-muted">{selectedUser.provider}</span></p>
               {selectedUser.createdAt && (
-                <p className="mb-2"><strong>Created:</strong> <span className="text-muted">{new Date(selectedUser.createdAt).toLocaleDateString()}</span></p>
+                <p className="mb-2"><strong>{t('user.created', 'Created')}:</strong> <span className="text-muted">{new Date(selectedUser.createdAt).toLocaleDateString()}</span></p>
               )}
               {selectedUser.lastLoginAt && (
-                <p className="mb-0"><strong>Last Login:</strong> <span className="text-muted">{new Date(selectedUser.lastLoginAt).toLocaleDateString()}</span></p>
+                <p className="mb-0"><strong>{t('user.lastLogin', 'Last Login')}:</strong> <span className="text-muted">{new Date(selectedUser.lastLoginAt).toLocaleDateString()}</span></p>
               )}
             </Card.Body>
           </Card>

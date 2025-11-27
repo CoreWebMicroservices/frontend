@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Modal, Button, Form, Spinner } from 'react-bootstrap';
 import { Key, X } from 'react-bootstrap-icons';
+import { useTranslation } from 'react-i18next';
 import { adminChangeUserPassword } from '@/user/store/UserState';
 import { useMessageState } from '@/common/utils/api/ApiResponseHandler';
 import { AlertMessage } from '@/common/component/ApiResponseAlert';
@@ -19,6 +20,7 @@ interface PasswordFormValues {
 }
 
 const AdminChangePasswordModal = ({ show, onHide, userId, userName }: AdminChangePasswordModalProps) => {
+  const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { register, handleSubmit, reset, watch, formState: { errors } } = useForm<PasswordFormValues>();
@@ -44,8 +46,8 @@ const AdminChangePasswordModal = ({ show, onHide, userId, userName }: AdminChang
 
     handleResponse(
       result,
-      `Failed to change password for ${userName}.`,
-      `Password has been changed successfully for ${userName}.`
+      t('password.changeFailedFor', 'Failed to change password for {{userName}}', { userName }),
+      t('password.changeSuccessFor', 'Password changed successfully for {{userName}}', { userName })
     );
 
     setIsSubmitting(false);
@@ -63,7 +65,7 @@ const AdminChangePasswordModal = ({ show, onHide, userId, userName }: AdminChang
       <Modal.Header closeButton>
         <Modal.Title>
           <Key className="me-2" />
-          Change Password - {userName}
+          {t('password.changePassword', 'Change Password')} - {userName}
         </Modal.Title>
       </Modal.Header>
 
@@ -72,16 +74,16 @@ const AdminChangePasswordModal = ({ show, onHide, userId, userName }: AdminChang
 
         <Form onSubmit={handleSubmit(onSubmit)}>
           <Form.Group className="mb-3">
-            <Form.Label>New Password</Form.Label>
+            <Form.Label>{t('password.newPassword', 'New Password')}</Form.Label>
             <Form.Control
               type="password"
-              placeholder="Enter new password"
+              placeholder={t('password.enterNewPassword', 'Enter new password')}
               isInvalid={!!errors.newPassword}
               {...register('newPassword', {
-                required: 'New password is required',
+                required: t('validation.newPasswordRequired', 'New password is required'),
                 minLength: {
                   value: 8,
-                  message: 'Password must be at least 8 characters long'
+                  message: t('validation.passwordMinLength', 'Password must be at least 8 characters')
                 }
               })}
             />
@@ -91,15 +93,15 @@ const AdminChangePasswordModal = ({ show, onHide, userId, userName }: AdminChang
           </Form.Group>
 
           <Form.Group className="mb-4">
-            <Form.Label>Confirm New Password</Form.Label>
+            <Form.Label>{t('password.confirmNewPassword', 'Confirm New Password')}</Form.Label>
             <Form.Control
               type="password"
-              placeholder="Confirm new password"
+              placeholder={t('password.confirmNewPasswordPlaceholder', 'Confirm your new password')}
               isInvalid={!!errors.confirmPassword}
               {...register('confirmPassword', {
-                required: 'Please confirm the new password',
+                required: t('validation.confirmNewPassword', 'Please confirm the new password'),
                 validate: (value) =>
-                  value === newPassword || 'Passwords do not match'
+                  value === newPassword || t('validation.passwordsDoNotMatch', 'Passwords do not match')
               })}
             />
             <Form.Control.Feedback type="invalid">
@@ -110,7 +112,7 @@ const AdminChangePasswordModal = ({ show, onHide, userId, userName }: AdminChang
           <div className="d-flex justify-content-end gap-2">
             <Button variant="outline-secondary" onClick={handleClose} disabled={isSubmitting}>
               <X className="me-1" />
-              Cancel
+              {t('common.cancel', 'Cancel')}
             </Button>
             <Button
               variant="warning"
@@ -127,12 +129,12 @@ const AdminChangePasswordModal = ({ show, onHide, userId, userName }: AdminChang
                     aria-hidden="true"
                     className="me-2"
                   />
-                  Changing...
+                  {t('password.changing', 'Changing...')}
                 </>
               ) : (
                 <>
                   <Key className="me-1" />
-                  Change Password
+                  {t('password.changePassword', 'Change Password')}
                 </>
               )}
             </Button>

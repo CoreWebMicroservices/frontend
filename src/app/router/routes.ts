@@ -19,6 +19,11 @@ export const APP_ROUTES = {
 
   // Communication module routes
   COMMUNICATION: "/communication",
+  
+  // Translation module routes
+  TRANSLATIONS: "/translations",
+  TRANSLATION_NEW: "/translations/new",
+  TRANSLATION_EDIT: "/translations/:realm/:lang"
 } as const;
 
 // Re-export with different name for internal use

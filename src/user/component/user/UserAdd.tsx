@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { Container, Row, Col, Card, Button, Form, ButtonGroup, Dropdown } from 'react-bootstrap';
 import { X } from 'react-bootstrap-icons';
+import { useTranslation } from 'react-i18next';
 import { AuthProvider } from '@/user/model/User';
 import { createUser } from '@/user/store/UserState';
 import { useMessageState } from '@/common/utils/api/ApiResponseHandler';
@@ -19,6 +20,7 @@ interface UserFormValues {
 }
 
 const UserAdd = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
 
@@ -85,14 +87,14 @@ const UserAdd = () => {
       {/* Breadcrumb Navigation */}
       <Breadcrumb
         items={[
-          { label: 'All Users', href: ROUTE_PATHS.USERS_LIST },
-          { label: 'Add New User', active: true }
+          { label: t('user.allUsers', 'All Users'), href: ROUTE_PATHS.USERS_LIST },
+          { label: t('user.addNewUser', 'Add New User'), active: true }
         ]}
       />
 
       <Row>
         <Col md={8}>
-          <h2 className="mb-4 mt-3 text-center">Add New User</h2>
+          <h2 className="mb-4 mt-3 text-center">{t('user.addNewUser', 'Add New User')}</h2>
 
           {/* Default Avatar Placeholder */}
           <div className="mb-3 text-center">
@@ -112,16 +114,16 @@ const UserAdd = () => {
             }}>
               +
             </div>
-            <small className="text-muted mt-1 d-block">Default avatar will be generated</small>
+            <small className="text-muted mt-1 d-block">{t('user.defaultAvatarGenerated', 'Avatar will be generated based on initials')}</small>
           </div>
 
           <Form className="mb-3" onSubmit={handleSubmit(onSubmit)}>
             <Form.Group className="mb-3" controlId="firstName">
-              <Form.Label>First Name</Form.Label>
+              <Form.Label>{t('form.firstName', 'First Name')}</Form.Label>
               <Form.Control
                 type="text"
                 isInvalid={!!errors.firstName}
-                {...register('firstName', { required: 'First name is required' })}
+                {...register('firstName', { required: t('validation.firstNameRequired', 'First name is required') })}
               />
               <Form.Control.Feedback type="invalid">
                 {errors.firstName?.message}
@@ -129,11 +131,11 @@ const UserAdd = () => {
             </Form.Group>
 
             <Form.Group className="mb-3" controlId="lastName">
-              <Form.Label>Last Name</Form.Label>
+              <Form.Label>{t('form.lastName', 'Last Name')}</Form.Label>
               <Form.Control
                 type="text"
                 isInvalid={!!errors.lastName}
-                {...register('lastName', { required: 'Last name is required' })}
+                {...register('lastName', { required: t('validation.lastNameRequired', 'Last name is required') })}
               />
               <Form.Control.Feedback type="invalid">
                 {errors.lastName?.message}
@@ -141,15 +143,15 @@ const UserAdd = () => {
             </Form.Group>
 
             <Form.Group className="mb-3" controlId="email">
-              <Form.Label>Email</Form.Label>
+              <Form.Label>{t('form.email', 'Email')}</Form.Label>
               <Form.Control
                 type="email"
                 isInvalid={!!errors.email}
                 {...register('email', {
-                  required: 'Email is required',
+                  required: t('validation.emailRequired', 'Email is required'),
                   pattern: {
                     value: /^\S+@\S+$/i,
-                    message: 'Invalid email address'
+                    message: t('validation.invalidEmail', 'Invalid email format')
                   }
                 })}
               />
@@ -159,7 +161,7 @@ const UserAdd = () => {
             </Form.Group>
 
             <Form.Group className="mb-3" controlId="phoneNumber">
-              <Form.Label>Phone Number</Form.Label>
+              <Form.Label>{t('form.phoneNumber', 'Phone Number')}</Form.Label>
               <Form.Control
                 type="text"
                 isInvalid={!!errors.phoneNumber}
@@ -173,7 +175,7 @@ const UserAdd = () => {
 
             <hr />
             <Form.Group className="mb-3" controlId="roles">
-              <Form.Label>User Roles</Form.Label>
+              <Form.Label>{t('user.roles', 'Roles')}</Form.Label>
               <div className="mb-3">
                 {roles.length > 0 ? (
                   <div className="d-flex flex-wrap gap-2">
@@ -189,7 +191,7 @@ const UserAdd = () => {
                             e.stopPropagation();
                             removeRole(role);
                           }}
-                          title={`Remove ${role} role`}
+                          title={t('user.removeRole', 'Remove role: {{role}}', { role })}
                         >
                           <X size={14} />
                         </Button>
@@ -197,7 +199,7 @@ const UserAdd = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-muted fst-italic mb-2">No roles assigned</div>
+                  <div className="text-muted fst-italic mb-2">{t('user.noRolesAssigned', 'No roles assigned')}</div>
                 )}
               </div>
 
@@ -205,7 +207,7 @@ const UserAdd = () => {
               {getAvailableRoles().length > 0 && (
                 <Dropdown>
                   <Dropdown.Toggle size="sm" variant="outline-success">
-                    Add role
+                    {t('user.addRole', 'Add Role')}
                   </Dropdown.Toggle>
                   <Dropdown.Menu>
                     {getAvailableRoles().map((role) => (
@@ -226,10 +228,10 @@ const UserAdd = () => {
 
             <div className="d-flex gap-2">
               <Button variant="primary" type="submit" disabled={isSubmitting}>
-                {isSubmitting ? 'Creating...' : 'Create User'}
+                {isSubmitting ? t('common.creating', 'Creating...') : t('user.createUser', 'Create User')}
               </Button>
               <Button variant="outline-secondary" onClick={() => navigate(ROUTE_PATHS.USERS_LIST)}>
-                Cancel
+                {t('common.cancel', 'Cancel')}
               </Button>
             </div>
           </Form>
@@ -239,16 +241,16 @@ const UserAdd = () => {
         </Col>
 
         <Col md={4}>
-          <h2 className="mb-4 mt-3 text-center">Information</h2>
+          <h2 className="mb-4 mt-3 text-center">{t('user.information', 'Information')}</h2>
 
           {/* Information Card */}
           <Card>
             <Card.Body>
-              <h6>Account Creation</h6>
-              <p className="mb-2 text-muted">• User will be created with local authentication</p>
-              <p className="mb-2 text-muted">• Default password will be generated</p>
-              <p className="mb-2 text-muted">• User will need to set their password on first login</p>
-              <p className="mb-0 text-muted">• Email verification may be required</p>
+              <h6>{t('user.accountCreation', 'Account Creation')}</h6>
+              <p className="mb-2 text-muted">• {t('user.accountCreationInfo.localAuth', 'User will be created with local authentication')}</p>
+              <p className="mb-2 text-muted">• {t('user.accountCreationInfo.defaultPassword', 'A temporary password will be generated')}</p>
+              <p className="mb-2 text-muted">• {t('user.accountCreationInfo.setPassword', 'User can set their own password later')}</p>
+              <p className="mb-0 text-muted">• {t('user.accountCreationInfo.emailVerification', 'Email verification will be required')}</p>
             </Card.Body>
           </Card>
         </Col>

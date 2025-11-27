@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { useProfileState, getProfileInfo, updateProfileInfo } from '@/user/store/ProfileState';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
@@ -19,6 +20,7 @@ interface UserFormValues {
 }
 
 const UserProfile = () => {
+  const { t } = useTranslation();
   const profileState = useProfileState();
   const user = profileState.user.get();
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -51,7 +53,7 @@ const UserProfile = () => {
     return (
       <div className="d-flex justify-content-center align-items-center" style={{ minHeight: 200 }}>
         <Spinner animation="border" role="status" variant="primary">
-          <span className="visually-hidden">Loading...</span>
+          <span className="visually-hidden">{t('common.loading', 'Loading...')}</span>
         </Spinner>
       </div>
     );
@@ -61,7 +63,7 @@ const UserProfile = () => {
     <Container>
       <Row>
         <Col>
-          <h2 className="mb-4 mt-3 text-center">Profile</h2>
+          <h2 className="mb-4 mt-3 text-center">{t('profile.title', 'Profile')}</h2>
           {user.imageUrl ? (
             <div className="mb-3 text-center">
               <img
@@ -99,7 +101,7 @@ const UserProfile = () => {
           )}
           <Form className="mb-3" onSubmit={handleSubmit(onSubmit)}>
             <Form.Group className="mb-3" controlId="firstName">
-              <Form.Label>First Name</Form.Label>
+              <Form.Label>{t('form.firstName', 'First Name')}</Form.Label>
               <Form.Control
                 type="text"
                 isInvalid={!!errors.firstName}
@@ -110,7 +112,7 @@ const UserProfile = () => {
               </Form.Control.Feedback>
             </Form.Group>
             <Form.Group className="mb-3" controlId="lastName">
-              <Form.Label>Last Name</Form.Label>
+              <Form.Label>{t('form.lastName', 'Last Name')}</Form.Label>
               <Form.Control
                 type="text"
                 isInvalid={!!errors.lastName}
@@ -121,7 +123,7 @@ const UserProfile = () => {
               </Form.Control.Feedback>
             </Form.Group>
             <Form.Group className="mb-3" controlId="email">
-              <Form.Label>Email</Form.Label>
+              <Form.Label>{t('form.email', 'Email')}</Form.Label>
               <Form.Control
                 type="email"
                 isInvalid={!!errors.email}
@@ -133,7 +135,7 @@ const UserProfile = () => {
               </Form.Control.Feedback>
             </Form.Group>
             <Form.Group className="mb-3" controlId="phoneNumber">
-              <Form.Label>Phone Number</Form.Label>
+              <Form.Label>{t('form.phoneNumber', 'Phone Number')}</Form.Label>
               <Form.Control
                 type="text"
                 isInvalid={!!errors.phoneNumber}
@@ -146,7 +148,7 @@ const UserProfile = () => {
             </Form.Group>
             <div className="d-flex gap-2">
               <Button variant="primary" type="submit" disabled={isSubmitting}>
-                Save Changes
+                {t('common.saveChanges', 'Save Changes')}
               </Button>
               <Button
                 variant="outline-secondary"
@@ -154,14 +156,14 @@ const UserProfile = () => {
                 disabled={isSubmitting}
               >
                 <Lock className="me-1" size={16} />
-                Change Password
+                {t('profile.changePassword', 'Change Password')}
               </Button>
             </div>
           </Form>
           <AlertMessage success={updateSuccess} initialErrorMessage={updateInitialError} errors={updateErrors} />
         </Col>
         <Col md={4}>
-          <h2 className="mb-4 mt-3 text-center">Roles</h2>
+          <h2 className="mb-4 mt-3 text-center">{t('profile.roles', 'Roles')}</h2>
           <ul className="list-group">
             {user.roles?.map((role) => (
               <li key={role} className="list-group-item text-center">

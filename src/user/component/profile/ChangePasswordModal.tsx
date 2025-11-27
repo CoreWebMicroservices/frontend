@@ -2,6 +2,7 @@
 import { useForm } from 'react-hook-form';
 import { Modal, Button, Form } from 'react-bootstrap';
 import { Lock } from 'react-bootstrap-icons';
+import { useTranslation } from 'react-i18next';
 import { updateProfilePassword } from '@/user/store/ProfileState';
 import { useMessageState } from '@/common/utils/api/ApiResponseHandler';
 import { AlertMessage } from '@/common/component/ApiResponseAlert';
@@ -18,6 +19,7 @@ interface ChangePasswordModalProps {
 }
 
 const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ show, onHide }) => {
+  const { t } = useTranslation();
   const {
     register,
     handleSubmit,
@@ -39,9 +41,9 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ show, onHide 
         {
           result: false,
           response: null,
-          errors: [{ reasonCode: 'validation.error', description: 'New passwords do not match' }]
+          errors: [{ reasonCode: 'validation.error', description: t('validation.passwordsDoNotMatch', 'Passwords do not match') }]
         },
-        'Password validation failed'
+        t('password.validationFailed', 'Password validation failed')
       );
       return;
     }
@@ -54,8 +56,8 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ show, onHide 
 
     handleResponse(
       result,
-      'Failed to change password.',
-      'Your password has been changed successfully.'
+      t('password.changeFailed', 'Failed to change password'),
+      t('password.changeSuccess', 'Password changed successfully')
     );
 
     if (result.result) {
@@ -78,7 +80,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ show, onHide 
       <Modal.Header closeButton>
         <Modal.Title>
           <Lock className="me-2" />
-          Change Password
+          {t('password.changePassword', 'Change Password')}
         </Modal.Title>
       </Modal.Header>
 
@@ -87,13 +89,13 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ show, onHide 
 
         <Form onSubmit={handleSubmit(onSubmit)}>
           <Form.Group className="mb-3" controlId="currentPassword">
-            <Form.Label>Current Password</Form.Label>
+            <Form.Label>{t('password.currentPassword', 'Current Password')}</Form.Label>
             <Form.Control
               type="password"
-              placeholder="Enter your current password"
+              placeholder={t('password.enterCurrentPassword', 'Enter current password')}
               isInvalid={!!errors.oldPassword}
               {...register('oldPassword', {
-                required: 'Current password is required'
+                required: t('validation.currentPasswordRequired', 'Current password is required')
               })}
             />
             <Form.Control.Feedback type="invalid">
@@ -102,16 +104,16 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ show, onHide 
           </Form.Group>
 
           <Form.Group className="mb-3" controlId="newPassword">
-            <Form.Label>New Password</Form.Label>
+            <Form.Label>{t('password.newPassword', 'New Password')}</Form.Label>
             <Form.Control
               type="password"
-              placeholder="Enter new password"
+              placeholder={t('password.enterNewPassword', 'Enter new password')}
               isInvalid={!!errors.newPassword}
               {...register('newPassword', {
-                required: 'New password is required',
+                required: t('validation.newPasswordRequired', 'New password is required'),
                 minLength: {
                   value: 8,
-                  message: 'Password must be at least 8 characters long'
+                  message: t('validation.passwordMinLength', 'Password must be at least 8 characters')
                 }
               })}
             />
@@ -121,15 +123,15 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ show, onHide 
           </Form.Group>
 
           <Form.Group className="mb-3" controlId="confirmPassword">
-            <Form.Label>Confirm New Password</Form.Label>
+            <Form.Label>{t('password.confirmNewPassword', 'Confirm New Password')}</Form.Label>
             <Form.Control
               type="password"
-              placeholder="Confirm new password"
+              placeholder={t('password.confirmNewPasswordPlaceholder', 'Confirm your new password')}
               isInvalid={!!errors.confirmPassword}
               {...register('confirmPassword', {
-                required: 'Please confirm your new password',
+                required: t('validation.confirmPasswordRequired', 'Please confirm your password'),
                 validate: value =>
-                  value === newPassword || 'Passwords do not match'
+                  value === newPassword || t('validation.passwordsDoNotMatch', 'Passwords do not match')
               })}
             />
             <Form.Control.Feedback type="invalid">
@@ -141,14 +143,14 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ show, onHide 
 
       <Modal.Footer>
         <Button variant="secondary" onClick={handleClose} disabled={isSubmitting}>
-          Cancel
+          {t('common.cancel', 'Cancel')}
         </Button>
         <Button
           variant="primary"
           onClick={handleSubmit(onSubmit)}
           disabled={isSubmitting}
         >
-          {isSubmitting ? 'Changing...' : 'Change Password'}
+          {isSubmitting ? t('password.changing', 'Changing...') : t('password.changePassword', 'Change Password')}
         </Button>
       </Modal.Footer>
     </Modal>

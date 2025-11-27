@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { Badge, OverlayTrigger, Popover } from "react-bootstrap";
 import { Envelope, ChatDots, CheckCircle, XCircle, Clock, Eye, Send } from "react-bootstrap-icons";
 import { useHookstate } from "@hookstate/core";
+import { useTranslation } from "react-i18next";
 import { DataTable, DataTableFilter } from "@/common/component/dataTable";
 import { useMessagesState } from "@/communication/store/MessageState";
 import { Message, EmailPayload } from "@/communication/model/Message";
@@ -20,6 +21,7 @@ import { Container } from "react-bootstrap";
 import { APP_ROUTES } from "@/app/router/routes";
 
 export const MessageList: React.FC<{ userId?: string }> = ({ userId }) => {
+  const { t } = useTranslation();
   const { fetchMessages } = useMessagesState();
   const { initialErrorMessage, errors } = useMessageState();
   const [isLoading, setIsLoading] = React.useState(false);
@@ -69,9 +71,9 @@ export const MessageList: React.FC<{ userId?: string }> = ({ userId }) => {
   if (!userId) {
     filters.push({
       key: 'userId',
-      label: 'User',
+      label: t('message.user', 'User'),
       type: 'async-select',
-      placeholder: 'Filter by User',
+      placeholder: t('message.filterByUser', 'Filter by user'),
       loadOptions: searchUsers,
       getOptionLabel: (user: User) => `${user.firstName} ${user.lastName}`,
       getOptionValue: (user: User) => user.userId,
@@ -81,34 +83,34 @@ export const MessageList: React.FC<{ userId?: string }> = ({ userId }) => {
 
   filters.push({
     key: 'type',
-    label: 'Channel',
+    label: t('message.channel', 'Channel'),
     type: 'select',
-    placeholder: 'Filter by Channel',
+    placeholder: t('message.filterByChannel', 'Filter by channel'),
     operator: 'eq',
     options: [
-      { value: 'email', label: 'Email' },
-      { value: 'sms', label: 'SMS' }
+      { value: 'email', label: t('message.email', 'Email') },
+      { value: 'sms', label: t('message.sms', 'SMS') }
     ]
   });
 
   const columns = [
-    { key: "type", title: "Channel", sortable: false, width: "100px" },
-    { key: "createdAt", title: "Sent", sortable: true, width: "180px" },
-    { key: "recipient", title: "To", sortable: false },
-    { key: "content", title: "Content", sortable: false },
-    { key: "status", title: "Status", sortable: true, width: "80px" },
-    { key: "sentBy", title: "Sent By", sortable: false },
+    { key: "type", title: t('message.channel', 'Channel'), sortable: false, width: "100px" },
+    { key: "createdAt", title: t('message.sent', 'Sent'), sortable: true, width: "180px" },
+    { key: "recipient", title: t('message.to', 'To'), sortable: false },
+    { key: "content", title: t('message.content', 'Content'), sortable: false },
+    { key: "status", title: t('message.status', 'Status'), sortable: true, width: "80px" },
+    { key: "sentBy", title: t('message.sentBy', 'Sent By'), sortable: false },
     { key: "actions", title: "", sortable: false, width: "80px" },
   ];
 
   const renderStatus = (status: string) => {
     switch (status) {
       case 'sent':
-        return <Badge bg="success" className="d-flex align-items-center gap-1"><CheckCircle /> Sent</Badge>;
+        return <Badge bg="success" className="d-flex align-items-center gap-1"><CheckCircle /> {t('message.statusSent', 'Sent')}</Badge>;
       case 'failed':
-        return <Badge bg="danger" className="d-flex align-items-center gap-1"><XCircle /> Failed</Badge>;
+        return <Badge bg="danger" className="d-flex align-items-center gap-1"><XCircle /> {t('message.statusFailed', 'Failed')}</Badge>;
       case 'enqueued':
-        return <Badge bg="primary" className="d-flex align-items-center gap-1"><Clock /> Queued</Badge>;
+        return <Badge bg="primary" className="d-flex align-items-center gap-1"><Clock /> {t('message.statusQueued', 'Queued')}</Badge>;
       default:
         return <Badge bg="secondary">{status}</Badge>;
     }
@@ -122,7 +124,7 @@ export const MessageList: React.FC<{ userId?: string }> = ({ userId }) => {
     const popover = (
       <Popover id={`popover-${msg.uuid}`} style={{ maxWidth: '500px' }}>
         <Popover.Header as="h3">
-          {msg.type === 'email' ? 'Email Content' : 'SMS Content'}
+          {msg.type === 'email' ? t('message.emailContent', 'Email Content') : t('message.smsContent', 'SMS Content')}
         </Popover.Header>
         <Popover.Body style={{ maxHeight: '600px', overflowY: 'auto' }}>
           {isHtml ? (
@@ -138,8 +140,8 @@ export const MessageList: React.FC<{ userId?: string }> = ({ userId }) => {
       <tr key={msg.uuid}>
         <td className="align-middle">
           {msg.type === 'email' ?
-            <div className="d-flex align-items-center text-info"><Envelope className="me-2" /> Email</div> :
-            <div className="d-flex align-items-center text-warning"><ChatDots className="me-2" /> SMS</div>
+            <div className="d-flex align-items-center text-info"><Envelope className="me-2" /> {t('message.email', 'Email')}</div> :
+            <div className="d-flex align-items-center text-warning"><ChatDots className="me-2" /> {t('message.sms', 'SMS')}</div>
           }
         </td>
         <td className="align-middle text-muted small">
@@ -147,7 +149,7 @@ export const MessageList: React.FC<{ userId?: string }> = ({ userId }) => {
         </td>
         <td className="align-middle fw-medium">
           {(isResolvingNames && !userNames[msg.userId])
-            ? 'Loading...'
+            ? t('common.loading', 'Loading...')
             : (userNames[msg.userId]
               ? <Link to={`${APP_ROUTES.USER_EDIT.replace(':userId', msg.userId)}`}>{userNames[msg.userId]}</Link>
               : getRecipient(msg))}
@@ -155,7 +157,7 @@ export const MessageList: React.FC<{ userId?: string }> = ({ userId }) => {
         <td className="align-middle">
           <div className="d-flex align-items-center" style={{ cursor: 'help' }}>
             <div className="text-truncate" style={{ maxWidth: '300px' }}>
-              {msg.type === 'email' && <span className="fw-bold me-1">Subject:</span>}
+              {msg.type === 'email' && <span className="fw-bold me-1">{t('message.subject', 'Subject')}:</span>}
               {preview}
             </div>
           </div>
@@ -165,8 +167,8 @@ export const MessageList: React.FC<{ userId?: string }> = ({ userId }) => {
         </td>
         <td className="align-middle">
           {msg.sentByType === 'user' && msg.sentById
-            ? ((isResolvingNames && !userNames[msg.sentById]) ? 'Loading...' : <Link to={`${APP_ROUTES.USER_EDIT.replace(':userId', msg.sentById)}`}>{userNames[msg.sentById] || '—'}</Link>)
-            : 'System'}
+            ? ((isResolvingNames && !userNames[msg.sentById]) ? t('common.loading', 'Loading...') : <Link to={`${APP_ROUTES.USER_EDIT.replace(':userId', msg.sentById)}`}>{userNames[msg.sentById] || '—'}</Link>)
+            : t('message.system', 'System')}
         </td>
         <td className="align-middle text-end">
           <OverlayTrigger
@@ -185,7 +187,7 @@ export const MessageList: React.FC<{ userId?: string }> = ({ userId }) => {
 
   const actions = (
     <button className="btn btn-outline-primary d-flex align-items-center" onClick={() => setShowSendModal(true)}>
-      <Send className="me-2" /> Send Message
+      <Send className="me-2" /> {t('message.sendMessage', 'Send Message')}
     </button>
   );
 

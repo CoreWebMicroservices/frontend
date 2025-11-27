@@ -1,8 +1,10 @@
 import { Nav } from 'react-bootstrap';
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const CommunicationNavBar = ({ path }: { path: string }) => {
   const location = useLocation();
+  const { t } = useTranslation();
 
   return (
     <Nav.Item>
@@ -11,7 +13,7 @@ const CommunicationNavBar = ({ path }: { path: string }) => {
         to={path}
         active={location.pathname === path}
       >
-        Communication
+        {t('nav.communication', 'Communication')}
       </Nav.Link>
     </Nav.Item>
   );

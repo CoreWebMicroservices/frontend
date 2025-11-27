@@ -1,8 +1,9 @@
 import React, { useEffect } from "react";
 import { Badge, Container } from "react-bootstrap";
-import { Globe, Pencil, Plus } from "react-bootstrap-icons";
+import { Pencil, Plus } from "react-bootstrap-icons";
 import { useHookstate } from "@hookstate/core";
 import { useNavigate, Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { DataTable } from "@/common/component/dataTable";
 import { useTranslationState } from "@/translation/store/TranslationState";
 import { RealmLanguages, LanguageInfo } from "@/translation/model/Translation";
@@ -14,7 +15,8 @@ import { APP_ROUTES } from "@/app/router/routes";
 import { formatDate } from "@/common/utils/DateUtils";
 import { resolveUserNames } from "@/user/utils/UserApi";
 
-export const RealmsList: React.FC = () => {
+export const TranslationList: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { fetchRealms } = useTranslationState();
   const { initialErrorMessage, errors } = useMessageState();
@@ -46,11 +48,10 @@ export const RealmsList: React.FC = () => {
   } = createDataTableActions(queryParams, { onUpdate: refreshRealmsCb });
 
   const columns = [
-    { key: "realm", title: "Realm", sortable: true, width: "150px" },
-    { key: "languages", title: "Languages", sortable: false, width: "250px" },
-    { key: "updatedAt", title: "Last Updated", sortable: true, width: "180px" },
-    { key: "updatedBy", title: "Updated By", sortable: false, width: "200px" },
-    { key: "actions", title: "", sortable: false, width: "100px" },
+    { key: "realm", title: t('translation.realm', 'Realm'), sortable: true, width: "150px" },
+    { key: "updatedAt", title: t('translation.lastUpdated', 'Last Updated'), sortable: true, width: "180px" },
+    { key: "updatedBy", title: t('translation.updatedBy', 'Updated By'), sortable: false, width: "200px" },
+    { key: "languages", title: t('translation.editLanguages', 'Edit Languages'), sortable: false, width: "auto" },
   ];
 
   const handleEdit = (realm: string, lang: string) => {
@@ -63,21 +64,21 @@ export const RealmsList: React.FC = () => {
 
   const renderLanguageBadge = (realm: string, langInfo: LanguageInfo) => {
     return (
-      <Badge 
-        key={langInfo.lang} 
-        bg="primary" 
+      <Badge
+        key={langInfo.lang}
+        bg="primary"
         className="me-2 mb-1 d-inline-flex align-items-center gap-1"
         style={{ cursor: 'pointer' }}
         onClick={() => handleEdit(realm, langInfo.lang)}
       >
-        <Globe size={14} />
+        <Pencil size={14} />
         {langInfo.lang.toUpperCase()}
       </Badge>
     );
   };
 
   const renderRow = (realm: RealmLanguages) => {
-    const mostRecentLang = realm.languages.reduce((latest, current) => 
+    const mostRecentLang = realm.languages.reduce((latest, current) =>
       new Date(current.updatedAt) > new Date(latest.updatedAt) ? current : latest
     );
 
@@ -86,17 +87,12 @@ export const RealmsList: React.FC = () => {
         <td className="align-middle fw-bold">
           {realm.realm}
         </td>
-        <td className="align-middle">
-          <div className="d-flex flex-wrap">
-            {realm.languages.map(lang => renderLanguageBadge(realm.realm, lang))}
-          </div>
-        </td>
         <td className="align-middle text-muted small">
           {formatDate(mostRecentLang.updatedAt)}
         </td>
         <td className="align-middle">
           {isResolvingNames && !userNames[mostRecentLang.updatedBy] ? (
-            <span className="text-muted">Loading...</span>
+            <span className="text-muted">{t('common.loading', 'Loading...')}</span>
           ) : userNames[mostRecentLang.updatedBy] ? (
             <Link to={APP_ROUTES.USER_EDIT.replace(':userId', mostRecentLang.updatedBy)}>
               {userNames[mostRecentLang.updatedBy]}
@@ -106,14 +102,8 @@ export const RealmsList: React.FC = () => {
           )}
         </td>
         <td className="align-middle text-end">
-          <div className="d-flex gap-2 justify-content-end">
-            <button 
-              className="btn btn-sm btn-outline-primary"
-              onClick={() => handleEdit(realm.realm, realm.languages[0].lang)}
-              title="Edit first language"
-            >
-              <Pencil size={14} />
-            </button>
+          <div className="d-flex flex-wrap">
+            {realm.languages.map(lang => renderLanguageBadge(realm.realm, lang))}
           </div>
         </td>
       </tr>
@@ -122,7 +112,7 @@ export const RealmsList: React.FC = () => {
 
   const actions = (
     <button className="btn btn-outline-primary d-flex align-items-center" onClick={handleAddNew}>
-      <Plus className="me-2" size={18} /> Add New
+      <Plus className="me-2" size={18} /> {t('translation.addNew', 'Add New')}
     </button>
   );
 
@@ -137,10 +127,10 @@ export const RealmsList: React.FC = () => {
         if (lang.updatedBy) userIds.add(lang.updatedBy);
       });
     });
-    
+
     const ids = Array.from(userIds);
     if (ids.length === 0) return;
-    
+
     setIsResolvingNames(true);
     resolveUserNames(ids).then(names => {
       setUserNames(names);
@@ -152,7 +142,7 @@ export const RealmsList: React.FC = () => {
       <AlertMessage initialErrorMessage={initialErrorMessage} errors={errors} />
 
       <DataTable
-        title="Translation Realms"
+        title={t('translation.realms', 'Translation Realms')}
         items={realms}
         pagination={pagedResponse ? {
           page: pagedResponse.page,
@@ -165,7 +155,7 @@ export const RealmsList: React.FC = () => {
         columns={columns}
         filters={[]}
         filterValues={{}}
-        onFilter={() => {}}
+        onFilter={() => { }}
         sortableFields={columns.filter(col => col.sortable).map(col => col.key)}
         currentSort={parseCurrentSort(queryParams.sort.get())}
         onPageChange={setPage}

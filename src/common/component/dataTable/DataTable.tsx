@@ -1,4 +1,5 @@
 import { Row, Col, Card, Table, Spinner } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 import { DataTableProps } from './DataTableTypes';
 import { DataTableSearch } from './DataTableSearch';
 import { DataTableFilters } from './filter/DataTableFilters';
@@ -34,12 +35,13 @@ export function DataTable<T>({
   title,
   actions
 }: DataTableProps<T>) {
+  const { t } = useTranslation();
 
   if (isLoading && items.length === 0) {
     return (
       <div className="d-flex justify-content-center align-items-center" style={{ minHeight: 400 }}>
         <Spinner animation="border" variant="primary">
-          <span className="visually-hidden">Loading...</span>
+          <span className="visually-hidden">{t('common.loading', 'Loading...')}</span>
         </Spinner>
       </div>
     );

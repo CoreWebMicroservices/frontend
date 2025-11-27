@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Row, Col, Alert, Button, ButtonGroup } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
 import { AsyncSelect } from '@/common/component/dataTable/filter/AsyncSelect';
 import { ModalDialog } from '@/common/component/ModalDialog';
 import { searchUsers, fetchUsersByIds } from '@/user/utils/UserApi';
@@ -16,6 +17,7 @@ interface SendMessageModalProps {
 }
 
 export const SendMessageModal: React.FC<SendMessageModalProps> = ({ show, onClose, userId, onSent }) => {
+  const { t } = useTranslation();
   const { sendEmailMessage, sendSmsMessage } = useMessagesState();
   const { initialErrorMessage, errors } = useMessageState();
 
@@ -44,14 +46,14 @@ export const SendMessageModal: React.FC<SendMessageModalProps> = ({ show, onClos
 
   const validate = (): string[] => {
     const errs: string[] = [];
-    if (!effectiveUserId) errs.push('User is required');
+    if (!effectiveUserId) errs.push(t('validation.userRequired', 'User is required'));
     if (channel === 'email') {
-      if (!recipientEmail.trim()) errs.push('Recipient email is required');
-      if (!subject.trim()) errs.push('Subject is required');
-      if (!body.trim()) errs.push('Body is required');
+      if (!recipientEmail.trim()) errs.push(t('validation.recipientEmailRequired', 'Recipient email is required'));
+      if (!subject.trim()) errs.push(t('validation.subjectRequired', 'Subject is required'));
+      if (!body.trim()) errs.push(t('validation.bodyRequired', 'Body is required'));
     } else {
-      if (!phoneNumber.trim()) errs.push('Phone number is required');
-      if (!smsMessage.trim()) errs.push('Message text is required');
+      if (!phoneNumber.trim()) errs.push(t('validation.phoneRequired', 'Phone number is required'));
+      if (!smsMessage.trim()) errs.push(t('validation.messageRequired', 'Message is required'));
     }
     return errs;
   };
@@ -82,7 +84,7 @@ export const SendMessageModal: React.FC<SendMessageModalProps> = ({ show, onClos
       });
     setIsSubmitting(false);
     if (result.result) {
-      setSuccessMessage('Message sent successfully');
+      setSuccessMessage(t('message.sentSuccess', 'Message sent successfully'));
       if (onSent) onSent();
       // Clear form after successful send
       if (!userId) {
@@ -135,11 +137,11 @@ export const SendMessageModal: React.FC<SendMessageModalProps> = ({ show, onClos
 
   return (
     <ModalDialog
-      title="Send Message"
+      title={t('message.sendMessage', 'Send Message')}
       show={show}
       onClose={handleCancel}
       onPrimary={handleSubmit}
-      primaryText={isSubmitting ? 'Sending...' : 'Send'}
+      primaryText={isSubmitting ? t('message.sending', 'Sending...') : t('common.send', 'Send')}
       disabledPrimary={isSubmitting || validationErrors.length > 0}
       size="lg"
       footerContent={successMessage && <span className="text-success me-auto">{successMessage}</span>}
@@ -147,7 +149,7 @@ export const SendMessageModal: React.FC<SendMessageModalProps> = ({ show, onClos
       <Form>
         {!userId && (
           <div className="mb-3">
-            <Form.Label>User *</Form.Label>
+            <Form.Label>{t('message.user', 'User')} *</Form.Label>
             <AsyncSelect<User>
               value={selectedUserId}
               onChange={(val) => {
@@ -170,16 +172,16 @@ export const SendMessageModal: React.FC<SendMessageModalProps> = ({ show, onClos
               getOptionLabel={(u) => `${u.firstName} ${u.lastName}`}
               getOptionValue={(u) => u.userId}
               getOptionSubtitle={(u) => u.email}
-              placeholder="Select user..."
+              placeholder={t('message.selectUser', 'Select a user')}
             />
           </div>
         )}
 
         <div className="mb-3 mt-2">
-          <Form.Label>Channel</Form.Label><br />
+          <Form.Label>{t('message.channel', 'Channel')}</Form.Label><br />
           <ButtonGroup aria-label="Channel selection">
-            <Button id="channel-email" className={channel === 'email' ? 'active' : ''} onClick={() => setChannel('email')} variant="outline-primary" size="sm">Email</Button>
-            <Button id="channel-sms" className={channel === 'sms' ? 'active' : ''} onClick={() => setChannel('sms')} variant="outline-primary" size="sm">SMS</Button>
+            <Button id="channel-email" className={channel === 'email' ? 'active' : ''} onClick={() => setChannel('email')} variant="outline-primary" size="sm">{t('message.email', 'Email')}</Button>
+            <Button id="channel-sms" className={channel === 'sms' ? 'active' : ''} onClick={() => setChannel('sms')} variant="outline-primary" size="sm">{t('message.sms', 'SMS')}</Button>
           </ButtonGroup>
         </div>
 
@@ -188,20 +190,20 @@ export const SendMessageModal: React.FC<SendMessageModalProps> = ({ show, onClos
             {/* Recipient full row */}
             <Row>
               <Col md={12} className="mb-3">
-                <Form.Label>Recipient Email *</Form.Label>
+                <Form.Label>{t('message.recipientEmail', 'Recipient Email')} *</Form.Label>
                 <Form.Control type="email" value={recipientEmail} onChange={e => setRecipientEmail(e.target.value)} placeholder="user@example.com" />
               </Col>
             </Row>
             {/* Subject & Format share row */}
             <Row>
               <Col md={8} className="mb-3">
-                <Form.Label>Subject *</Form.Label>
+                <Form.Label>{t('message.subject', 'Subject')} *</Form.Label>
                 <Form.Control value={subject} onChange={e => setSubject(e.target.value)} />
               </Col>
               <Col md={4} className="mb-3">
-                <Form.Label>Format</Form.Label>
+                <Form.Label>{t('message.format', 'Format')}</Form.Label>
                 <Form.Select value={emailType} onChange={e => setEmailType(e.target.value as 'html' | 'txt')}>
-                  <option value="txt">Plain Text</option>
+                  <option value="txt">{t('message.plainText', 'Plain Text')}</option>
                   <option value="html">HTML</option>
                 </Form.Select>
               </Col>
@@ -210,17 +212,17 @@ export const SendMessageModal: React.FC<SendMessageModalProps> = ({ show, onClos
             <Row>
               <Col md={6} className="mb-3">
                 <Form.Label>CC</Form.Label>
-                <Form.Control value={cc} onChange={e => setCc(e.target.value)} placeholder="comma separated" />
+                <Form.Control value={cc} onChange={e => setCc(e.target.value)} placeholder={t('message.commaSeparated', 'Comma separated')} />
               </Col>
               <Col md={6} className="mb-3">
                 <Form.Label>BCC</Form.Label>
-                <Form.Control value={bcc} onChange={e => setBcc(e.target.value)} placeholder="comma separated" />
+                <Form.Control value={bcc} onChange={e => setBcc(e.target.value)} placeholder={t('message.commaSeparated', 'Comma separated')} />
               </Col>
             </Row>
             {/* Body full row */}
             <Row>
               <Col md={12} className="mb-3">
-                <Form.Label>Body *</Form.Label>
+                <Form.Label>{t('message.body', 'Body')} *</Form.Label>
                 <Form.Control as="textarea" rows={6} value={body} onChange={e => setBody(e.target.value)} />
               </Col>
             </Row>
@@ -232,14 +234,14 @@ export const SendMessageModal: React.FC<SendMessageModalProps> = ({ show, onClos
             {/* Phone full row */}
             <Row>
               <Col md={12} className="mb-3">
-                <Form.Label>Phone Number *</Form.Label>
+                <Form.Label>{t('form.phoneNumber', 'Phone Number')} *</Form.Label>
                 <Form.Control value={phoneNumber} onChange={e => setPhoneNumber(e.target.value)} placeholder="+123456789" />
               </Col>
             </Row>
             {/* Message full row */}
             <Row>
               <Col md={12} className="mb-3">
-                <Form.Label>Message *</Form.Label>
+                <Form.Label>{t('message.messageText', 'Message')} *</Form.Label>
                 <Form.Control as="textarea" rows={4} value={smsMessage} onChange={e => setSmsMessage(e.target.value)} />
               </Col>
             </Row>

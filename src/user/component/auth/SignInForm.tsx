@@ -3,6 +3,7 @@ import { Button, Col, FloatingLabel, Form, Row } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 
 import { signInUser } from "@/user/store/AuthState";
 import { SignInUserRequest } from "@/user/model/Auth";
@@ -18,6 +19,7 @@ const signInSchema = yup.object().shape({
 
 
 const SignInForm = () => {
+  const { t } = useTranslation();
   const { success, initialErrorMessage, errors: apiErrors, handleResponse } = useMessageState();
   const {
     register,
@@ -45,12 +47,12 @@ const SignInForm = () => {
     <Form noValidate onSubmit={handleSubmit(onSubmit)} className="needs-validation">
       <FloatingLabel
         controlId="floatingEmail"
-        label="Email"
+        label={t('form.email', 'Email')}
         className="mb-3"
       >
         <Form.Control
           type="email"
-          placeholder="Enter email"
+          placeholder={t('form.enterEmail', 'Enter email')}
           size="lg"
           className="border-0 border-bottom rounded-0"
           autoComplete="email"
@@ -63,12 +65,12 @@ const SignInForm = () => {
       </FloatingLabel>
       <FloatingLabel
         controlId="floatingPassword"
-        label="Password"
+        label={t('form.password', 'Password')}
         className="mb-3"
       >
         <Form.Control
           type="password"
-          placeholder="Password"
+          placeholder={t('form.password', 'Password')}
           size="lg"
           className="border-0 border-bottom rounded-0"
           required
@@ -85,11 +87,11 @@ const SignInForm = () => {
 
       <Row className="justify-content-cenmt mb-3">
         <Col xs={{ span: 6, offset: 6 }} className="text-end">
-          <Link to={APP_ROUTES.FORGOT_PASSWORD} className="link-secondary text-decoration-none">Forgot password?</Link>
+          <Link to={APP_ROUTES.FORGOT_PASSWORD} className="link-secondary text-decoration-none">{t('auth.forgotPassword', 'Forgot password?')}</Link>
         </Col>
       </Row>
       <div className="d-grid mb-3">
-        <Button size="lg" type="submit" disabled={isSubmitting} className="fs-6 py-2">Sign In</Button>
+        <Button size="lg" type="submit" disabled={isSubmitting} className="fs-6 py-2">{t('auth.signIn', 'Sign In')}</Button>
       </div>
     </Form>
   );

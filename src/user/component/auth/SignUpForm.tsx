@@ -2,6 +2,7 @@ import * as yup from 'yup';
 import { Button, Col, FloatingLabel, Form, Row } from "react-bootstrap";
 import { useForm } from 'react-hook-form';
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useTranslation } from 'react-i18next';
 
 import { SignUpUserRequest } from "@/user/model/Auth";
 import { signUpUser } from "@/user/store/AuthState";
@@ -22,6 +23,7 @@ interface SignUpFormProps {
 }
 
 const SignUpForm: React.FC<SignUpFormProps> = ({ onSignedUp }) => {
+  const { t } = useTranslation();
   const { success, initialErrorMessage, errors: apiErrors, handleResponse } = useMessageState();
   const {
     register,
@@ -50,12 +52,12 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSignedUp }) => {
 
       <FloatingLabel
         controlId="floatingEmail"
-        label="Email"
+        label={t('form.email', 'Email')}
         className="mb-3"
       >
         <Form.Control
           type="email"
-          placeholder="Enter email"
+          placeholder={t('form.enterEmail', 'Enter email')}
           size="lg"
           className="border-0 border-bottom rounded-0"
           autoComplete="email"
@@ -67,12 +69,12 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSignedUp }) => {
         <Col md={6}>
           <FloatingLabel
             controlId="firstName"
-            label="First Name"
+            label={t('form.firstName', 'First Name')}
             className="mb-3"
           >
             <Form.Control
               type="input"
-              placeholder="First Name"
+              placeholder={t('form.firstName', 'First Name')}
               size="lg"
               className="border-0 border-bottom rounded-0"
               autoComplete="first-name"
@@ -84,12 +86,12 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSignedUp }) => {
         <Col md={6}>
           <FloatingLabel
             controlId="lastName"
-            label="Last Name"
+            label={t('form.lastName', 'Last Name')}
             className="mb-3"
           >
             <Form.Control
               type="input"
-              placeholder="Last Name"
+              placeholder={t('form.lastName', 'Last Name')}
               size="lg"
               className="border-0 border-bottom rounded-0"
               autoComplete="last-name"
@@ -102,12 +104,12 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSignedUp }) => {
 
       <FloatingLabel
         controlId="floatingPassword"
-        label="Password"
+        label={t('form.password', 'Password')}
         className="mb-3"
       >
         <Form.Control
           type="password"
-          placeholder="Password"
+          placeholder={t('form.password', 'Password')}
           size="lg"
           className="border-0 border-bottom rounded-0"
           autoComplete="new-password"
@@ -117,12 +119,12 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSignedUp }) => {
       </FloatingLabel>
       <FloatingLabel
         controlId="floatingConfirmPassword"
-        label="Confirm Password"
+        label={t('form.confirmPassword', 'Confirm Password')}
         className="mb-3"
       >
         <Form.Control
           type="password"
-          placeholder="Password"
+          placeholder={t('form.password', 'Password')}
           size="lg"
           className="border-0 border-bottom rounded-0"
           autoComplete="new-password"
@@ -132,7 +134,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSignedUp }) => {
       </FloatingLabel>
       <div className="d-grid mb-3">
         <Button size="lg" type="submit" disabled={isSubmitting} className="fs-6 py-2">
-          Register new account
+          {t('auth.register', 'Register new account')}
         </Button>
       </div>
     </Form>

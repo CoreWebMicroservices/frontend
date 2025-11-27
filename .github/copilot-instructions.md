@@ -1,5 +1,21 @@
 # GitHub Copilot Instructions – Core Microservices Frontend (React + TypeScript + Vite)
 
+## 🌐 Supported Languages
+
+```typescript
+// Add new languages here - update both arrays and create locale files
+const SUPPORTED_LANGUAGES = ["en", "no"]; // English, Norwegian
+```
+
+**To add a new language:**
+
+1. Add the language code to `SUPPORTED_LANGUAGES` above
+2. Create `/app/locales/{lang}.json` with default translations
+3. Update `App.tsx` to import the new locale file
+4. If using translation module, ensure backend supports the language
+
+---
+
 ## 🎯 Project Overview
 
 This project is the **frontend** of the Core Microservices platform—a comprehensive demonstration of enterprise-grade **modular architecture** patterns. It showcases how to build scalable, maintainable web applications using React, TypeScript, and modern architectural principles.
@@ -48,6 +64,7 @@ frontend/
 ├── src/
 │   ├── app/              # App-level composition and configuration
 │   │   ├── layout/       # App layout components (header, footer, etc.)
+│   │   ├── locales/      # Default translation files (en.json, no.json, etc.)
 │   │   ├── router/       # Centralized routing configuration
 │   │   │   ├── AppRouter.tsx    # Main router component
 │   │   │   ├── AppRoutes.tsx    # Route definitions & component composition
@@ -59,7 +76,7 @@ frontend/
 │   │   ├── component/    # Reusable UI components (DataTable, Breadcrumb, etc.)
 │   │   ├── router/       # Configurable auth guards & router utilities
 │   │   ├── model/        # Shared TypeScript interfaces
-│   │   └── utils/        # API layer, error handlers, helpers
+│   │   └── utils/        # API layer, error handlers, helpers, i18n
 │   │
 │   ├── user/             # User module (standalone & composable)
 │   │   ├── component/    # User-specific components only
@@ -73,8 +90,10 @@ frontend/
 │   │   ├── model/        # Communication TypeScript interfaces
 │   │   └── config.ts     # Communication module configuration
 │   │
-│   ├── translation/      # Translation module (standalone & composable)
-│   │   └── ...           # Similar modular structure
+│   ├── translation/      # Translation module (optional - for API-based translations)
+│   │   ├── component/    # Translation management UI (editor, list)
+│   │   ├── utils/        # TranslationApi for fetching from backend
+│   │   └── config.ts     # Translation module configuration
 │   │
 │   └── main.tsx          # App entry point
 │
@@ -258,6 +277,48 @@ Each service follows the pattern:
 - Use **Vitest** + **React Testing Library**.
 - Write tests for major components and hooks.
 - Maintain at least 60% coverage for now.
+
+### 9. Internationalization (i18n)
+
+**Always use translations with English fallback values:**
+
+```typescript
+import { useTranslation } from "react-i18next";
+
+const MyComponent = () => {
+  const { t } = useTranslation();
+
+  return (
+    <div>
+      {/* ✅ CORRECT: Always provide English fallback as second parameter */}
+      <h1>{t("page.title", "Page Title")}</h1>
+      <p>{t("page.description", "This is the page description")}</p>
+      <button>{t("common.save", "Save")}</button>
+
+      {/* ❌ WRONG: Never use t() without fallback */}
+      <span>{t("some.key")}</span>
+    </div>
+  );
+};
+```
+
+**Translation key naming convention (flat format for database):**
+
+- Use dot notation: `category.subcategory.key`
+- Examples: `nav.signIn`, `user.profile.title`, `error.notFound`
+- Common prefixes: `app.`, `nav.`, `auth.`, `user.`, `form.`, `common.`, `error.`, `theme.`
+
+**After creating a new component with translations:**
+
+> ⚠️ **IMPORTANT**: Remember to add new translation keys to the database!
+>
+> The `/app/locales/` files contain only baseline translations (auth UI, navigation).
+> New component translations should be added via the translation module backend.
+
+**Translation files location:**
+
+- Default translations: `/app/locales/{lang}.json` - baseline only (auth, nav, common errors)
+- API translations (translation module): Fetched from backend, merged with defaults
 
 ---
 
@@ -469,6 +530,8 @@ When generating code with GitHub Copilot, follow these rules:
 7. **Configurable components** — Accept configuration props instead of hardcoding values
 8. **Error handling**: Always display error messages using `ApiResponseAlert` components.
 9. **Use environment variables**: `import.meta.env.VITE_API_URL` for backend base URL.
+10. **Translations**: Always use `t('key', 'English Fallback')` pattern - never omit the fallback value!
+11. **After new components**: Remind user to add new translation keys to the database (not locale files).
 
 ---
 
