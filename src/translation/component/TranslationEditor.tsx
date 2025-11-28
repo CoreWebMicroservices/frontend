@@ -6,12 +6,14 @@ import { useTranslation } from 'react-i18next';
 import AceEditor from 'react-ace';
 import 'ace-builds/src-noconflict/mode-json';
 import 'ace-builds/src-noconflict/theme-github';
+import 'ace-builds/src-noconflict/theme-monokai';
 import 'ace-builds/src-noconflict/ext-language_tools';
 import { useTranslationState } from '@/translation/store/TranslationState';
 import { useMessageState } from '@/common/utils/api/ApiResponseHandler';
 import { AlertMessage } from '@/common/component/ApiResponseAlert';
 import { APP_ROUTES } from '@/app/router/routes';
 import Breadcrumb from '@/common/component/Breadcrumb';
+import { useTheme } from '@/app/layout/useTheme';
 
 type ViewMode = 'form' | 'json';
 
@@ -22,6 +24,7 @@ interface TranslationEntry {
 
 export const TranslationEditor: React.FC = () => {
   const { t } = useTranslation();
+  const { theme } = useTheme();
   const { realm, lang } = useParams<{ realm: string; lang: string }>();
   const navigate = useNavigate();
   const { getTranslation, updateTranslation, deleteTranslation } = useTranslationState();
@@ -365,7 +368,7 @@ export const TranslationEditor: React.FC = () => {
             <div>
               <AceEditor
                 mode="json"
-                theme="github"
+                theme={theme === 'dark' ? 'monokai' : 'github'}
                 value={jsonText}
                 onChange={setJsonText}
                 name="json-editor"
@@ -379,7 +382,7 @@ export const TranslationEditor: React.FC = () => {
                   width: '100%',
                   height: '500px',
                   borderRadius: '4px',
-                  border: '1px solid #dee2e6'
+                  border: '1px solid var(--bs-border-color)'
                 }}
               />
               {jsonError && (
