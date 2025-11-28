@@ -19,19 +19,14 @@ import { buildUrlSearchParams } from "@/common/component/dataTable/DataTableStat
 
 const userMsApi = new CoreMsApi({ baseURL: USER_MS_BASE_URL });
 
-// Type alias for users paged response using generic PageResponse
 type UsersPagedResponse = PageResponse<User>;
 
 interface UserManagementState {
-  // users: User[];
   selectedUser?: User;
-  // pagedResponse?: UsersPagedResponse;
 }
 
 const initialState: UserManagementState = {
-  // users: [],
   selectedUser: undefined,
-  // pagedResponse: undefined,
 };
 
 const userState = hookstate(initialState, devtools({ key: "userManagement" }));
@@ -50,11 +45,6 @@ export async function getAllUsers(
     HttpMethod.GET,
     `/api/users?${params.toString()}`
   );
-
-  if (res.result === true && res.response) {
-    // userState.pagedResponse.set(res.response);
-    // userState.users.set(res.response.items);
-  }
 
   return res;
 }
@@ -84,11 +74,6 @@ export async function createUser(
     `/api/users`,
     userData
   );
-
-  // Refresh the users list after creating
-  // if (res.result === true) {
-  //   getAllUsers();
-  // }
 
   return res;
 }
@@ -121,11 +106,6 @@ export async function deleteUser(
   );
 
   if (res.result === true) {
-    // Remove user from the list
-    // const users = userState.users.get();
-    // const updatedUsers = users.filter((user) => user.userId !== userId);
-    // userState.users.set(updatedUsers);
-
     // Clear selected user if it was the deleted one
     const selectedUser = userState.selectedUser.get();
     if (selectedUser?.userId === userId) {
@@ -180,33 +160,6 @@ export async function adminChangeUserEmail(
   return res;
 }
 
-// Create actions
-// const actions = createDataTableActions(userState.queryParams, {
-//   fieldMapper: (field) => (field === "name" ? "lastName" : field),
-// });
-
-// Export actions
-// export const {
-//   setSearch,
-//   setPage,
-//   setPageSize,
-//   setSort,
-//   setFilter,
-//   clearFilters,
-//   setFilters,
-// } = actions;
-
-// Reset query parameters to defaults
-// export function resetQueryParams(): void {
-//   actions.reset();
-// }
-
-// Clear selected user
 export function clearSelectedUser(): void {
   userState.selectedUser.set(undefined);
-}
-
-// Clear users list
-export function clearUsersList(): void {
-  // userState.users.set([]);
 }

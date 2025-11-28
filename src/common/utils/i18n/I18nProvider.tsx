@@ -17,7 +17,7 @@ export interface I18nProviderProps {
    */
   loader?: (realm: string, lang: string) => Promise<Record<string, string>>;
   /** Optional loader to fetch available languages list */
-  languagesLoader?: () => Promise<string[]>;
+  languagesLoader?: (realm: string) => Promise<string[]>;
   /** The realm to use when fetching translations (only used with loader) */
   realm?: string;
   /** 
@@ -132,7 +132,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({
         // Load available languages from API
         if (languagesLoader) {
           try {
-            const langs = await languagesLoader();
+            const langs = await languagesLoader(realm);
             if (mounted && langs.length > 0) {
               setLanguages(langs);
             }

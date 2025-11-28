@@ -37,8 +37,17 @@ export const fetchTranslations = async (
  * Fetch available languages from backend
  * This should be implemented when backend provides a languages endpoint
  */
-export const fetchAvailableLanguages = async (): Promise<string[]> => {
-  // TODO: Implement when backend provides /api/translation/languages endpoint
-  // For now, return default languages
-  return ['en', 'no'];
+export const fetchAvailableLanguages = async (
+  realm: string
+): Promise<string[]> => {
+  const response = await translationMsApi.apiRequest<string[]>(
+    HttpMethod.GET,
+    `/api/languages/${realm}`
+  );
+
+  if (response.result && response.response) {
+    return response.response;
+  }
+
+  return [];
 };
