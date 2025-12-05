@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { Tabs, Tab, Container } from 'react-bootstrap';
 import UserEditForm from '@/user/component/user/UserEdit';
 import { MessageList } from '@/communication/component/MessageList';
+import DocumentList from '@/document/component/DocumentList';
 import Breadcrumb from '@/common/component/Breadcrumb';
 import { ROUTE_PATHS } from '@/app/router/routes';
 
@@ -26,6 +27,11 @@ const UserEdit: React.FC = () => {
         <Tab eventKey="messages" title="Messages">
           <div style={{ marginTop: 8 }}>
             <MessageList userId={userId} />
+          </div>
+        </Tab>
+        <Tab eventKey="documents" title="Documents">
+          <div style={{ marginTop: 8 }}>
+            <DocumentList userId={userId} />
           </div>
         </Tab>
       </Tabs>

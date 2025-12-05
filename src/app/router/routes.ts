@@ -23,7 +23,10 @@ export const APP_ROUTES = {
   // Translation module routes
   TRANSLATIONS: "/translations",
   TRANSLATION_NEW: "/translations/new",
-  TRANSLATION_EDIT: "/translations/:realm/:lang"
+  TRANSLATION_EDIT: "/translations/:realm/:lang",
+
+  // Document module routes
+  DOCUMENTS: "/documents"
 } as const;
 
 // Re-export with different name for internal use

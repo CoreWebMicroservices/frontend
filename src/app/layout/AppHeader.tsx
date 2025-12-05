@@ -17,6 +17,7 @@ import { createAuthGuards } from '@/common/router/AuthGuards';
 import { AppRoles } from '@/common/AppRoles';
 import CommunicationNavBar from '@/communication/component/CommunicationNavBar';
 import TranslationNavBar from '@/translation/component/TranslationNavBar';
+import DocumentNavBar from '@/document/component/DocumentNavBar';
 
 // Create auth guards for this component
 const authGuards = createAuthGuards({
@@ -44,6 +45,7 @@ const AppHeader = () => {
             {authGuards.hasAnyRole([AppRoles.UserMsAdmin]) && <UserNavBar path={APP_ROUTES.USERS_LIST} />}
             {authGuards.hasAnyRole([AppRoles.CommunicationMsAdmin]) && <CommunicationNavBar path={APP_ROUTES.COMMUNICATION} />}
             {authGuards.hasAnyRole([AppRoles.TranslationMsAdmin]) && <TranslationNavBar path={APP_ROUTES.TRANSLATIONS} />}
+            {authGuards.isAuthenticated() && <DocumentNavBar path={APP_ROUTES.DOCUMENTS} />}
           </Nav>
           <Nav className="align-items-center">
             <AppTheme />

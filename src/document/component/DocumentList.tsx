@@ -1,0 +1,401 @@
+import { useEffect, useState } from "react";
+import { Container, Button, Badge, Row, Col } from "react-bootstrap";
+import { useHookstate } from "@hookstate/core";
+import { useTranslation } from "react-i18next";
+import { Download, InfoCircle, Trash, Upload } from "react-bootstrap-icons";
+import { Document, Visibility } from "@/document/model/Document";
+import {
+  listDocuments,
+  deleteDocument,
+  getDocumentDownloadUrl,
+} from "@/document/store/DocumentState";
+import { useMessageState } from "@/common/utils/api/ApiResponseHandler";
+import { AlertMessage } from "@/common/component/ApiResponseAlert";
+import { DataTable } from "@/common/component/dataTable";
+import type { DataTableColumn, DataTableFilter } from "@/common/component/dataTable";
+import { PageResponse } from "@/common/model/CoreMsApiModel";
+import {
+  parseCurrentSort,
+  getInitialDataTableQueryParams,
+  createDataTableActions,
+} from "@/common/component/dataTable/DataTableState";
+import { formatDate } from "@/common/utils/DateUtils";
+import DocumentUploadModal from "@/document/component/DocumentUploadModal";
+import { ModalDialog } from "@/common/component/ModalDialog";
+import { searchUsers, resolveUserNames } from "@/user/utils/UserApi";
+import type { User } from "@/user/model/User";
+import { Link } from "react-router-dom";
+import { APP_ROUTES } from "@/app/router/routes";
+
+interface DocumentListProps {
+  userId?: string;
+}
+
+const DocumentList: React.FC<DocumentListProps> = ({ userId }) => {
+  const { t } = useTranslation();
+  const [documents, setDocuments] = useState<Document[]>([]);
+  const [pagedResponse, setPagedResponse] = useState<
+    PageResponse<Document> | undefined
+  >(undefined);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [selectedDocument, setSelectedDocument] = useState<Document | null>(
+    null
+  );
+  const [userNames, setUserNames] = useState<Record<string, string>>({});
+  const [isResolvingNames, setIsResolvingNames] = useState(false);
+
+  const queryParams = useHookstate(getInitialDataTableQueryParams());
+  const { setSearch, setPage, setPageSize, setFilter, setSort } =
+    createDataTableActions(queryParams);
+
+  const { initialErrorMessage, errors, handleResponse } = useMessageState();
+
+  const refreshDocuments = async () => {
+    setIsLoading(true);
+    const includeDeleted = queryParams.filters.get()?.includeDeleted === "true";
+    const result = await listDocuments(queryParams.get(), includeDeleted);
+
+    if (result.result && result.response) {
+      setDocuments(result.response.items || []);
+      setPagedResponse(result.response);
+    }
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    if (userId) {
+      setFilter("userId", userId);
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    refreshDocuments();
+  }, [JSON.stringify(queryParams.get())]);
+
+  async function handleDelete(uuid: string, permanent: boolean = false) {
+    if (
+      !confirm(
+        `Are you sure you want to ${permanent ? "permanently " : ""}delete this document?`
+      )
+    ) {
+      return;
+    }
+
+    const result = await deleteDocument(uuid, permanent);
+    handleResponse(
+      result,
+      "Failed to delete document",
+      "Document deleted successfully"
+    );
+
+    if (result.result) {
+      refreshDocuments();
+    }
+  }
+
+  async function handleDownload(uuid: string) {
+    try {
+      const accessToken = localStorage.getItem("accessToken");
+      const url = getDocumentDownloadUrl(uuid);
+      
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to download document");
+      }
+
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      
+      // Get filename from Content-Disposition header or use uuid
+      const contentDisposition = response.headers.get("Content-Disposition");
+      let filename = uuid;
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="?(.+)"?/i);
+        if (filenameMatch) {
+          filename = filenameMatch[1];
+        }
+      }
+
+      // Create temporary link and trigger download
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Clean up blob URL
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error("Download error:", error);
+      handleResponse(
+        { result: false, response: null, errors: [{ reasonCode: "download.failed", description: "Failed to download document" }] },
+        "Failed to download document"
+      );
+    }
+  }
+
+  function getVisibilityBadge(visibility: Visibility) {
+    const variants = {
+      [Visibility.PUBLIC]: "success",
+      [Visibility.PRIVATE]: "secondary",
+      [Visibility.BY_LINK]: "info",
+    };
+    return <Badge bg={variants[visibility]}>{visibility}</Badge>;
+  }
+
+  function formatFileSize(bytes: number): string {
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + " KB";
+    return (bytes / (1024 * 1024)).toFixed(2) + " MB";
+  }
+
+  const columns: DataTableColumn[] = [
+    { key: "owner", title: t("document.owner", "Owner") },
+    { key: "name", title: t("document.name", "Name"), sortable: true },
+    { key: "tags", title: t("document.tags", "Tags") },
+    { key: "visibility", title: t("document.visibility", "Visibility") },
+    {
+      key: "createdAt",
+      title: t("document.created", "Created"),
+      sortable: true,
+    },
+    { key: "actions", title: t("common.actions", "Actions") },
+  ];
+
+  const currentSort = parseCurrentSort(queryParams.sort.get());
+
+  const filters: DataTableFilter<User>[] = [];
+
+  // Add user filter if not already filtered by userId prop
+  if (!userId) {
+    filters.push({
+      key: "userId",
+      label: t("document.user", "User"),
+      type: "async-select",
+      placeholder: t("document.filterByUser", "Filter by user"),
+      loadOptions: searchUsers,
+      getOptionLabel: (user: User) => `${user.firstName} ${user.lastName}`,
+      getOptionValue: (user: User) => user.userId,
+      getOptionSubtitle: (user: User) => user.email,
+    });
+  }
+
+  filters.push({
+    key: "visibility",
+    label: t("document.visibility", "Visibility"),
+    type: "select",
+    operator: "eq",
+    placeholder: t("document.allVisibilities", "All Visibilities"),
+    options: [
+      { value: Visibility.PUBLIC, label: "Public" },
+      { value: Visibility.PRIVATE, label: "Private" },
+      { value: Visibility.BY_LINK, label: "By Link" },
+    ],
+  });
+
+  const renderDocumentRow = (doc: Document) => (
+    <tr key={doc.uuid} style={{ opacity: doc.deleted ? 0.6 : 1 }}>
+      <td>
+        {doc.userId ? (
+          isResolvingNames && !userNames[doc.userId] ? (
+            t("common.loading", "Loading...")
+          ) : (
+            <Link to={APP_ROUTES.USER_EDIT.replace(":userId", doc.userId)}>
+              {userNames[doc.userId] || doc.userId}
+            </Link>
+          )
+        ) : (
+          <span className="text-muted">—</span>
+        )}
+      </td>
+      <td>
+        {doc.name}
+        {doc.deleted && (
+          <Badge bg="danger" className="ms-2">
+            {t("document.deleted", "Deleted")}
+          </Badge>
+        )}
+      </td>
+      <td>
+        {doc.tags ? (
+          doc.tags.split(",").map((tag) => (
+            <Badge key={tag} bg="secondary" className="me-1">
+              {tag.trim()}
+            </Badge>
+          ))
+        ) : (
+          <span className="text-muted">—</span>
+        )}
+      </td>
+      <td>{getVisibilityBadge(doc.visibility)}</td>
+      <td>{formatDate(doc.createdAt)}</td>
+      <td>
+        <Button
+          size="sm"
+          variant="outline-primary"
+          onClick={() => handleDownload(doc.uuid)}
+          className="me-2"
+        >
+          <Download className="me-1" />
+          {t("document.download", "Download")}
+        </Button>
+        <Button
+          size="sm"
+          variant="outline-info"
+          onClick={() => setSelectedDocument(doc)}
+          className="me-2"
+        >
+          <InfoCircle className="me-1" />
+          {t("document.details", "Details")}
+        </Button>
+        <Button
+          size="sm"
+          variant="outline-danger"
+          onClick={() => handleDelete(doc.uuid, doc.deleted)}
+        >
+          <Trash className="me-1" />
+          {doc.deleted
+            ? t("document.deletePermanently", "Delete Permanently")
+            : t("common.delete", "Delete")}
+        </Button>
+      </td>
+    </tr>
+  );
+
+  const actions = (
+    <button
+      className="btn btn-outline-primary d-flex align-items-center"
+      onClick={() => setShowUploadModal(true)}
+    >
+      <Upload className="me-2" />
+      {t("document.uploadDocument", "Upload Document")}
+    </button>
+  );
+
+  return (
+    <Container>
+      <AlertMessage initialErrorMessage={initialErrorMessage} errors={errors} />
+
+      <DataTable
+        items={documents}
+        pagination={
+          pagedResponse
+            ? {
+                page: pagedResponse.page,
+                pageSize: pagedResponse.pageSize,
+                totalElements: pagedResponse.totalElements,
+                totalPages: pagedResponse.totalPages,
+              }
+            : undefined
+        }
+        isLoading={isLoading}
+        columns={columns}
+        filters={filters}
+        filterValues={queryParams.filters.get() || {}}
+        sortableFields={columns.filter((col) => col.sortable).map((col) => col.key)}
+        currentSort={currentSort}
+        searchPlaceholder={t(
+          "document.searchPlaceholder",
+          "Search documents..."
+        )}
+        onSearch={setSearch}
+        onFilter={setFilter}
+        onPageChange={setPage}
+        onPageSizeChange={setPageSize}
+        onSort={setSort}
+        renderRow={renderDocumentRow}
+        title=""
+        actions={actions}
+      />
+
+      <NameResolutionEffect
+        documents={documents}
+        setUserNames={setUserNames}
+        setIsResolving={setIsResolvingNames}
+      />
+
+      <DocumentUploadModal
+        show={showUploadModal}
+        onClose={() => setShowUploadModal(false)}
+        onUploaded={() => {
+          setShowUploadModal(false);
+          refreshDocuments();
+        }}
+      />
+
+      <ModalDialog
+        show={!!selectedDocument}
+        onClose={() => setSelectedDocument(null)}
+        title={t("document.documentDetails", "Document Details")}
+        size="xl"
+      >
+        {selectedDocument && (
+          <Row>
+            <Col md={6}>
+              <h6 className="text-muted mb-3">{t("document.fileInformation", "File Information")}</h6>
+              <p className="mb-2"><strong>{t("document.name", "Name")}:</strong> {selectedDocument.name}</p>
+              <p className="mb-2"><strong>{t("document.originalFilename", "Original Filename")}:</strong> {selectedDocument.originalFilename}</p>
+              <p className="mb-2"><strong>{t("document.size", "Size")}:</strong> {formatFileSize(selectedDocument.size)}</p>
+              <p className="mb-2"><strong>{t("document.type", "Type")}:</strong> {selectedDocument.contentType}</p>
+              <p className="mb-2"><strong>{t("document.extension", "Extension")}:</strong> {selectedDocument.extension}</p>
+              <p className="mb-2"><strong>{t("document.checksum", "Checksum")}:</strong> <code className="text-muted small">{selectedDocument.checksum}</code></p>
+            </Col>
+            <Col md={6}>
+              <h6 className="text-muted mb-3">{t("document.metadata", "Metadata")}</h6>
+              <p className="mb-2"><strong>{t("document.visibility", "Visibility")}:</strong> {getVisibilityBadge(selectedDocument.visibility)}</p>
+              <p className="mb-2"><strong>{t("document.created", "Created")}:</strong> {formatDate(selectedDocument.createdAt)}</p>
+              <p className="mb-2"><strong>{t("document.updated", "Updated")}:</strong> {formatDate(selectedDocument.updatedAt)}</p>
+              <p className="mb-2"><strong>{t("document.uploadedBy", "Uploaded By")}:</strong> {selectedDocument.uploadedByType}</p>
+              {selectedDocument.description && (
+                <p className="mb-2"><strong>{t("document.description", "Description")}:</strong> {selectedDocument.description}</p>
+              )}
+              {selectedDocument.tags && (
+                <p className="mb-2">
+                  <strong>{t("document.tags", "Tags")}:</strong>{" "}
+                  {selectedDocument.tags.split(",").map((tag) => (
+                    <Badge key={tag} bg="secondary" className="me-1">
+                      {tag.trim()}
+                    </Badge>
+                  ))}
+                </p>
+              )}
+            </Col>
+          </Row>
+        )}
+      </ModalDialog>
+    </Container>
+  );
+};
+
+// Side-effect component for resolving user names with loading state
+const NameResolutionEffect: React.FC<{
+  documents: Document[];
+  setUserNames: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  setIsResolving: React.Dispatch<React.SetStateAction<boolean>>;
+}> = ({ documents, setUserNames, setIsResolving }) => {
+  useEffect(() => {
+    const idsSet = new Set<string>();
+    documents.forEach((doc) => {
+      if (doc.userId) idsSet.add(doc.userId);
+      if (doc.uploadedByType === "user" && doc.uploadedById) idsSet.add(doc.uploadedById);
+    });
+    const ids = Array.from(idsSet);
+    if (ids.length === 0) return;
+    setIsResolving(true);
+    resolveUserNames(ids)
+      .then((names) => {
+        setUserNames((prev) => ({ ...prev, ...names }));
+      })
+      .finally(() => setIsResolving(false));
+  }, [documents]);
+  return null;
+};
+
+export default DocumentList;

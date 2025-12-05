@@ -227,5 +227,9 @@ $btn-border-radius-lg: 0.20rem;
       color: rgba(203,213,225,0.5);
     }
   }
-}
 
+  /* Breadcrumb active item should not have background */
+  .breadcrumb-item.active {
+    background-color: transparent !important;
+  }
+}

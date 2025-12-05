@@ -35,8 +35,20 @@ class CoreMsApi {
     data?: unknown,
     headers?: Record<string, string>
   ): Promise<CoreMsApiResonse<T>> {
-    const requestHeaders = { ...this.getDefaultHeaders(), ...(headers ?? {}) };
-    const requestKey = generateRequestKey(method, url, data, requestHeaders);
+    let requestHeaders: Record<string, string> | undefined;
+    
+    // If data is FormData, don't include any Content-Type header
+    if (data instanceof FormData) {
+      // Only include Authorization header, let browser set Content-Type
+      const accessToken = localStorage.getItem(ACCESS_TOKEN_KEY);
+      requestHeaders = accessToken ? { "Authorization": `Bearer ${accessToken}` } : undefined;
+      console.log("FormData detected, using minimal headers:", requestHeaders);
+    } else {
+      requestHeaders = { ...this.getDefaultHeaders(), ...(headers ?? {}) };
+      console.log("Regular request headers:", requestHeaders);
+    }
+    
+    const requestKey = generateRequestKey(method, url, data, requestHeaders || {});
 
     // Check if identical request is already in progress
     if (this.pendingRequests.has(requestKey)) {
