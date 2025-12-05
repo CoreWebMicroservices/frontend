@@ -5,7 +5,7 @@ import UserEditForm from '@/user/component/user/UserEdit';
 import { MessageList } from '@/communication/component/MessageList';
 import DocumentList from '@/document/component/DocumentList';
 import Breadcrumb from '@/common/component/Breadcrumb';
-import { ROUTE_PATHS } from '@/app/router/routes';
+import { APP_ROUTES } from '@/app/router/routes';
 
 const UserEdit: React.FC = () => {
   const { userId } = useParams<{ userId: string }>();
@@ -15,7 +15,7 @@ const UserEdit: React.FC = () => {
     <Container>
       <Breadcrumb
         items={[
-          { label: 'All Users', href: ROUTE_PATHS.USERS_LIST },
+          { label: 'All Users', href: APP_ROUTES.USERS_LIST },
           { label: 'Edit User', active: true }
         ]}
       />

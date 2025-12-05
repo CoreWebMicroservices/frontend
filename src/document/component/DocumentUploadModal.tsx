@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Form } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { ModalDialog } from "@/common/component/ModalDialog";
@@ -25,8 +25,7 @@ export const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
   const [tags, setTags] = useState("");
   const [confirmReplace, setConfirmReplace] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const { initialErrorMessage, errors, handleResponse } = useMessageState();
+  const { initialErrorMessage, errors, success, handleResponse } = useMessageState();
 
   async function handleSubmit() {
     if (!file) {
@@ -34,7 +33,6 @@ export const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
     }
 
     setIsSubmitting(true);
-    setSuccessMessage(null);
 
     const metadata = {
       visibility,
@@ -53,9 +51,6 @@ export const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
     );
 
     if (result.result) {
-      setSuccessMessage(
-        t("document.uploadSuccess", "Document uploaded successfully")
-      );
       if (onUploaded) onUploaded();
       // Clear form
       setFile(null);
@@ -66,23 +61,11 @@ export const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
     }
   }
 
-  useEffect(() => {
-    if (successMessage) {
-      const timer = setTimeout(() => setSuccessMessage(null), 4000);
-      return () => clearTimeout(timer);
-    }
-  }, [successMessage]);
-
-  function handleCancel() {
-    setSuccessMessage(null);
-    onClose();
-  }
-
   return (
     <ModalDialog
       title={t("document.uploadDocument", "Upload Document")}
       show={show}
-      onClose={handleCancel}
+      onClose={onClose}
       onPrimary={handleSubmit}
       primaryText={
         isSubmitting
@@ -92,7 +75,7 @@ export const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
       disabledPrimary={isSubmitting || !file}
       size="lg"
       footerContent={
-        successMessage && <span className="text-success me-auto">{successMessage}</span>
+        success && <span className="text-success me-auto">{success}</span>
       }
     >
       <Form>

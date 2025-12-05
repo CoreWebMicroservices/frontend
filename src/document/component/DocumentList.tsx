@@ -45,7 +45,15 @@ const DocumentList: React.FC<DocumentListProps> = ({ userId }) => {
   const [userNames, setUserNames] = useState<Record<string, string>>({});
   const [isResolvingNames, setIsResolvingNames] = useState(false);
 
-  const queryParams = useHookstate(getInitialDataTableQueryParams());
+  const queryParams = useHookstate(() => {
+    const initial = getInitialDataTableQueryParams();
+    // Set userId filter on initialization if provided
+    if (userId) {
+      initial.filters = { userId };
+    }
+    return initial;
+  });
+  
   const { setSearch, setPage, setPageSize, setFilter, setSort } =
     createDataTableActions(queryParams);
 
@@ -53,8 +61,9 @@ const DocumentList: React.FC<DocumentListProps> = ({ userId }) => {
 
   const refreshDocuments = async () => {
     setIsLoading(true);
-    const includeDeleted = queryParams.filters.get()?.includeDeleted === "true";
-    const result = await listDocuments(queryParams.get(), includeDeleted);
+    const params = queryParams.get();
+    const includeDeleted = params.filters?.includeDeleted === "true";
+    const result = await listDocuments(params, includeDeleted);
 
     if (result.result && result.response) {
       setDocuments(result.response.items || []);
@@ -62,12 +71,6 @@ const DocumentList: React.FC<DocumentListProps> = ({ userId }) => {
     }
     setIsLoading(false);
   };
-
-  useEffect(() => {
-    if (userId) {
-      setFilter("userId", userId);
-    }
-  }, [userId]);
 
   useEffect(() => {
     refreshDocuments();
@@ -94,7 +97,7 @@ const DocumentList: React.FC<DocumentListProps> = ({ userId }) => {
     }
   }
 
-  async function handleDownload(uuid: string) {
+  async function handleDownload(uuid: string, filename?: string) {
     try {
       const accessToken = localStorage.getItem("accessToken");
       const url = getDocumentDownloadUrl(uuid);
@@ -112,20 +115,13 @@ const DocumentList: React.FC<DocumentListProps> = ({ userId }) => {
       const blob = await response.blob();
       const blobUrl = window.URL.createObjectURL(blob);
       
-      // Get filename from Content-Disposition header or use uuid
-      const contentDisposition = response.headers.get("Content-Disposition");
-      let filename = uuid;
-      if (contentDisposition) {
-        const filenameMatch = contentDisposition.match(/filename="?(.+)"?/i);
-        if (filenameMatch) {
-          filename = filenameMatch[1];
-        }
-      }
+      // Use provided filename or fall back to uuid
+      const downloadFilename = filename || uuid;
 
       // Create temporary link and trigger download
       const link = document.createElement("a");
       link.href = blobUrl;
-      link.download = filename;
+      link.download = downloadFilename;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -240,7 +236,7 @@ const DocumentList: React.FC<DocumentListProps> = ({ userId }) => {
         <Button
           size="sm"
           variant="outline-primary"
-          onClick={() => handleDownload(doc.uuid)}
+          onClick={() => handleDownload(doc.uuid, doc.originalFilename)}
           className="me-2"
         >
           <Download className="me-1" />
