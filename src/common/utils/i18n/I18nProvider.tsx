@@ -70,6 +70,8 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({
 
   useEffect(() => {
     let mounted = true;
+    const missingKeys: Record<string, string> = {};
+    let missingKeysTimer: NodeJS.Timeout | null = null;
 
     const init = async () => {
       try {
@@ -96,6 +98,33 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({
           react: {
             useSuspense: false,
           },
+          // Collect missing translations and print after delay (dev only)
+          saveMissing: import.meta.env.DEV,
+          missingKeyHandler: import.meta.env.DEV
+            ? (_lngs, _ns, key, fallbackValue) => {
+                // Store missing key with its fallback value
+                if (!missingKeys[key]) {
+                  missingKeys[key] = fallbackValue || key;
+                }
+
+                // Clear existing timer and set new one
+                if (missingKeysTimer) {
+                  clearTimeout(missingKeysTimer);
+                }
+
+                // Print collected missing keys after 3 seconds of inactivity
+                missingKeysTimer = setTimeout(() => {
+                  if (Object.keys(missingKeys).length > 0) {
+                    console.warn(
+                      '[i18n] Missing translation keys:\n',
+                      JSON.stringify(missingKeys, null, 2)
+                    );
+                    // Clear the collected keys after printing
+                    Object.keys(missingKeys).forEach(key => delete missingKeys[key]);
+                  }
+                }, 3000);
+              }
+            : undefined,
         });
 
         // If using API loader, load and merge translations
@@ -151,6 +180,10 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({
 
     return () => {
       mounted = false;
+      // Clear timer on unmount
+      if (missingKeysTimer) {
+        clearTimeout(missingKeysTimer);
+      }
     };
   }, [realm, defaultLanguage, fallbackLanguage, loader, languagesLoader, staticTranslations, availableLanguages]);
 
