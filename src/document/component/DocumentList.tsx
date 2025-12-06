@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Container, Button, Badge } from "react-bootstrap";
 import { useHookstate } from "@hookstate/core";
 import { useTranslation } from "react-i18next";
-import { Download, InfoCircle, Trash, Upload } from "react-bootstrap-icons";
+import { Download, InfoCircle, Trash, Upload, Link45deg } from "react-bootstrap-icons";
 import { Document, Visibility, UploadedByType } from "@/document/model/Document";
 import {
   listDocuments,
@@ -22,6 +22,8 @@ import {
 import { formatDate } from "@/common/utils/DateUtils";
 import DocumentUploadModal from "@/document/component/DocumentUploadModal";
 import DocumentDetailsModal from "@/document/component/DocumentDetailsModal";
+import DocumentLinkModal from "@/document/component/DocumentLinkModal";
+import DocumentDeleteModal from "@/document/component/DocumentDeleteModal";
 import { searchUsers, resolveUserNames } from "@/user/utils/UserApi";
 import type { User } from "@/user/model/User";
 import { Link } from "react-router-dom";
@@ -44,6 +46,9 @@ const DocumentList: React.FC<DocumentListProps> = ({ userId }) => {
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(
     null
   );
+  const [linkDocument, setLinkDocument] = useState<Document | null>(null);
+  const [documentToDelete, setDocumentToDelete] = useState<Document | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [userNames, setUserNames] = useState<Record<string, string>>({});
   const [isResolvingNames, setIsResolvingNames] = useState(false);
 
@@ -78,16 +83,11 @@ const DocumentList: React.FC<DocumentListProps> = ({ userId }) => {
     refreshDocuments();
   }, [JSON.stringify(queryParams.get())]);
 
-  async function handleDelete(uuid: string, permanent: boolean = false) {
-    if (
-      !confirm(
-        `Are you sure you want to ${permanent ? "permanently " : ""}delete this document?`
-      )
-    ) {
-      return;
-    }
+  async function handleDeleteConfirm() {
+    if (!documentToDelete) return;
 
-    const result = await deleteDocument(uuid, permanent);
+    setIsDeleting(true);
+    const result = await deleteDocument(documentToDelete.uuid, documentToDelete.deleted);
     handleResponse(
       result,
       "Failed to delete document",
@@ -95,8 +95,10 @@ const DocumentList: React.FC<DocumentListProps> = ({ userId }) => {
     );
 
     if (result.result) {
+      setDocumentToDelete(null);
       refreshDocuments();
     }
+    setIsDeleting(false);
   }
 
   async function handleDownload(uuid: string, filename?: string) {
@@ -228,7 +230,7 @@ const DocumentList: React.FC<DocumentListProps> = ({ userId }) => {
       </td>
       <td>{getVisibilityBadge(doc.visibility)}</td>
       <td>{formatDate(doc.createdAt)}</td>
-      <td>
+      <td style={{ width: "1%", whiteSpace: "nowrap" }}>
         <Button
           size="sm"
           variant="outline-primary"
@@ -247,11 +249,20 @@ const DocumentList: React.FC<DocumentListProps> = ({ userId }) => {
           <InfoCircle className="me-1" />
           {t("document.details", "Details")}
         </Button>
+        <Button
+          size="sm"
+          variant="outline-success"
+          onClick={() => setLinkDocument(doc)}
+          className="me-2"
+        >
+          <Link45deg className="me-1" />
+          {t("document.createLink", "Link")}
+        </Button>
         {hasAnyRole([AppRoles.DocumentMsAdmin]) && (
           <Button
             size="sm"
             variant="outline-danger"
-            onClick={() => handleDelete(doc.uuid, doc.deleted)}
+            onClick={() => setDocumentToDelete(doc)}
           >
             <Trash className="me-1" />
             {doc.deleted
@@ -330,6 +341,20 @@ const DocumentList: React.FC<DocumentListProps> = ({ userId }) => {
         show={!!selectedDocument}
         onClose={() => setSelectedDocument(null)}
         onUpdated={refreshDocuments}
+      />
+
+      <DocumentLinkModal
+        document={linkDocument}
+        show={!!linkDocument}
+        onClose={() => setLinkDocument(null)}
+      />
+
+      <DocumentDeleteModal
+        document={documentToDelete}
+        show={!!documentToDelete}
+        onClose={() => setDocumentToDelete(null)}
+        onConfirm={handleDeleteConfirm}
+        isDeleting={isDeleting}
       />
     </Container>
   );

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Row, Col, Form, Badge, Button } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
+import { Link45deg } from "react-bootstrap-icons";
 import { ModalDialog } from "@/common/component/ModalDialog";
 import { updateDocument } from "@/document/store/DocumentState";
 import { Document, Visibility, UploadedByType } from "@/document/model/Document";
@@ -10,6 +11,7 @@ import { resolveUserNames } from "@/user/utils/UserApi";
 import { getDocumentDownloadUrl } from "@/document/store/DocumentState";
 import { hasAnyRole } from "@/user/store/AuthState";
 import { AppRoles } from "@/common/AppRoles";
+import DocumentLinkModal from "@/document/component/DocumentLinkModal";
 
 interface DocumentDetailsModalProps {
   document: Document | null;
@@ -35,6 +37,7 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
   const [uploadedByUserName, setUploadedByUserName] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isLoadingPreview, setIsLoadingPreview] = useState(false);
+  const [showLinkModal, setShowLinkModal] = useState(false);
 
   const { handleResponse } = useMessageState();
 
@@ -185,28 +188,34 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
       footerContent={
         !isEditing && (
           <>
-            {hasAnyRole([AppRoles.DocumentMsAdmin]) && (
-              <Button
-                variant="primary"
-                onClick={() => setIsEditing(true)}
-                className="me-2"
-              >
-                {t("common.edit", "Edit")}
-              </Button>
-            )}
-            {document && isPreviewable(document.contentType) && (
+          {document && isPreviewable(document.contentType) && (
               <Button
                 variant="outline-info"
-                size="sm"
                 onClick={previewUrl ? closePreview : handlePreview}
                 disabled={isLoadingPreview}
-                className="me-auto"
+                className="me-2"
               >
                 {isLoadingPreview
                   ? t("common.loading", "Loading...")
                   : previewUrl
                   ? t("document.closePreview", "Close Preview")
                   : t("document.preview", "Preview")}
+              </Button>
+            )}
+            <Button
+              variant="outline-success"
+              onClick={() => setShowLinkModal(true)}
+              className="me-2"
+            >
+              <Link45deg className="me-1" />
+              {t("document.createLink", "Create Link")}
+            </Button>
+            {hasAnyRole([AppRoles.DocumentMsAdmin]) && (
+              <Button
+                variant="primary"
+                onClick={() => setIsEditing(true)}
+              >
+                {t("common.edit", "Edit")}
               </Button>
             )}
           </>
@@ -386,6 +395,12 @@ export const DocumentDetailsModal: React.FC<DocumentDetailsModalProps> = ({
         </Row>
         </>
       )}
+
+      <DocumentLinkModal
+        document={document}
+        show={showLinkModal}
+        onClose={() => setShowLinkModal(false)}
+      />
     </ModalDialog>
   );
 };

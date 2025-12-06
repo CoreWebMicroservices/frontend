@@ -54,7 +54,7 @@ export interface DocumentUpdateRequest {
 }
 
 export interface GenerateLinkRequest {
-  expiresInSeconds?: number;
+  expiresInHours?: number;
 }
 
 export interface LinkResponse {
