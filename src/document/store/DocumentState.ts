@@ -11,6 +11,7 @@ import { buildUrlSearchParams } from "@/common/component/dataTable/DataTableStat
 import {
   Document,
   UploadBase64Request,
+  DocumentUpdateRequest,
   GenerateLinkRequest,
   LinkResponse,
 } from "@/document/model/Document";
@@ -77,6 +78,17 @@ export async function getDocumentMetadata(
   return await documentMsApi.apiRequest<Document>(
     HttpMethod.GET,
     `/api/documents/${uuid}`
+  );
+}
+
+export async function updateDocument(
+  uuid: string,
+  request: DocumentUpdateRequest
+): Promise<CoreMsApiResonse<Document>> {
+  return await documentMsApi.apiRequest<Document>(
+    HttpMethod.PATCH,
+    `/api/documents/${uuid}`,
+    request
   );
 }
 

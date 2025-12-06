@@ -58,17 +58,17 @@ export const userRoutes: RouteObject[] = [
   {
     path: ROUTE_PATHS.USERS_LIST,
     element: <UserList />,
-    loader: authGuards.redirectIfNotInRole([AppRoles.SuperAdmin, AppRoles.UserMsAdmin]),
+    loader: authGuards.redirectIfNotInRole([AppRoles.UserMsAdmin]),
   },
   {
     path: ROUTE_PATHS.USER_ADD,
     element: <UserAdd />,
-    loader: authGuards.redirectIfNotInRole([AppRoles.SuperAdmin, AppRoles.UserMsAdmin]),
+    loader: authGuards.redirectIfNotInRole([AppRoles.UserMsAdmin]),
   },
   {
     path: ROUTE_PATHS.USER_EDIT,
     element: <AppUserEdit />,
-    loader: authGuards.redirectIfNotInRole([AppRoles.SuperAdmin, AppRoles.UserMsAdmin]),
+    loader: authGuards.redirectIfNotInRole([AppRoles.UserMsAdmin]),
   },
 ];
 
@@ -85,17 +85,17 @@ export const translationRoutes: RouteObject[] = [
   {
     path: ROUTE_PATHS.TRANSLATIONS,
     element: <TranslationList />,
-    loader: authGuards.redirectIfNotAuthenticated,
+    loader: authGuards.redirectIfNotInRole([AppRoles.TranslationMsAdmin]),
   },
   {
     path: ROUTE_PATHS.TRANSLATION_EDIT,
     element: <TranslationEditor />,
-    loader: authGuards.redirectIfNotAuthenticated,
+    loader: authGuards.redirectIfNotInRole([AppRoles.TranslationMsAdmin]),
   },
   {
     path: ROUTE_PATHS.TRANSLATION_NEW,
     element: <TranslationEditor />,
-    loader: authGuards.redirectIfNotAuthenticated,
+    loader: authGuards.redirectIfNotInRole([AppRoles.TranslationMsAdmin]),
   },
 ];
 

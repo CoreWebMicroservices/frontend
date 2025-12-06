@@ -43,9 +43,9 @@ const AppHeader = () => {
             <Nav.Item><Nav.Link as={Link} to={APP_ROUTES.FEATURES}>{t('nav.features', 'Features')}</Nav.Link></Nav.Item>
             {/* App controls component visibility with business logic */}
             {authGuards.hasAnyRole([AppRoles.UserMsAdmin]) && <UserNavBar path={APP_ROUTES.USERS_LIST} />}
-            {authGuards.hasAnyRole([AppRoles.CommunicationMsAdmin]) && <CommunicationNavBar path={APP_ROUTES.COMMUNICATION} />}
-            {authGuards.hasAnyRole([AppRoles.TranslationMsAdmin]) && <TranslationNavBar path={APP_ROUTES.TRANSLATIONS} />}
+            {authGuards.isAuthenticated() && <CommunicationNavBar path={APP_ROUTES.COMMUNICATION} />}
             {authGuards.isAuthenticated() && <DocumentNavBar path={APP_ROUTES.DOCUMENTS} />}
+            {authGuards.hasAnyRole([AppRoles.TranslationMsAdmin]) && <TranslationNavBar path={APP_ROUTES.TRANSLATIONS} />}
           </Nav>
           <Nav className="align-items-center">
             <AppTheme />

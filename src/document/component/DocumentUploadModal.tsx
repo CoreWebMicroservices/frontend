@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Form } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { ModalDialog } from "@/common/component/ModalDialog";
@@ -6,26 +6,41 @@ import { uploadDocumentMultipart } from "@/document/store/DocumentState";
 import { Visibility } from "@/document/model/Document";
 import { useMessageState } from "@/common/utils/api/ApiResponseHandler";
 import { AlertMessage } from "@/common/component/ApiResponseAlert";
+import { AsyncSelect } from "@/common/component/dataTable/filter/AsyncSelect";
+import { searchUsers } from "@/user/utils/UserApi";
+import type { User } from "@/user/model/User";
 
 interface DocumentUploadModalProps {
   show: boolean;
   onClose: () => void;
   onUploaded?: () => void;
+  ownerUserId?: string; // If provided, locks the owner to this user
 }
 
 export const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
   show,
   onClose,
   onUploaded,
+  ownerUserId,
 }) => {
   const { t } = useTranslation();
   const [file, setFile] = useState<File | null>(null);
+  const [selectedOwnerId, setSelectedOwnerId] = useState<string | undefined>(undefined);
   const [visibility, setVisibility] = useState<Visibility>(Visibility.PRIVATE);
   const [description, setDescription] = useState("");
   const [tags, setTags] = useState("");
   const [confirmReplace, setConfirmReplace] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { initialErrorMessage, errors, success, handleResponse } = useMessageState();
+
+  useEffect(() => {
+    // Set owner when modal opens with ownerUserId
+    if (show && ownerUserId) {
+      setSelectedOwnerId(ownerUserId);
+    } else if (!show) {
+      setSelectedOwnerId(undefined);
+    }
+  }, [show, ownerUserId]);
 
   async function handleSubmit() {
     if (!file) {
@@ -35,6 +50,7 @@ export const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
     setIsSubmitting(true);
 
     const metadata = {
+      ownerUserId: ownerUserId || selectedOwnerId,
       visibility,
       description: description || undefined,
       tags: tags ? tags.split(",").map((t) => t.trim()) : undefined,
@@ -54,6 +70,7 @@ export const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
       if (onUploaded) onUploaded();
       // Clear form
       setFile(null);
+      setSelectedOwnerId(undefined);
       setDescription("");
       setTags("");
       setConfirmReplace(false);
@@ -72,7 +89,7 @@ export const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
           ? t("document.uploading", "Uploading...")
           : t("document.upload", "Upload")
       }
-      disabledPrimary={isSubmitting || !file}
+      disabledPrimary={isSubmitting || !file || (!ownerUserId && !selectedOwnerId)}
       size="lg"
       footerContent={
         success && <span className="text-success me-auto">{success}</span>
@@ -89,6 +106,21 @@ export const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
             required
           />
         </Form.Group>
+
+        {!ownerUserId && (
+          <Form.Group className="mb-3">
+            <Form.Label>{t("document.owner", "Owner")} *</Form.Label>
+            <AsyncSelect<User>
+              value={selectedOwnerId}
+              onChange={(value) => setSelectedOwnerId(value as string | undefined)}
+              loadOptions={searchUsers}
+              getOptionLabel={(user: User) => `${user.firstName} ${user.lastName}`}
+              getOptionValue={(user: User) => user.userId}
+              getOptionSubtitle={(user: User) => user.email}
+              placeholder={t("document.selectOwner", "Select owner...")}
+            />
+          </Form.Group>
+        )}
 
         <Form.Group className="mb-3">
           <Form.Label>{t("document.visibility", "Visibility")}</Form.Label>

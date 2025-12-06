@@ -5,8 +5,8 @@ export enum Visibility {
 }
 
 export enum UploadedByType {
-  USER = "user",
-  SYSTEM = "system",
+  USER = "USER",
+  SYSTEM = "SYSTEM",
 }
 
 export interface Document {
@@ -44,6 +44,13 @@ export interface UploadBase64Request extends DocumentUploadMetadata {
   name: string;
   base64Data: string;
   contentType?: string;
+}
+
+export interface DocumentUpdateRequest {
+  name?: string;
+  description?: string;
+  tags?: string;
+  visibility?: Visibility;
 }
 
 export interface GenerateLinkRequest {

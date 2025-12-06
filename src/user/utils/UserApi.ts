@@ -40,7 +40,7 @@ export const fetchUsersByIds = async (ids: string[]): Promise<User[]> => {
     return ids.map((id) => userCache.get(id)).filter(Boolean) as User[];
   }
   // Build bulk 'in' filter using correct param key 'filter'
-  const filterParam = encodeURIComponent(`uuid:in:${missing.join(",")}`);
+  const filterParam = encodeURIComponent(`userId:in:${missing.join(",")}`);
   const bulkUrl = `/api/users?filter=${filterParam}&page=1&pageSize=${missing.length}`;
   const res = await userMsApi.apiRequest<PageResponse<User>>(
     HttpMethod.GET,
@@ -57,7 +57,7 @@ export const fetchUsersByIds = async (ids: string[]): Promise<User[]> => {
   const stillMissing = userCache.missing(missing);
   if (stillMissing.length > 0) {
     for (const id of stillMissing) {
-      const singleFilter = encodeURIComponent(`uuid:${id}`);
+      const singleFilter = encodeURIComponent(`userId:${id}`);
       const singleUrl = `/api/users?filter=${singleFilter}&page=1&pageSize=1`;
       const singleRes = await userMsApi.apiRequest<PageResponse<User>>(
         HttpMethod.GET,

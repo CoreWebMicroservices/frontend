@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { Container, Button, Badge, Row, Col } from "react-bootstrap";
+import { Container, Button, Badge } from "react-bootstrap";
 import { useHookstate } from "@hookstate/core";
 import { useTranslation } from "react-i18next";
 import { Download, InfoCircle, Trash, Upload } from "react-bootstrap-icons";
-import { Document, Visibility } from "@/document/model/Document";
+import { Document, Visibility, UploadedByType } from "@/document/model/Document";
 import {
   listDocuments,
   deleteDocument,
@@ -21,11 +21,13 @@ import {
 } from "@/common/component/dataTable/DataTableState";
 import { formatDate } from "@/common/utils/DateUtils";
 import DocumentUploadModal from "@/document/component/DocumentUploadModal";
-import { ModalDialog } from "@/common/component/ModalDialog";
+import DocumentDetailsModal from "@/document/component/DocumentDetailsModal";
 import { searchUsers, resolveUserNames } from "@/user/utils/UserApi";
 import type { User } from "@/user/model/User";
 import { Link } from "react-router-dom";
 import { APP_ROUTES } from "@/app/router/routes";
+import { hasAnyRole } from "@/user/store/AuthState";
+import { AppRoles } from "@/common/AppRoles";
 
 interface DocumentListProps {
   userId?: string;
@@ -146,12 +148,6 @@ const DocumentList: React.FC<DocumentListProps> = ({ userId }) => {
     return <Badge bg={variants[visibility]}>{visibility}</Badge>;
   }
 
-  function formatFileSize(bytes: number): string {
-    if (bytes < 1024) return bytes + " B";
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(2) + " KB";
-    return (bytes / (1024 * 1024)).toFixed(2) + " MB";
-  }
-
   const columns: DataTableColumn[] = [
     { key: "owner", title: t("document.owner", "Owner") },
     { key: "name", title: t("document.name", "Name"), sortable: true },
@@ -236,7 +232,7 @@ const DocumentList: React.FC<DocumentListProps> = ({ userId }) => {
         <Button
           size="sm"
           variant="outline-primary"
-          onClick={() => handleDownload(doc.uuid, doc.originalFilename)}
+          onClick={() => handleDownload(doc.uuid, doc.name)}
           className="me-2"
         >
           <Download className="me-1" />
@@ -251,16 +247,18 @@ const DocumentList: React.FC<DocumentListProps> = ({ userId }) => {
           <InfoCircle className="me-1" />
           {t("document.details", "Details")}
         </Button>
-        <Button
-          size="sm"
-          variant="outline-danger"
-          onClick={() => handleDelete(doc.uuid, doc.deleted)}
-        >
-          <Trash className="me-1" />
-          {doc.deleted
-            ? t("document.deletePermanently", "Delete Permanently")
-            : t("common.delete", "Delete")}
-        </Button>
+        {hasAnyRole([AppRoles.DocumentMsAdmin]) && (
+          <Button
+            size="sm"
+            variant="outline-danger"
+            onClick={() => handleDelete(doc.uuid, doc.deleted)}
+          >
+            <Trash className="me-1" />
+            {doc.deleted
+              ? t("document.deletePermanently", "Delete Permanently")
+              : t("common.delete", "Delete")}
+          </Button>
+        )}
       </td>
     </tr>
   );
@@ -324,48 +322,15 @@ const DocumentList: React.FC<DocumentListProps> = ({ userId }) => {
           setShowUploadModal(false);
           refreshDocuments();
         }}
+        ownerUserId={userId}
       />
 
-      <ModalDialog
+      <DocumentDetailsModal
+        document={selectedDocument}
         show={!!selectedDocument}
         onClose={() => setSelectedDocument(null)}
-        title={t("document.documentDetails", "Document Details")}
-        size="xl"
-      >
-        {selectedDocument && (
-          <Row>
-            <Col md={6}>
-              <h6 className="text-muted mb-3">{t("document.fileInformation", "File Information")}</h6>
-              <p className="mb-2"><strong>{t("document.name", "Name")}:</strong> {selectedDocument.name}</p>
-              <p className="mb-2"><strong>{t("document.originalFilename", "Original Filename")}:</strong> {selectedDocument.originalFilename}</p>
-              <p className="mb-2"><strong>{t("document.size", "Size")}:</strong> {formatFileSize(selectedDocument.size)}</p>
-              <p className="mb-2"><strong>{t("document.type", "Type")}:</strong> {selectedDocument.contentType}</p>
-              <p className="mb-2"><strong>{t("document.extension", "Extension")}:</strong> {selectedDocument.extension}</p>
-              <p className="mb-2"><strong>{t("document.checksum", "Checksum")}:</strong> <code className="text-muted small">{selectedDocument.checksum}</code></p>
-            </Col>
-            <Col md={6}>
-              <h6 className="text-muted mb-3">{t("document.metadata", "Metadata")}</h6>
-              <p className="mb-2"><strong>{t("document.visibility", "Visibility")}:</strong> {getVisibilityBadge(selectedDocument.visibility)}</p>
-              <p className="mb-2"><strong>{t("document.created", "Created")}:</strong> {formatDate(selectedDocument.createdAt)}</p>
-              <p className="mb-2"><strong>{t("document.updated", "Updated")}:</strong> {formatDate(selectedDocument.updatedAt)}</p>
-              <p className="mb-2"><strong>{t("document.uploadedBy", "Uploaded By")}:</strong> {selectedDocument.uploadedByType}</p>
-              {selectedDocument.description && (
-                <p className="mb-2"><strong>{t("document.description", "Description")}:</strong> {selectedDocument.description}</p>
-              )}
-              {selectedDocument.tags && (
-                <p className="mb-2">
-                  <strong>{t("document.tags", "Tags")}:</strong>{" "}
-                  {selectedDocument.tags.split(",").map((tag) => (
-                    <Badge key={tag} bg="secondary" className="me-1">
-                      {tag.trim()}
-                    </Badge>
-                  ))}
-                </p>
-              )}
-            </Col>
-          </Row>
-        )}
-      </ModalDialog>
+        onUpdated={refreshDocuments}
+      />
     </Container>
   );
 };
@@ -380,7 +345,7 @@ const NameResolutionEffect: React.FC<{
     const idsSet = new Set<string>();
     documents.forEach((doc) => {
       if (doc.userId) idsSet.add(doc.userId);
-      if (doc.uploadedByType === "user" && doc.uploadedById) idsSet.add(doc.uploadedById);
+      if (doc.uploadedByType === UploadedByType.USER && doc.uploadedById) idsSet.add(doc.uploadedById);
     });
     const ids = Array.from(idsSet);
     if (ids.length === 0) return;
