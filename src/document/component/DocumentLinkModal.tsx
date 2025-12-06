@@ -3,11 +3,13 @@ import { Form, Button, InputGroup, Alert } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { Clipboard, ClipboardCheck } from "react-bootstrap-icons";
 import { ModalDialog } from "@/common/component/ModalDialog";
-import { generateDocumentAccessLink } from "@/document/store/DocumentState";
+import {
+  generateDocumentAccessLink,
+  getPublicDocumentUrl,
+} from "@/document/store/DocumentState";
 import { Document, Visibility } from "@/document/model/Document";
 import { useMessageState } from "@/common/utils/api/ApiResponseHandler";
 import { AlertMessage } from "@/common/component/ApiResponseAlert";
-import { DOCUMENT_MS_BASE_URL } from "@/document/config";
 
 interface DocumentLinkModalProps {
   document: Document | null;
@@ -28,16 +30,12 @@ export const DocumentLinkModal: React.FC<DocumentLinkModalProps> = ({
 
   const { initialErrorMessage, errors, handleResponse } = useMessageState();
 
-  const getPublicLink = (uuid: string) => {
-    return `${DOCUMENT_MS_BASE_URL}/api/public/documents/${uuid}/download`;
-  };
-
   const handleGenerate = async () => {
     if (!document) return;
 
     // For PUBLIC documents, just show the public URL
     if (document.visibility === Visibility.PUBLIC) {
-      setGeneratedLink(getPublicLink(document.uuid));
+      setGeneratedLink(getPublicDocumentUrl(document.uuid));
       setIsCopied(false);
       return;
     }

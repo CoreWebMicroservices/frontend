@@ -118,3 +118,8 @@ export function getDocumentDownloadUrl(uuid: string): string {
   const baseUrl = DOCUMENT_MS_BASE_URL;
   return `${baseUrl}/api/documents/${uuid}/download`;
 }
+
+export function getPublicDocumentUrl(uuid: string): string {
+  const baseUrl = DOCUMENT_MS_BASE_URL;
+  return `${baseUrl}/api/public/documents/${uuid}/download`;
+}
