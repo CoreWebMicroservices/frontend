@@ -146,6 +146,12 @@ handleResponse(
 VITE_API_URL=https://api.corems.local
 ```
 
+## Git Commits
+
+- Keep commit messages minimal and concise
+- Use conventional commit format: `feat:`, `fix:`, `refactor:`, etc.
+- Focus on what changed, not implementation details
+
 ## When Writing Code
 
 1. Follow modular architecture - components in module folders, routes in `/app/router/`
