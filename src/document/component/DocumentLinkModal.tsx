@@ -7,6 +7,7 @@ import { generateDocumentAccessLink } from "@/document/store/DocumentState";
 import { Document, Visibility } from "@/document/model/Document";
 import { useMessageState } from "@/common/utils/api/ApiResponseHandler";
 import { AlertMessage } from "@/common/component/ApiResponseAlert";
+import { DOCUMENT_MS_BASE_URL } from "@/document/config";
 
 interface DocumentLinkModalProps {
   document: Document | null;
@@ -27,8 +28,19 @@ export const DocumentLinkModal: React.FC<DocumentLinkModalProps> = ({
 
   const { initialErrorMessage, errors, handleResponse } = useMessageState();
 
+  const getPublicLink = (uuid: string) => {
+    return `${DOCUMENT_MS_BASE_URL}/api/public/documents/${uuid}/download`;
+  };
+
   const handleGenerate = async () => {
     if (!document) return;
+
+    // For PUBLIC documents, just show the public URL
+    if (document.visibility === Visibility.PUBLIC) {
+      setGeneratedLink(getPublicLink(document.uuid));
+      setIsCopied(false);
+      return;
+    }
 
     // Check if document visibility is BY_LINK
     if (document.visibility !== Visibility.BY_LINK) {
@@ -39,7 +51,7 @@ export const DocumentLinkModal: React.FC<DocumentLinkModalProps> = ({
           errors: [
             {
               reasonCode: "document.invalid_visibility",
-              description: "Only documents with BY_LINK visibility can generate access links",
+              description: "Only documents with BY_LINK or PUBLIC visibility can generate access links",
             },
           ],
         },
@@ -103,15 +115,17 @@ export const DocumentLinkModal: React.FC<DocumentLinkModalProps> = ({
       secondaryText={t("common.close", "Close")}
       onPrimary={
         !generatedLink &&
-        document?.visibility === Visibility.BY_LINK
+        (document?.visibility === Visibility.BY_LINK || document?.visibility === Visibility.PUBLIC)
           ? handleGenerate
           : undefined
       }
       primaryText={
         !generatedLink &&
-        document?.visibility === Visibility.BY_LINK
+        (document?.visibility === Visibility.BY_LINK || document?.visibility === Visibility.PUBLIC)
           ? isGenerating
             ? t("common.generating", "Generating...")
+            : document?.visibility === Visibility.PUBLIC
+            ? t("document.showLink", "Show Link")
             : t("document.generateLink", "Generate Link")
           : undefined
       }
@@ -132,61 +146,72 @@ export const DocumentLinkModal: React.FC<DocumentLinkModalProps> = ({
     >
       <AlertMessage initialErrorMessage={initialErrorMessage} errors={errors} />
 
-      {document && document.visibility !== Visibility.BY_LINK && (
+      {document && document.visibility === Visibility.PRIVATE && (
         <Alert variant="warning">
           {t(
-            "document.linkOnlyForByLink",
-            "Links can only be generated for documents with BY_LINK visibility. This document has {visibility} visibility.",
+            "document.linkOnlyForByLinkOrPublic",
+            "Links can only be generated for documents with BY_LINK or PUBLIC visibility. This document is PRIVATE.",
             { visibility: document.visibility }
           )}
         </Alert>
       )}
 
-      {document && document.visibility === Visibility.BY_LINK && (
+      {document && document.visibility === Visibility.PUBLIC && !generatedLink && (
+        <Alert variant="info">
+          {t(
+            "document.publicDocumentInfo",
+            "This is a PUBLIC document. Anyone can access it without authentication."
+          )}
+        </Alert>
+      )}
+
+      {document && (document.visibility === Visibility.BY_LINK || document.visibility === Visibility.PUBLIC) && (
         <>
           {!generatedLink ? (
             <>
-              <Form.Group className="mb-3">
-                <Form.Label>
-                  {t("document.expiresIn", "Link Expiration")}
-                </Form.Label>
-                <div className="d-flex gap-2 mb-2">
-                  {getExpirationPresets().map((preset) => (
-                    <Button
-                      key={preset.value}
-                      size="sm"
-                      variant={
-                        expiresInHours === preset.value
-                          ? "primary"
-                          : "outline-secondary"
+              {document.visibility === Visibility.BY_LINK && (
+                <Form.Group className="mb-3">
+                  <Form.Label>
+                    {t("document.expiresIn", "Link Expiration")}
+                  </Form.Label>
+                  <div className="d-flex gap-2 mb-2">
+                    {getExpirationPresets().map((preset) => (
+                      <Button
+                        key={preset.value}
+                        size="sm"
+                        variant={
+                          expiresInHours === preset.value
+                            ? "primary"
+                            : "outline-secondary"
+                        }
+                        onClick={() => setExpiresInHours(preset.value)}
+                      >
+                        {preset.label}
+                      </Button>
+                    ))}
+                  </div>
+                  <InputGroup>
+                    <Form.Control
+                      type="number"
+                      value={expiresInHours}
+                      onChange={(e) =>
+                        setExpiresInHours(parseInt(e.target.value) || 24)
                       }
-                      onClick={() => setExpiresInHours(preset.value)}
-                    >
-                      {preset.label}
-                    </Button>
-                  ))}
-                </div>
-                <InputGroup>
-                  <Form.Control
-                    type="number"
-                    value={expiresInHours}
-                    onChange={(e) =>
-                      setExpiresInHours(parseInt(e.target.value) || 24)
-                    }
-                    min={1}
-                    max={8760}
-                  />
-                  <InputGroup.Text>
-                    {t("document.hours", "hours")}
-                  </InputGroup.Text>
-                </InputGroup>
-                <Form.Text className="text-muted">
-                  {t(
-                    "document.expiresInHelp",
-                    "Specify how long the link will be valid (1 hour to 1 year)"
-                  )}
-                </Form.Text>
-              </Form.Group>
+                      min={1}
+                      max={8760}
+                    />
+                    <InputGroup.Text>
+                      {t("document.hours", "hours")}
+                    </InputGroup.Text>
+                  </InputGroup>
+                  <Form.Text className="text-muted">
+                    {t(
+                      "document.expiresInHelp",
+                      "Specify how long the link will be valid (1 hour to 1 year)"
+                    )}
+                  </Form.Text>
+                </Form.Group>
+              )}
             </>
           ) : (
             <>
