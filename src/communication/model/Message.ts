@@ -12,6 +12,7 @@ export interface EmailPayload {
   subject: string;
   recipient: string;
   body: string;
+  documentUuids?: string[];
 }
 
 export interface Message {

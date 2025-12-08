@@ -7,7 +7,10 @@ import { searchUsers, fetchUsersByIds } from '@/user/utils/UserApi';
 import { useMessagesState } from '@/communication/store/MessageState';
 import { useMessageState } from '@/common/utils/api/ApiResponseHandler';
 import { AlertMessage } from '@/common/component/ApiResponseAlert';
+import { DocumentSelector } from '@/document/component/DocumentSelector';
+import { DocumentUploadModal } from '@/document/component/DocumentUploadModal';
 import type { User } from '@/user/model/User';
+import type { Document as DocumentModel } from '@/document/model/Document';
 
 interface SendMessageModalProps {
   show: boolean;
@@ -36,6 +39,10 @@ export const SendMessageModal: React.FC<SendMessageModalProps> = ({ show, onClos
   // SMS state
   const [phoneNumber, setPhoneNumber] = useState('');
   const [smsMessage, setSmsMessage] = useState('');
+
+  // Document state
+  const [selectedDocuments, setSelectedDocuments] = useState<DocumentModel[]>([]);
+  const [showUploadModal, setShowUploadModal] = useState(false);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -76,6 +83,7 @@ export const SendMessageModal: React.FC<SendMessageModalProps> = ({ show, onClos
         emailType,
         cc: cc ? cc.split(',').map(s => s.trim()).filter(Boolean) : undefined,
         bcc: bcc ? bcc.split(',').map(s => s.trim()).filter(Boolean) : undefined,
+        documentUuids: selectedDocuments.length > 0 ? selectedDocuments.map(d => d.uuid) : undefined,
       })
       : await sendSmsMessage({
         userId: effectiveUserId,
@@ -97,6 +105,7 @@ export const SendMessageModal: React.FC<SendMessageModalProps> = ({ show, onClos
       setCc('');
       setBcc('');
       setSmsMessage('');
+      setSelectedDocuments([]);
       setShowValidation(false);
     }
   };
@@ -127,6 +136,11 @@ export const SendMessageModal: React.FC<SendMessageModalProps> = ({ show, onClos
     }
     return () => { mounted = false; };
   }, [userId, show]);
+
+  // Reset selected documents when user changes
+  useEffect(() => {
+    setSelectedDocuments([]);
+  }, [effectiveUserId]);
 
   const handleCancel = () => {
     setShowValidation(false);
@@ -226,6 +240,24 @@ export const SendMessageModal: React.FC<SendMessageModalProps> = ({ show, onClos
                 <Form.Control as="textarea" rows={6} value={body} onChange={e => setBody(e.target.value)} />
               </Col>
             </Row>
+            {/* Document attachments */}
+            <Row>
+              <Col md={12} className="mb-3">
+                <DocumentSelector
+                  selectedDocuments={selectedDocuments}
+                  onChange={setSelectedDocuments}
+                  userId={effectiveUserId}
+                />
+                <Button
+                  variant="outline-primary"
+                  size="sm"
+                  className="mt-2"
+                  onClick={() => setShowUploadModal(true)}
+                >
+                  {t('document.uploadNew', 'Upload New Document')}
+                </Button>
+              </Col>
+            </Row>
           </>
         )}
 
@@ -255,6 +287,18 @@ export const SendMessageModal: React.FC<SendMessageModalProps> = ({ show, onClos
         )}
         <AlertMessage initialErrorMessage={initialErrorMessage} errors={errors} />
       </Form>
+
+      <DocumentUploadModal
+        show={showUploadModal}
+        onClose={() => setShowUploadModal(false)}
+        onUploaded={(document) => {
+          setShowUploadModal(false);
+          if (document && !selectedDocuments.find(d => d.uuid === document.uuid)) {
+            setSelectedDocuments([...selectedDocuments, document]);
+          }
+        }}
+        ownerUserId={effectiveUserId}
+      />
     </ModalDialog>
   );
 };

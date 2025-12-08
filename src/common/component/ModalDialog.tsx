@@ -33,10 +33,10 @@ export const ModalDialog: React.FC<ModalDialogProps> = ({
       </Modal.Header>
       <Modal.Body>{children}</Modal.Body>
       <Modal.Footer>
-        {footerContent}
         <Button variant="secondary" onClick={onClose}>
           {secondaryText}
         </Button>
+        {footerContent}
         {onPrimary && (
           <Button variant="primary" onClick={onPrimary} disabled={disabledPrimary}>
             {primaryText}

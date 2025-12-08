@@ -52,6 +52,7 @@ export const useMessagesState = () => {
     emailType: "html" | "txt";
     cc?: string[];
     bcc?: string[];
+    documentUuids?: string[];
   }) => {
     const response = await communicationMsApi.apiRequest<Message>(
       HttpMethod.POST,

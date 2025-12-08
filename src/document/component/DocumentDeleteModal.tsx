@@ -33,7 +33,7 @@ export const DocumentDeleteModal: React.FC<DocumentDeleteModalProps> = ({
           ? t("document.deletePermanently", "Delete Permanently")
           : t("common.delete", "Delete Document")
       }
-      size="md"
+      size="sm"
       onPrimary={onConfirm}
       primaryText={
         isDeleting

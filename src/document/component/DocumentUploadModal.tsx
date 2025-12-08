@@ -3,7 +3,7 @@ import { Form } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { ModalDialog } from "@/common/component/ModalDialog";
 import { uploadDocumentMultipart } from "@/document/store/DocumentState";
-import { Visibility } from "@/document/model/Document";
+import { Visibility, type Document } from "@/document/model/Document";
 import { useMessageState } from "@/common/utils/api/ApiResponseHandler";
 import { AlertMessage } from "@/common/component/ApiResponseAlert";
 import { AsyncSelect } from "@/common/component/dataTable/filter/AsyncSelect";
@@ -13,7 +13,7 @@ import type { User } from "@/user/model/User";
 interface DocumentUploadModalProps {
   show: boolean;
   onClose: () => void;
-  onUploaded?: () => void;
+  onUploaded?: (document?: Document) => void;
   ownerUserId?: string; // If provided, locks the owner to this user
 }
 
@@ -66,8 +66,8 @@ export const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
       t("document.uploadSuccess", "Document uploaded successfully")
     );
 
-    if (result.result) {
-      if (onUploaded) onUploaded();
+    if (result.result && result.response) {
+      if (onUploaded) onUploaded(result.response);
       // Clear form
       setFile(null);
       setSelectedOwnerId(undefined);
