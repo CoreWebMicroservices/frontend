@@ -7,9 +7,11 @@ export interface ModalDialogProps {
   onClose: () => void;
   onPrimary?: () => void;
   primaryText?: string;
+  primaryVariant?: string;
   secondaryText?: string;
   size?: 'sm' | 'lg' | 'xl';
   disabledPrimary?: boolean;
+  disablePrimary?: boolean;
   footerContent?: React.ReactNode;
   children: React.ReactNode;
 }
@@ -20,12 +22,16 @@ export const ModalDialog: React.FC<ModalDialogProps> = ({
   onClose,
   onPrimary,
   primaryText = 'Save',
+  primaryVariant = 'primary',
   secondaryText = 'Cancel',
   size,
   disabledPrimary,
+  disablePrimary,
   footerContent,
   children,
 }) => {
+  const isDisabled = disabledPrimary || disablePrimary;
+
   return (
     <Modal show={show} onHide={onClose} size={size} centered backdrop="static">
       <Modal.Header closeButton>
@@ -38,7 +44,7 @@ export const ModalDialog: React.FC<ModalDialogProps> = ({
         </Button>
         {footerContent}
         {onPrimary && (
-          <Button variant="primary" onClick={onPrimary} disabled={disabledPrimary}>
+          <Button variant={primaryVariant} onClick={onPrimary} disabled={isDisabled}>
             {primaryText}
           </Button>
         )}
