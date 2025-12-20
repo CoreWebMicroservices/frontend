@@ -13,6 +13,10 @@ on:
         description: 'Also build and push Docker image'
         type: boolean
         default: false
+      run_sonar:
+        description: 'Run SonarCloud analysis'
+        type: boolean
+        default: false
 
 env:
   REGISTRY: ghcr.io
@@ -47,6 +51,35 @@ jobs:
           name: frontend-dist
           path: dist/
           retention-days: 7
+
+  # SonarCloud analysis (only on manual trigger with run_sonar=true)
+  sonar:
+    needs: build
+    if: github.event_name == 'workflow_dispatch' && inputs.run_sonar
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.projectKey=${{ github.repository_owner }}_corems-frontend
+            -Dsonar.organization=${{ github.repository_owner }}
 
   # Build and push Docker image on release or manual trigger
   docker:
