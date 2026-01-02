@@ -1,5 +1,7 @@
 # Core Microservices Frontend
 
+> **Part of [Core Microservices Project](https://github.com/CoreWebMicroservices/corems-project)** - Enterprise-grade microservices toolkit for rapid application development
+
 **Enterprise-grade React application demonstrating modular architecture patterns and best practices**
 
 This project showcases a comprehensive **modular and composable frontend architecture** built with React, TypeScript, and Vite. It demonstrates real-world patterns for building scalable, maintainable web applications that can grow with your business needs.
@@ -46,9 +48,12 @@ This project showcases a comprehensive **modular and composable frontend archite
 ## Quick Start
 
 ```bash
-# Clone the repository
-git clone https://github.com/dmitry3325/corems-frontend.git
-cd corems-frontend
+# Clone the main project
+git clone https://github.com/CoreWebMicroservices/corems-project.git
+cd corems-project
+
+# Navigate to frontend
+cd repos/frontend
 
 # Install dependencies
 npm install
@@ -138,11 +143,11 @@ This project is perfect for developers who want to learn:
 
 ## Related Projects
 
-- **Backend**: [Core Microservices](https://github.com/dmitry3325/core-microservices) - Java Spring Boot microservices architecture
+- **Backend**: [Core Microservices](https://github.com/CoreWebMicroservices/corems-project) - Java Spring Boot microservices architecture
 
 ## License
 
-This project is open source and available under the [MIT License](LICENSE).
+Licensed under the Apache License 2.0. See the [main project](https://github.com/CoreWebMicroservices/corems-project) for details.
 
 ---
 

@@ -1,0 +1,17 @@
+services:
+  frontend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8080:80"
+    env_file:
+      - ../.env
+    environment:
+      - NODE_ENV=production
+    networks:
+      - corems-network
+
+networks:
+  corems-network:
+    external: true

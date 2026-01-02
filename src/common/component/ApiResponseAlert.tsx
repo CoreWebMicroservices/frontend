@@ -15,7 +15,7 @@ export const AlertMessage: React.FC<AlertMessageProps> = ({
   className = "mb-3"
 }) => {
   const [visible, setVisible] = useState<boolean>(false);
-  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
+  const [timeoutId, setTimeoutId] = useState<number | null>(null);
 
   // When success prop changes, show the alert and auto-hide after 5s
   useEffect(() => {

@@ -71,7 +71,7 @@ export const I18nProvider: React.FC<I18nProviderProps> = ({
   useEffect(() => {
     let mounted = true;
     const missingKeys: Record<string, string> = {};
-    let missingKeysTimer: NodeJS.Timeout | null = null;
+    let missingKeysTimer: number | null = null;
 
     const init = async () => {
       try {
