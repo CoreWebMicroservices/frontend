@@ -24,6 +24,7 @@ export interface Message {
   sentById?: string;
   sentByType?: "user" | "system";
   createdAt: string;
+  payloadType: "sms" | "email";
   payload: SmsPayload | EmailPayload;
 }
 

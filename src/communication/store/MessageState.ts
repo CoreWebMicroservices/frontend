@@ -54,10 +54,15 @@ export const useMessagesState = () => {
     bcc?: string[];
     documentUuids?: string[];
   }) => {
+    const requestData = {
+      ...data,
+      payloadType: "email" as const, // Required by API spec
+    };
+    
     const response = await communicationMsApi.apiRequest<Message>(
       HttpMethod.POST,
       `/api/messages/email`,
-      data
+      requestData
     );
     return response;
   };
@@ -67,10 +72,15 @@ export const useMessagesState = () => {
     phoneNumber: string;
     message: string;
   }) => {
+    const requestData = {
+      ...data,
+      payloadType: "sms" as const, // Required by API spec
+    };
+    
     const response = await communicationMsApi.apiRequest<Message>(
       HttpMethod.POST,
       `/api/messages/sms`,
-      data
+      requestData
     );
     return response;
   };
