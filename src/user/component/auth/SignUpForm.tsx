@@ -3,11 +3,13 @@ import { Button, Col, FloatingLabel, Form, Row } from "react-bootstrap";
 import { useForm } from 'react-hook-form';
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useTranslation } from 'react-i18next';
+import { useState } from 'react';
 
 import { SignUpUserRequest } from "@/user/model/Auth";
 import { signUpUser } from "@/user/store/AuthState";
 import { useMessageState } from '@/common/utils/api/ApiResponseHandler';
 import { AlertMessage } from '@/common/component/ApiResponseAlert';
+import RegistrationSuccessForm from './RegistrationSuccessForm';
 
 const signUpUserSchema = yup.object().shape({
   email: yup.string().email('Invalid email address').required('Email is required'),
@@ -15,6 +17,9 @@ const signUpUserSchema = yup.object().shape({
   lastName: yup.string().required('Last name is required'),
   password: yup.string().required('Password is required'),
   confirmPassword: yup.string().required('Password is required'),
+  phoneNumber: yup.string()
+    .matches(/^\+\d{1,20}$/, 'Phone number must be in E.164 format (e.g., +15551234567)')
+    .optional(),
 });
 
 
@@ -25,6 +30,7 @@ interface SignUpFormProps {
 const SignUpForm: React.FC<SignUpFormProps> = ({ onSignedUp }) => {
   const { t } = useTranslation();
   const { success, initialErrorMessage, errors: apiErrors, handleResponse } = useMessageState();
+  const [registrationData, setRegistrationData] = useState<SignUpUserRequest | null>(null);
   const {
     register,
     handleSubmit,
@@ -42,9 +48,20 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSignedUp }) => {
     );
 
     if (res.result === true) {
+      setRegistrationData(data);
       onSignedUp();
     }
   };
+
+  // Show success page after successful registration
+  if (registrationData) {
+    return (
+      <RegistrationSuccessForm 
+        email={registrationData.email}
+        hasPhoneNumber={!!registrationData.phoneNumber}
+      />
+    );
+  }
 
   return (
     <Form noValidate onSubmit={handleSubmit(onSubmit)} className="needs-validation">
@@ -101,6 +118,25 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSignedUp }) => {
           </FloatingLabel>
         </Col>
       </Row>
+
+      <FloatingLabel
+        controlId="phoneNumber"
+        label={t('form.phoneNumber', 'Phone Number (Optional)')}
+        className="mb-3"
+      >
+        <Form.Control
+          type="tel"
+          placeholder={t('form.enterPhoneNumber', 'Enter phone number (e.g., +15551234567)')}
+          size="lg"
+          className="border-0 border-bottom rounded-0"
+          autoComplete="tel"
+          isInvalid={!!errors.phoneNumber}
+          {...register('phoneNumber')}
+        />
+        <Form.Control.Feedback type="invalid">
+          {errors.phoneNumber?.message}
+        </Form.Control.Feedback>
+      </FloatingLabel>
 
       <FloatingLabel
         controlId="floatingPassword"

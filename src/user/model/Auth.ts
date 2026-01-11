@@ -9,6 +9,7 @@ export interface SignUpUserRequest {
   lastName: string;
   password: string;
   confirmPassword: string;
+  phoneNumber?: string;
 }
 
 export interface TokenResponse {
@@ -29,4 +30,30 @@ export interface Token {
   roles: string[];
   exp: number;
   iat: number;
+}
+
+export interface VerifyEmailRequest {
+  email: string;
+  token: string;
+}
+
+export interface VerifyPhoneRequest {
+  phoneNumber: string;
+  code: string;
+}
+
+export interface ResendVerificationRequest {
+  email: string;
+  type: 'EMAIL' | 'SMS';
+}
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  email: string;
+  token: string;
+  newPassword: string;
+  confirmPassword: string;
 }

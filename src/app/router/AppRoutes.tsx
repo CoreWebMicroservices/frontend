@@ -6,6 +6,10 @@ import { getCurrentUserAuth, hasAnyRole } from "@/user/store/AuthState";
 
 // Import components directly from modules (no route configuration)
 import AuthForm from "@/user/component/auth/AuthForm";
+import ForgotPasswordForm from "@/user/component/auth/ForgotPasswordForm";
+import ResetPasswordForm from "@/user/component/auth/ResetPasswordForm";
+import VerifyEmailForm from "@/user/component/auth/VerifyEmailForm";
+import VerifyPhoneForm from "@/user/component/auth/VerifyPhoneForm";
 import UserProfile from "@/user/component/profile/UserProfile";
 import UserList from "@/user/component/user/UserList";
 import AppUserEdit from "@/app/layout/components/UserEdit";
@@ -48,6 +52,26 @@ export const userRoutes: RouteObject[] = [
   {
     path: ROUTE_PATHS.LOGIN,
     element: <AuthForm />,
+    loader: authGuards.redirectIfAuthenticated,
+  },
+  {
+    path: ROUTE_PATHS.FORGOT_PASSWORD,
+    element: <ForgotPasswordForm />,
+    loader: authGuards.redirectIfAuthenticated,
+  },
+  {
+    path: ROUTE_PATHS.RESET_PASSWORD,
+    element: <ResetPasswordForm />,
+    loader: authGuards.redirectIfAuthenticated,
+  },
+  {
+    path: ROUTE_PATHS.VERIFY_EMAIL,
+    element: <VerifyEmailForm />,
+    loader: authGuards.redirectIfAuthenticated,
+  },
+  {
+    path: ROUTE_PATHS.VERIFY_PHONE,
+    element: <VerifyPhoneForm />,
     loader: authGuards.redirectIfAuthenticated,
   },
   {

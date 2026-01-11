@@ -85,7 +85,7 @@ const SignInForm = () => {
 
       <AlertMessage success={success} initialErrorMessage={initialErrorMessage} errors={apiErrors} />
 
-      <Row className="justify-content-cenmt mb-3">
+      <Row className="justify-content-center mb-3">
         <Col xs={{ span: 6, offset: 6 }} className="text-end">
           <Link to={APP_ROUTES.FORGOT_PASSWORD} className="link-secondary text-decoration-none">{t('auth.forgotPassword', 'Forgot password?')}</Link>
         </Col>

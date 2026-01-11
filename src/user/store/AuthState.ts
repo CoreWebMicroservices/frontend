@@ -17,6 +17,11 @@ import {
   SignUpUserRequest,
   Token,
   TokenResponse,
+  VerifyEmailRequest,
+  VerifyPhoneRequest,
+  ResendVerificationRequest,
+  ForgotPasswordRequest,
+  ResetPasswordRequest,
 } from "@/user/model/Auth";
 import { User, AuthProvider } from "@/user/model/User";
 
@@ -87,6 +92,56 @@ export async function signUpUser(
 
   authState.isInProgress.set(false);
   return res;
+}
+
+export async function verifyEmail(
+  verifyRequest: VerifyEmailRequest
+): Promise<CoreMsApiResonse<ApiSuccessfulResponse>> {
+  return await userMsApi.apiRequest<ApiSuccessfulResponse>(
+    HttpMethod.POST,
+    "/api/auth/verify-email",
+    verifyRequest
+  );
+}
+
+export async function verifyPhone(
+  verifyRequest: VerifyPhoneRequest
+): Promise<CoreMsApiResonse<ApiSuccessfulResponse>> {
+  return await userMsApi.apiRequest<ApiSuccessfulResponse>(
+    HttpMethod.POST,
+    "/api/auth/verify-phone",
+    verifyRequest
+  );
+}
+
+export async function resendVerification(
+  resendRequest: ResendVerificationRequest
+): Promise<CoreMsApiResonse<ApiSuccessfulResponse>> {
+  return await userMsApi.apiRequest<ApiSuccessfulResponse>(
+    HttpMethod.POST,
+    "/api/auth/resend-verification",
+    resendRequest
+  );
+}
+
+export async function forgotPassword(
+  forgotRequest: ForgotPasswordRequest
+): Promise<CoreMsApiResonse<ApiSuccessfulResponse>> {
+  return await userMsApi.apiRequest<ApiSuccessfulResponse>(
+    HttpMethod.POST,
+    "/api/auth/forgot-password",
+    forgotRequest
+  );
+}
+
+export async function resetPassword(
+  resetRequest: ResetPasswordRequest
+): Promise<CoreMsApiResonse<ApiSuccessfulResponse>> {
+  return await userMsApi.apiRequest<ApiSuccessfulResponse>(
+    HttpMethod.POST,
+    "/api/auth/reset-password",
+    resetRequest
+  );
 }
 
 export async function signOut() {
@@ -228,10 +283,10 @@ export function hasAnyRole(requiredRoles: string[]): boolean {
 }
 
 const urlParams = new URLSearchParams(window.location.search);
-const token = urlParams.get("token");
+const token = urlParams.get("refresh_token");
 if (token) {
   setRefreshToken(token);
-  urlParams.delete("token");
+  urlParams.delete("refresh_token");
   window.location.search = urlParams.toString();
   setAccessToken(null);
 } else {
