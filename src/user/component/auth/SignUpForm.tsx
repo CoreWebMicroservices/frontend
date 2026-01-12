@@ -17,9 +17,6 @@ const signUpUserSchema = yup.object().shape({
   lastName: yup.string().required('Last name is required'),
   password: yup.string().required('Password is required'),
   confirmPassword: yup.string().required('Password is required'),
-  phoneNumber: yup.string()
-    .matches(/^\+\d{1,20}$/, 'Phone number must be in E.164 format (e.g., +15551234567)')
-    .optional(),
 });
 
 
@@ -58,7 +55,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSignedUp }) => {
     return (
       <RegistrationSuccessForm 
         email={registrationData.email}
-        hasPhoneNumber={!!registrationData.phoneNumber}
+        hasPhoneNumber={false}
       />
     );
   }
@@ -118,25 +115,6 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSignedUp }) => {
           </FloatingLabel>
         </Col>
       </Row>
-
-      <FloatingLabel
-        controlId="phoneNumber"
-        label={t('form.phoneNumber', 'Phone Number (Optional)')}
-        className="mb-3"
-      >
-        <Form.Control
-          type="tel"
-          placeholder={t('form.enterPhoneNumber', 'Enter phone number (e.g., +15551234567)')}
-          size="lg"
-          className="border-0 border-bottom rounded-0"
-          autoComplete="tel"
-          isInvalid={!!errors.phoneNumber}
-          {...register('phoneNumber')}
-        />
-        <Form.Control.Feedback type="invalid">
-          {errors.phoneNumber?.message}
-        </Form.Control.Feedback>
-      </FloatingLabel>
 
       <FloatingLabel
         controlId="floatingPassword"

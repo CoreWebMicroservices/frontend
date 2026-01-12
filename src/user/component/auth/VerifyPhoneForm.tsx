@@ -51,12 +51,18 @@ const VerifyPhoneForm = () => {
     handleResponse(
       res,
       "Failed to verify phone number. Please check the code and try again.",
-      "Phone number verified successfully! You can now sign in to your account."
+      "Phone number verified successfully!"
     );
 
     if (res.result) {
       setTimeout(() => {
-        navigate(ROUTE_PATHS.LOGIN);
+        // If user came from profile page, redirect back to profile
+        // Otherwise redirect to login (for new registrations)
+        if (email) {
+          navigate(ROUTE_PATHS.USER_PROFILE);
+        } else {
+          navigate(ROUTE_PATHS.LOGIN);
+        }
       }, 2000);
     }
   };
@@ -158,9 +164,15 @@ const VerifyPhoneForm = () => {
             )}
 
             <div className="text-center">
-              <Link to={ROUTE_PATHS.LOGIN} className="text-decoration-none">
-                {t('auth.backToLogin', 'Back to Login')}
-              </Link>
+              {email ? (
+                <Link to={ROUTE_PATHS.USER_PROFILE} className="text-decoration-none">
+                  {t('profile.backToProfile', 'Back to Profile')}
+                </Link>
+              ) : (
+                <Link to={ROUTE_PATHS.LOGIN} className="text-decoration-none">
+                  {t('auth.backToLogin', 'Back to Login')}
+                </Link>
+              )}
             </div>
           </Form>
         </Col>

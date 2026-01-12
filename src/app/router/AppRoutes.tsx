@@ -67,12 +67,10 @@ export const userRoutes: RouteObject[] = [
   {
     path: ROUTE_PATHS.VERIFY_EMAIL,
     element: <VerifyEmailForm />,
-    loader: authGuards.redirectIfAuthenticated,
   },
   {
     path: ROUTE_PATHS.VERIFY_PHONE,
     element: <VerifyPhoneForm />,
-    loader: authGuards.redirectIfAuthenticated,
   },
   {
     path: ROUTE_PATHS.USER_PROFILE,

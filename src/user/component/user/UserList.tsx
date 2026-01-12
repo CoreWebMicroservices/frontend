@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Button, Container } from 'react-bootstrap';
-import { PencilSquare, Plus } from 'react-bootstrap-icons';
+import { Button, Container, Badge } from 'react-bootstrap';
+import { PencilSquare, Plus, CheckCircleFill, ExclamationCircleFill, Envelope } from 'react-bootstrap-icons';
 import { useHookstate } from '@hookstate/core';
 import { useTranslation } from 'react-i18next';
 import { getAllUsers } from '@/user/store/UserState';
@@ -52,7 +52,6 @@ const UserList = () => {
     { key: 'provider', title: t('user.provider', 'Provider'), sortable: true },
     { key: 'lastLoginAt', title: t('user.lastLogin', 'Last Login'), sortable: true },
     { key: 'actions', title: t('common.actions', 'Actions') },
-    { key: 'message', title: '' }
   ];
 
   const currentSort = parseCurrentSort(queryParams.sort.get());
@@ -84,7 +83,23 @@ const UserList = () => {
           </span>
         </div>
       </td>
-      <td>{user.email}</td>
+      <td>
+        <div className="d-flex align-items-center gap-2">
+          <Envelope size={14} />
+          <span>{user.email}</span>
+          {user.emailVerified ? (
+            <Badge bg="success" className="d-flex align-items-center gap-1">
+              <CheckCircleFill size={10} />
+              {t('profile.verified', 'Verified')}
+            </Badge>
+          ) : (
+            <Badge bg="warning" className="d-flex align-items-center gap-1">
+              <ExclamationCircleFill size={10} />
+              {t('profile.unverified', 'Unverified')}
+            </Badge>
+          )}
+        </div>
+      </td>
       <td>{user.provider}</td>
       <td>{formatDate(user.lastLoginAt)}</td>
       <td>
