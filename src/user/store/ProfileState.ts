@@ -64,11 +64,17 @@ export async function getProfileInfo(): Promise<CoreMsApiResonse<User>> {
 export async function updateProfileInfo(
   userData: Partial<User>
 ): Promise<CoreMsApiResonse<User>> {
+  const cleanedData = { ...userData };
+  
+  if (cleanedData.phoneNumber === "") {
+    delete cleanedData.phoneNumber;
+  }
+
   profileState.isInProgress.set(true);
   const res = await userMsApi.apiRequest<User>(
     HttpMethod.PATCH,
     "/api/profile",
-    userData
+    cleanedData
   );
   profileState.isInProgress.set(false);
 

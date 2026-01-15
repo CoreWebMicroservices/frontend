@@ -9,6 +9,7 @@ import { useUserState, getUserById, updateUserInfo } from '@/user/store/UserStat
 import { useMessageState } from '@/common/utils/api/ApiResponseHandler';
 import { AlertMessage } from '@/common/component/ApiResponseAlert';
 import AdminChangePasswordModal from './AdminChangePasswordModal';
+import ProfileImageUpload from '@/user/component/shared/ProfileImageUpload';
 import { AppRoles } from '@/common/AppRoles';
 import { ROUTE_PATHS } from '@/app/router/routes';
 
@@ -81,6 +82,27 @@ const UserEdit = () => {
     );
   };
 
+  const handleImageUpdate = async (imageUrl: string) => {
+    if (!userId || !selectedUser) return;
+
+    // Create minimal user object with only the fields we want to update
+    const userData: User = {
+      userId: selectedUser.userId,
+      provider: selectedUser.provider,
+      firstName: selectedUser.firstName,
+      lastName: selectedUser.lastName,
+      email: selectedUser.email,
+      imageUrl: imageUrl,
+    };
+
+    const result = await updateUserInfo(userId, userData);
+    if (result.result) {
+      // Refresh user data to show new image
+      await getUserById(userId);
+    }
+    return Promise.resolve();
+  };
+
   const addRole = (role: string) => {
     const currentRoles = roles || [];
     if (!currentRoles.includes(role)) {
@@ -136,35 +158,12 @@ const UserEdit = () => {
         <Col md={8}>
           <h2 className="mb-4 mt-3 text-center">{t('user.editUser', 'Edit User')}</h2>
 
-          {/* User Avatar Display (Non-editable) */}
-          {selectedUser.imageUrl ? (
-            <div className="mb-3 text-center">
-              <img
-                src={selectedUser.imageUrl}
-                alt={t('user.avatar', 'User avatar')}
-                style={{ width: 96, height: 96, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--bs-primary)' }}
-              />
-            </div>
-          ) : (
-            <div className="mb-3 text-center">
-              <div style={{
-                width: 96,
-                height: 96,
-                borderRadius: '50%',
-                background: '#e9ecef',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                border: '2px solid var(--bs-primary)',
-                fontSize: 32,
-                fontWeight: 'bold',
-                color: '#6c757d',
-                margin: '0 auto'
-              }}>
-                {selectedUser.firstName?.charAt(0)}{selectedUser.lastName?.charAt(0)}
-              </div>
-            </div>
-          )}
+          <ProfileImageUpload
+            currentImageUrl={selectedUser.imageUrl}
+            onImageUpdate={handleImageUpdate}
+            size={96}
+            className="mb-3"
+          />
 
           <Form className="mb-3" onSubmit={handleSubmit(onSubmit)}>
             <Form.Group className="mb-3" controlId="firstName">

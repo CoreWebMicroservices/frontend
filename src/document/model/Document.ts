@@ -27,6 +27,8 @@ export interface Document {
   checksum: string;
   description?: string;
   tags?: string; // Comma-separated string
+  viewUrl?: string; // Full URL to view the document inline
+  downloadUrl?: string; // Full URL to download the document
   deleted: boolean;
   deletedAt?: string;
   deletedBy?: string;

@@ -9,12 +9,14 @@ import { AlertMessage } from "@/common/component/ApiResponseAlert";
 import { AsyncSelect } from "@/common/component/dataTable/filter/AsyncSelect";
 import { searchUsers } from "@/user/utils/UserApi";
 import type { User } from "@/user/model/User";
+import { hasAnyRole } from "@/user/store/AuthState";
+import { AppRoles } from "@/common/AppRoles";
 
 interface DocumentUploadModalProps {
   show: boolean;
   onClose: () => void;
   onUploaded?: (document?: Document) => void;
-  ownerUserId?: string; // If provided, locks the owner to this user
+  ownerUserId?: string;
 }
 
 export const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
@@ -32,9 +34,11 @@ export const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
   const [confirmReplace, setConfirmReplace] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { initialErrorMessage, errors, success, handleResponse } = useMessageState();
+  
+  const isAdmin = hasAnyRole([AppRoles.DocumentMsAdmin, AppRoles.SuperAdmin]);
+  const showOwnerSelector = !ownerUserId && isAdmin;
 
   useEffect(() => {
-    // Set owner when modal opens with ownerUserId
     if (show && ownerUserId) {
       setSelectedOwnerId(ownerUserId);
     } else if (!show) {
@@ -89,7 +93,7 @@ export const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
           ? t("document.uploading", "Uploading...")
           : t("document.upload", "Upload")
       }
-      disabledPrimary={isSubmitting || !file || (!ownerUserId && !selectedOwnerId)}
+      disabledPrimary={isSubmitting || !file}
       size="lg"
       footerContent={
         success && <span className="text-success me-auto">{success}</span>
@@ -107,7 +111,7 @@ export const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
           />
         </Form.Group>
 
-        {!ownerUserId && (
+        {showOwnerSelector && !ownerUserId && (
           <Form.Group className="mb-3">
             <Form.Label>{t("document.owner", "Owner")} *</Form.Label>
             <AsyncSelect<User>
@@ -128,13 +132,13 @@ export const DocumentUploadModal: React.FC<DocumentUploadModalProps> = ({
             value={visibility}
             onChange={(e) => setVisibility(e.target.value as Visibility)}
           >
-            <option value={Visibility.PRIVATE}>
+            <option key={Visibility.PRIVATE} value={Visibility.PRIVATE}>
               {t("document.private", "Private")}
             </option>
-            <option value={Visibility.PUBLIC}>
+            <option key={Visibility.PUBLIC} value={Visibility.PUBLIC}>
               {t("document.public", "Public")}
             </option>
-            <option value={Visibility.BY_LINK}>
+            <option key={Visibility.BY_LINK} value={Visibility.BY_LINK}>
               {t("document.byLink", "By Link")}
             </option>
           </Form.Select>

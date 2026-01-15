@@ -14,6 +14,8 @@ export interface User {
   email: string;
   phoneNumber?: string;
   imageUrl?: string;
+  emailVerified?: boolean;
+  phoneVerified?: boolean;
   roles?: string[];
   createdAt?: string;
   updatedAt?: string;

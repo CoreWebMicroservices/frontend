@@ -83,10 +83,16 @@ export async function updateUserInfo(
   userId: string,
   userData: User
 ): Promise<CoreMsApiResonse<ApiSuccessfulResponse>> {
+  const cleanedData = { ...userData };
+  
+  if (cleanedData.phoneNumber === "") {
+    delete cleanedData.phoneNumber;
+  }
+
   const res = await userMsApi.apiRequest<ApiSuccessfulResponse>(
     HttpMethod.PUT,
     `/api/users/${userId}`,
-    userData
+    cleanedData
   );
 
   if (res.result === true) {

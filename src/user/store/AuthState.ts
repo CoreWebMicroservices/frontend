@@ -199,7 +199,7 @@ const setRefreshToken = (refreshToken: string | null) => {
     refreshToken,
     user: {
       userId: tokenInfo.sub,
-      provider: AuthProvider.local, // TODO fix Default to local since we don't have provider info in token
+      provider: AuthProvider.local,
       email: tokenInfo.email,
       firstName: tokenInfo.first_name,
       lastName: tokenInfo.last_name,

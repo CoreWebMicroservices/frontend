@@ -28,7 +28,7 @@ import { searchUsers, resolveUserNames } from "@/user/utils/UserApi";
 import type { User } from "@/user/model/User";
 import { Link } from "react-router-dom";
 import { APP_ROUTES } from "@/app/router/routes";
-import { hasAnyRole } from "@/user/store/AuthState";
+import { hasAnyRole, getCurrentUserAuth } from "@/user/store/AuthState";
 import { AppRoles } from "@/common/AppRoles";
 
 interface DocumentListProps {
@@ -194,85 +194,91 @@ const DocumentList: React.FC<DocumentListProps> = ({ userId }) => {
     ],
   });
 
-  const renderDocumentRow = (doc: Document) => (
-    <tr key={doc.uuid} style={{ opacity: doc.deleted ? 0.6 : 1 }}>
-      <td>
-        {doc.userId ? (
-          isResolvingNames && !userNames[doc.userId] ? (
-            t("common.loading", "Loading...")
+  const renderDocumentRow = (doc: Document) => {
+    const { user: currentUser } = getCurrentUserAuth();
+    const isOwner = currentUser && doc.userId === (currentUser as User).userId;
+    const isAdmin = hasAnyRole([AppRoles.DocumentMsAdmin]);
+
+    return (
+      <tr key={doc.uuid} style={{ opacity: doc.deleted ? 0.6 : 1 }}>
+        <td>
+          {doc.userId ? (
+            isResolvingNames && !userNames[doc.userId] ? (
+              t("common.loading", "Loading...")
+            ) : (
+              <Link to={APP_ROUTES.USER_EDIT.replace(":userId", doc.userId)}>
+                {userNames[doc.userId] || doc.userId}
+              </Link>
+            )
           ) : (
-            <Link to={APP_ROUTES.USER_EDIT.replace(":userId", doc.userId)}>
-              {userNames[doc.userId] || doc.userId}
-            </Link>
-          )
-        ) : (
-          <span className="text-muted">—</span>
-        )}
-      </td>
-      <td>
-        {doc.name}
-        {doc.deleted && (
-          <Badge bg="danger" className="ms-2">
-            {t("document.deleted", "Deleted")}
-          </Badge>
-        )}
-      </td>
-      <td>
-        {doc.tags ? (
-          doc.tags.split(",").map((tag) => (
-            <Badge key={tag} bg="secondary" className="me-1">
-              {tag.trim()}
+            <span className="text-muted">—</span>
+          )}
+        </td>
+        <td>
+          {doc.name}
+          {doc.deleted && (
+            <Badge bg="danger" className="ms-2">
+              {t("document.deleted", "Deleted")}
             </Badge>
-          ))
-        ) : (
-          <span className="text-muted">—</span>
-        )}
-      </td>
-      <td>{getVisibilityBadge(doc.visibility)}</td>
-      <td>{formatDate(doc.createdAt)}</td>
-      <td style={{ width: "1%", whiteSpace: "nowrap" }}>
-        <Button
-          size="sm"
-          variant="outline-primary"
-          onClick={() => handleDownload(doc.uuid, doc.name)}
-          className="me-2"
-        >
-          <Download className="me-1" />
-          {t("document.download", "Download")}
-        </Button>
-        <Button
-          size="sm"
-          variant="outline-info"
-          onClick={() => setSelectedDocument(doc)}
-          className="me-2"
-        >
-          <InfoCircle className="me-1" />
-          {t("document.details", "Details")}
-        </Button>
-        <Button
-          size="sm"
-          variant="outline-success"
-          onClick={() => setLinkDocument(doc)}
-          className="me-2"
-        >
-          <Link45deg className="me-1" />
-          {t("document.createLink", "Link")}
-        </Button>
-        {hasAnyRole([AppRoles.DocumentMsAdmin]) && (
+          )}
+        </td>
+        <td>
+          {doc.tags ? (
+            doc.tags.split(",").map((tag) => (
+              <Badge key={tag} bg="secondary" className="me-1">
+                {tag.trim()}
+              </Badge>
+            ))
+          ) : (
+            <span className="text-muted">—</span>
+          )}
+        </td>
+        <td>{getVisibilityBadge(doc.visibility)}</td>
+        <td>{formatDate(doc.createdAt)}</td>
+        <td style={{ width: "1%", whiteSpace: "nowrap" }}>
           <Button
             size="sm"
-            variant="outline-danger"
-            onClick={() => setDocumentToDelete(doc)}
+            variant="outline-primary"
+            onClick={() => handleDownload(doc.uuid, doc.name)}
+            className="me-2"
           >
-            <Trash className="me-1" />
-            {doc.deleted
-              ? t("document.deletePermanently", "Delete Permanently")
-              : t("common.delete", "Delete")}
+            <Download className="me-1" />
+            {t("document.download", "Download")}
           </Button>
-        )}
-      </td>
-    </tr>
-  );
+          <Button
+            size="sm"
+            variant="outline-info"
+            onClick={() => setSelectedDocument(doc)}
+            className="me-2"
+          >
+            <InfoCircle className="me-1" />
+            {t("document.details", "Details")}
+          </Button>
+          <Button
+            size="sm"
+            variant="outline-success"
+            onClick={() => setLinkDocument(doc)}
+            className="me-2"
+          >
+            <Link45deg className="me-1" />
+            {t("document.createLink", "Link")}
+          </Button>
+          {(isAdmin || isOwner) && (
+            <Button
+              size="sm"
+              variant="outline-danger"
+              onClick={() => setDocumentToDelete(doc)}
+            >
+              <Trash className="me-1" />
+              {doc.deleted
+                ? t("document.deletePermanently", "Delete Permanently")
+                : t("common.delete", "Delete")}
+            </Button>
+          )}
+        </td>
+      </tr>
+    );
+  };
 
   const actions = (
     <button

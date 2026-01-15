@@ -12,6 +12,7 @@ import Spinner from 'react-bootstrap/Spinner';
 import { Col, Row, Badge, InputGroup } from 'react-bootstrap';
 import { Lock, CheckCircleFill, ExclamationCircleFill, Envelope, Telephone } from 'react-bootstrap-icons';
 import ChangePasswordModal from './ChangePasswordModal';
+import ProfileImageUpload from '@/user/component/shared/ProfileImageUpload';
 import { useMessageState } from '@/common/utils/api/ApiResponseHandler';
 import { AlertMessage } from '@/common/component/ApiResponseAlert';
 import { ROUTE_PATHS } from '@/app/router/routes';
@@ -59,6 +60,15 @@ const UserProfile = () => {
       'Verification email sent! Please check your email.'
     );
     setIsResendingEmail(false);
+  };
+
+  const handleImageUpdate = async (imageUrl: string) => {
+    const result = await updateProfileInfo({ imageUrl });
+    if (result.result) {
+      // Refresh profile data to show new image
+      getProfileInfo();
+    }
+    return Promise.resolve();
   };
 
   const handleResendPhoneVerification = async () => {
@@ -118,41 +128,12 @@ const UserProfile = () => {
       <Row>
         <Col>
           <h2 className="mb-4 mt-3 text-center">{t('profile.title', 'Profile')}</h2>
-          {user.imageUrl ? (
-            <div className="mb-3 text-center">
-              <img
-                src={user.imageUrl}
-                alt="User avatar"
-                style={{ width: 96, height: 96, borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--bs-primary)' }}
-              />
-            </div>
-          ) : (
-            <div className="mb-3 text-center">
-              <label htmlFor="user-image-upload" style={{ cursor: 'pointer', display: 'inline-block' }}>
-                <div style={{
-                  width: 96,
-                  height: 96,
-                  borderRadius: '50%',
-                  background: '#e9ecef',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  border: '2px dashed var(--bs-primary)',
-                  fontSize: 32,
-                  color: 'var(--bs-primary)'
-                }}>
-                  +
-                </div>
-                <input
-                  id="user-image-upload"
-                  type="file"
-                  accept="image/*"
-                  style={{ display: 'none' }}
-                // TODO: handle image upload
-                />
-              </label>
-            </div>
-          )}
+          <ProfileImageUpload
+            currentImageUrl={user.imageUrl}
+            onImageUpdate={handleImageUpdate}
+            size={96}
+            className="mb-3"
+          />
           <Form className="mb-3" onSubmit={handleSubmit(onSubmit)}>
             <Form.Group className="mb-3" controlId="firstName">
               <Form.Label>{t('form.firstName', 'First Name')}</Form.Label>

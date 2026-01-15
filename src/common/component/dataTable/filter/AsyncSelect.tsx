@@ -90,8 +90,8 @@ export function AsyncSelect<T>({
   };
 
   // Custom Toggle
-  const CustomToggle = React.forwardRef<HTMLDivElement, { onClick: (e: React.MouseEvent) => void }>(
-    ({ onClick }, ref) => (
+  const CustomToggle = React.forwardRef<HTMLDivElement, { onClick: (e: React.MouseEvent) => void; children?: React.ReactNode }>(
+    ({ onClick, children }, ref) => (
       <div
         ref={ref}
         onClick={(e) => {
@@ -112,6 +112,8 @@ export function AsyncSelect<T>({
       </div>
     )
   );
+
+  CustomToggle.displayName = 'CustomToggle';
 
   return (
     <Dropdown show={isOpen} onToggle={(show) => setIsOpen(show)}>
