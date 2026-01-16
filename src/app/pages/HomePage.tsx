@@ -1,12 +1,20 @@
 import { useState } from 'react';
 import { Container, Row, Col, Button, Card } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import SignUpForm from '@/user/component/auth/SignUpForm';
 import { GOOGLE_AUTH_URL, GITHUB_AUTH_URL, LINKEDIN_AUTH_URL } from "@/user/config";
+import { useAuthState } from '@/user/store/AuthState';
+import { ROUTE_PATHS } from '@/app/router/routes';
 
 const HomePage = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const authState = useAuthState();
   const [showRegister, setShowRegister] = useState(false);
+
+  const isAuthenticated = authState.isAuthenticated.get();
+  const user = authState.user.get();
 
   const handleSignedUp = () => {
     setShowRegister(false);
@@ -19,35 +27,60 @@ const HomePage = () => {
         <Container>
           <Row className="align-items-center min-vh-50">
             <Col lg={7} className="text-white">
-              <h1 className="display-3 fw-bold mb-4">
-                {t('home.hero.title', 'Enterprise-Grade Architecture Made Simple')}
-              </h1>
-              <p className="lead mb-4 fs-4">
-                {t('home.hero.subtitle', 'Deploy production-ready microservices in minutes, not months. Complete infrastructure, CI/CD pipelines, and cloud deployment - all configured and ready to scale.')}
-              </p>
-              <div className="d-flex gap-3 flex-wrap">
-                <Button 
-                  size="lg" 
-                  variant="light" 
-                  className="px-4 py-3"
-                  onClick={() => setShowRegister(true)}
-                >
-                  {t('home.hero.getStarted', 'Get Started Free')}
-                </Button>
-                <Button 
-                  size="lg" 
-                  variant="outline-light" 
-                  className="px-4 py-3"
-                  href="https://github.com/CoreWebMicroservices/corems-project"
-                  target="_blank"
-                >
-                  <i className="bi bi-github me-2"></i>
-                  {t('home.hero.viewGithub', 'View on GitHub')}
-                </Button>
-              </div>
+              {isAuthenticated && user ? (
+                <>
+                  <h1 className="display-3 fw-bold mb-4">
+                    {t('home.hero.welcomeBack', 'Welcome Back, {{name}}!', { name: user.firstName })}
+                  </h1>
+                  <p className="lead mb-4 fs-4">
+                    {t('home.hero.welcomeMessage', 'This applications is just a frontend showcase. Explore the features of it or jump right into building your next great application.')}
+                  </p>
+                  <div className="d-flex gap-3 flex-wrap">
+                    <Button 
+                      size="lg" 
+                      variant="outline-light" 
+                      className="px-4 py-3"
+                      href="https://github.com/CoreWebMicroservices/corems-project"
+                      target="_blank"
+                    >
+                      <i className="bi bi-github me-2"></i>
+                      {t('home.hero.viewGithub', 'View on GitHub')}
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <h1 className="display-3 fw-bold mb-4">
+                    {t('home.hero.title', 'Enterprise-Grade Architecture Made Simple')}
+                  </h1>
+                  <p className="lead mb-4 fs-4">
+                    {t('home.hero.subtitle', 'Deploy production-ready microservices in minutes, not months. Complete infrastructure, CI/CD pipelines, and cloud deployment - all configured and ready to scale.')}
+                  </p>
+                  <div className="d-flex gap-3 flex-wrap">
+                    <Button 
+                      size="lg" 
+                      variant="light" 
+                      className="px-4 py-3"
+                      onClick={() => setShowRegister(true)}
+                    >
+                      {t('home.hero.getStarted', 'Get Started Free')}
+                    </Button>
+                    <Button 
+                      size="lg" 
+                      variant="outline-light" 
+                      className="px-4 py-3"
+                      href="https://github.com/CoreWebMicroservices/corems-project"
+                      target="_blank"
+                    >
+                      <i className="bi bi-github me-2"></i>
+                      {t('home.hero.viewGithub', 'View on GitHub')}
+                    </Button>
+                  </div>
+                </>
+              )}
             </Col>
             <Col lg={5} className="mt-4 mt-lg-0">
-              {showRegister ? (
+              {!isAuthenticated && showRegister ? (
                 <Card className="shadow-lg border-0">
                   <Card.Body className="p-4">
                     <div className="d-flex justify-content-between align-items-center mb-3">
