@@ -91,7 +91,7 @@ export function AsyncSelect<T>({
 
   // Custom Toggle
   const CustomToggle = React.forwardRef<HTMLDivElement, { onClick: (e: React.MouseEvent) => void; children?: React.ReactNode }>(
-    ({ onClick, children }, ref) => (
+    ({ onClick }, ref) => (
       <div
         ref={ref}
         onClick={(e) => {

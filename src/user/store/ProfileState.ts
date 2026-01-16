@@ -8,6 +8,7 @@ import {
   CoreMsApiResonse,
   HttpMethod,
 } from "@/common/model/CoreMsApiModel";
+import { OidcUserInfo } from "@/user/model/Auth";
 
 const userMsApi = new CoreMsApi({ baseURL: USER_MS_BASE_URL });
 
@@ -52,26 +53,51 @@ export async function getProfileInfo(): Promise<CoreMsApiResonse<User>> {
   }
 
   profileState.isInProgress.set(true);
-  const res = await userMsApi.apiRequest<User>(HttpMethod.GET, "/api/profile");
+  const res = await userMsApi.apiRequest<OidcUserInfo>(HttpMethod.GET, "/oauth2/userinfo");
   profileState.isInProgress.set(false);
 
   if (res.result === true && res.response) {
-    profileState.user.set(res.response);
+    const oidcUser = res.response;
+    const user: User = {
+      userId: oidcUser.sub,
+      email: oidcUser.email || '',
+      emailVerified: oidcUser.email_verified || false,
+      firstName: oidcUser.given_name || '',
+      lastName: oidcUser.family_name || '',
+      phoneNumber: oidcUser.phone_number,
+      phoneVerified: oidcUser.phone_number_verified || false,
+      imageUrl: oidcUser.picture,
+      roles: oidcUser.roles || [],
+      provider: (oidcUser.provider || 'local') as User['provider'],
+    };
+    profileState.user.set(user);
+    return {
+      result: true,
+      response: user,
+      errors: [],
+    };
   }
-  return res;
+  return {
+    result: false,
+    response: {} as User,
+    errors: res.errors,
+  };
 }
 
 export async function updateProfileInfo(
   userData: Partial<User>
 ): Promise<CoreMsApiResonse<User>> {
-  const cleanedData = { ...userData };
+  const cleanedData: Record<string, string | undefined> = {};
   
-  if (cleanedData.phoneNumber === "") {
-    delete cleanedData.phoneNumber;
+  if (userData.firstName !== undefined) cleanedData.firstName = userData.firstName;
+  if (userData.lastName !== undefined) cleanedData.lastName = userData.lastName;
+  if (userData.phoneNumber !== undefined && userData.phoneNumber !== "") {
+    cleanedData.phoneNumber = userData.phoneNumber;
   }
+  if (userData.imageUrl !== undefined) cleanedData.imageUrl = userData.imageUrl;
 
   profileState.isInProgress.set(true);
-  const res = await userMsApi.apiRequest<User>(
+  const res = await userMsApi.apiRequest<OidcUserInfo>(
     HttpMethod.PATCH,
     "/api/profile",
     cleanedData
@@ -79,9 +105,31 @@ export async function updateProfileInfo(
   profileState.isInProgress.set(false);
 
   if (res.result === true && res.response) {
-    profileState.user.set(res.response);
+    const oidcUser = res.response;
+    const user: User = {
+      userId: oidcUser.sub,
+      email: oidcUser.email || '',
+      emailVerified: oidcUser.email_verified || false,
+      firstName: oidcUser.given_name || '',
+      lastName: oidcUser.family_name || '',
+      phoneNumber: oidcUser.phone_number,
+      phoneVerified: oidcUser.phone_number_verified || false,
+      imageUrl: oidcUser.picture,
+      roles: oidcUser.roles || [],
+      provider: (oidcUser.provider || 'local') as User['provider'],
+    };
+    profileState.user.set(user);
+    return {
+      result: true,
+      response: user,
+      errors: [],
+    };
   }
-  return res;
+  return {
+    result: false,
+    response: {} as User,
+    errors: res.errors,
+  };
 }
 
 export async function updateProfilePassword(passwordData: {

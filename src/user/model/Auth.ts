@@ -10,15 +10,30 @@ export interface SignUpUserRequest {
   password: string;
   confirmPassword: string;
   phoneNumber?: string;
+  imageUrl?: string;
 }
 
-export interface TokenResponse {
-  refreshToken: string;
-  accessToken: string;
+export interface OAuth2TokenResponse {
+  access_token: string;
+  token_type: 'Bearer';
+  expires_in: number;
+  refresh_token?: string;
+  id_token?: string;
+  scope?: string;
 }
 
-export interface AccessTokenResponse {
-  accessToken: string;
+export interface OidcUserInfo {
+  sub: string;
+  email?: string;
+  email_verified?: boolean;
+  phone_number?: string;
+  phone_number_verified?: boolean;
+  given_name?: string;
+  family_name?: string;
+  picture?: string;
+  updated_at?: number;
+  roles?: string[];
+  provider?: string;
 }
 
 export interface Token {

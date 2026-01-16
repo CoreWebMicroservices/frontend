@@ -12,11 +12,10 @@ import {
   REFRESH_TOKEN_KEY,
 } from "@/common/model/CoreMsApiModel";
 import {
-  AccessTokenResponse,
+  OAuth2TokenResponse,
   SignInUserRequest,
   SignUpUserRequest,
   Token,
-  TokenResponse,
   VerifyEmailRequest,
   VerifyPhoneRequest,
   ResendVerificationRequest,
@@ -49,31 +48,38 @@ export function useAuthState() {
 
 export async function signInUser(
   signInRequest: SignInUserRequest
-): Promise<CoreMsApiResonse<TokenResponse>> {
+): Promise<CoreMsApiResonse<OAuth2TokenResponse>> {
   authState.isInProgress.set(true);
-  const signInReponse = await userMsApi.apiRequest<TokenResponse>(
+  
+  const formData = new URLSearchParams();
+  formData.append('grant_type', 'password');
+  formData.append('username', signInRequest.email);
+  formData.append('password', signInRequest.password);
+  formData.append('scope', 'openid profile email');
+
+  const signInReponse = await userMsApi.apiRequest<OAuth2TokenResponse>(
     HttpMethod.POST,
-    "/api/auth/signin",
-    {
-      email: signInRequest.email,
-      password: signInRequest.password,
-    }
+    "/oauth2/token",
+    formData.toString(),
+    { 'Content-Type': 'application/x-www-form-urlencoded' }
   );
   authState.isInProgress.set(false);
 
   if (signInReponse.result === true) {
-    const { accessToken, refreshToken } = signInReponse.response;
-    const parsedRefreshToken = jwtDecode(refreshToken) as Token;
+    const { access_token, refresh_token } = signInReponse.response;
+    if (refresh_token) {
+      const parsedRefreshToken = jwtDecode(refresh_token) as Token;
 
-    authState.merge({
-      isAuthenticated: true,
-      accessToken,
-      refreshToken,
-      parsedRefreshToken,
-    });
+      authState.merge({
+        isAuthenticated: true,
+        accessToken: access_token,
+        refreshToken: refresh_token,
+        parsedRefreshToken,
+      });
 
-    setRefreshToken(refreshToken);
-    setAccessToken(accessToken);
+      setRefreshToken(refresh_token);
+      setAccessToken(access_token);
+    }
   }
 
   return signInReponse;
@@ -145,15 +151,23 @@ export async function resetPassword(
 }
 
 export async function signOut() {
-  const res = await userMsApi.apiRequest<ApiSuccessfulResponse>(
-    HttpMethod.POST,
-    "/api/auth/signout",
-    null,
-    { Authorization: `Bearer ${authState.refreshToken.get()}` }
-  );
+  const token = authState.refreshToken.get() || authState.accessToken.get();
+  
+  if (token) {
+    const formData = new URLSearchParams();
+    formData.append('token', token);
+    formData.append('token_type_hint', authState.refreshToken.get() ? 'refresh_token' : 'access_token');
 
-  if (res.result === false) {
-    console.error("Sign out failed", res.errors);
+    const res = await userMsApi.apiRequest<ApiSuccessfulResponse>(
+      HttpMethod.POST,
+      "/oauth2/revoke",
+      formData.toString(),
+      { 'Content-Type': 'application/x-www-form-urlencoded' }
+    );
+
+    if (res.result === false) {
+      console.error("Sign out failed", res.errors);
+    }
   }
 
   authState.merge({
@@ -219,15 +233,19 @@ const setAccessToken = async (
   if (!authState.refreshToken.get()) return false;
 
   if (!accessToken || force) {
-    const tokenResponse = await userMsApi.apiRequest<AccessTokenResponse>(
+    const formData = new URLSearchParams();
+    formData.append('grant_type', 'refresh_token');
+    formData.append('refresh_token', authState.refreshToken.get() as string);
+
+    const tokenResponse = await userMsApi.apiRequest<OAuth2TokenResponse>(
       HttpMethod.POST,
-      "/api/auth/refresh-token",
-      null,
-      { Authorization: `Bearer ${authState.refreshToken.get()}` }
+      "/oauth2/token",
+      formData.toString(),
+      { 'Content-Type': 'application/x-www-form-urlencoded' }
     );
 
     if (tokenResponse.result === true) {
-      accessToken = tokenResponse.response.accessToken;
+      accessToken = tokenResponse.response.access_token;
       localStorage.setItem(ACCESS_TOKEN_KEY, accessToken as string);
     } else {
       console.error("Failed to refresh token", tokenResponse.errors);
