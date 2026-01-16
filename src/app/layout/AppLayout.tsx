@@ -1,13 +1,12 @@
 import { PropsWithChildren } from "react";
 import { Outlet } from "react-router-dom";
-import Container from "react-bootstrap/Container";
 
 import AppHeader from "@/app/layout/AppHeader";
 
 const AppLayout = ({ children }: PropsWithChildren) => (
   <div className="mb-5">
     <AppHeader />
-    <Container fluid className="content">{children ?? <Outlet />}</Container>
+    <div className="content">{children ?? <Outlet />}</div>
   </div>
 );
 

@@ -40,8 +40,6 @@ const AppHeader = () => {
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="me-auto">
-            <Nav.Item><Nav.Link as={Link} to={APP_ROUTES.FEATURES}>{t('nav.features', 'Features')}</Nav.Link></Nav.Item>
-            {/* App controls component visibility with business logic */}
             {authGuards.hasAnyRole([AppRoles.UserMsAdmin]) && <UserNavBar path={APP_ROUTES.USERS_LIST} />}
             {authGuards.isAuthenticated() && <CommunicationNavBar path={APP_ROUTES.COMMUNICATION} />}
             {authGuards.isAuthenticated() && <DocumentNavBar path={APP_ROUTES.DOCUMENTS} />}

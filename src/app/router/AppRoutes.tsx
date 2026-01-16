@@ -18,6 +18,7 @@ import { MessageList } from "@/communication/component/MessageList";
 import TranslationEditor from "@/translation/component/TranslationEditor";
 import { TranslationList } from "@/translation/component/TranslationList";
 import DocumentList from "@/document/component/DocumentList";
+import HomePage from "@/app/pages/HomePage";
 
 // Create auth guards with dependency injection
 const authGuards = createAuthGuards({
@@ -38,13 +39,8 @@ const authGuards = createAuthGuards({
 export const coreRoutes: RouteObject[] = [
   {
     path: ROUTE_PATHS.HOME,
-    element: <div>HOME</div>,
-  },
-  {
-    path: ROUTE_PATHS.FEATURES,
-    element: <div>Features</div>,
-    loader: authGuards.redirectIfNotAuthenticated,
-  },
+    element: <HomePage />,
+  }
 ];
 
 // User module routes (moved from UserRouter)
