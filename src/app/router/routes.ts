@@ -6,6 +6,7 @@
 export const APP_ROUTES = {
   // Core app routes
   HOME: "/",
+  WELCOME: "/welcome",
   PRICING: "/pricing",
   FEATURES: "/features",
 

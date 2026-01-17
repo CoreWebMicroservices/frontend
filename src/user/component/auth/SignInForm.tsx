@@ -39,7 +39,7 @@ const SignInForm = () => {
 
     // reload on sign in success
     if (res.result === true) {
-      window.location.href = APP_ROUTES.HOME;
+      window.location.href = APP_ROUTES.WELCOME;
     }
   };
 

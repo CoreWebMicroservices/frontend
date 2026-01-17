@@ -21,7 +21,7 @@ const HomePage = () => {
   };
 
   return (
-    <div className="home-page" style={{ marginTop: '-1.5rem'}}>
+    <div className="home-page">
       {/* Hero Section */}
       <section className="hero-section py-5 mb-5" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
         <Container>
@@ -38,13 +38,20 @@ const HomePage = () => {
                   <div className="d-flex gap-3 flex-wrap">
                     <Button 
                       size="lg" 
+                      variant="light" 
+                      className="px-4 py-3"
+                      onClick={() => navigate('/welcome')}
+                    >
+                      {t('home.hero.explore', 'Explore Features')}
+                    </Button>
+                    <Button 
+                      size="lg" 
                       variant="outline-light" 
                       className="px-4 py-3"
-                      href="https://github.com/CoreWebMicroservices/corems-project"
-                      target="_blank"
+                      onClick={() => navigate('/docs/introduction')}
                     >
-                      <i className="bi bi-github me-2"></i>
-                      {t('home.hero.viewGithub', 'View on GitHub')}
+                      <i className="bi bi-book me-2"></i>
+                      {t('home.hero.documentation', 'Documentation')}
                     </Button>
                   </div>
                 </>
@@ -69,11 +76,10 @@ const HomePage = () => {
                       size="lg" 
                       variant="outline-light" 
                       className="px-4 py-3"
-                      href="https://github.com/CoreWebMicroservices/corems-project"
-                      target="_blank"
+                      onClick={() => navigate('/docs/introduction')}
                     >
-                      <i className="bi bi-github me-2"></i>
-                      {t('home.hero.viewGithub', 'View on GitHub')}
+                      <i className="bi bi-book me-2"></i>
+                      {t('home.hero.documentation', 'Documentation')}
                     </Button>
                   </div>
                 </>

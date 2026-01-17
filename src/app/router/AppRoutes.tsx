@@ -3,6 +3,8 @@ import { createAuthGuards } from "@/common/router/AuthGuards";
 import { AppRoles } from "@/common/AppRoles";
 import { ROUTE_PATHS } from "@/app/router/routes";
 import { getCurrentUserAuth, hasAnyRole } from "@/user/store/AuthState";
+import { Container, Row, Col, Button } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
 // Import components directly from modules (no route configuration)
 import AuthForm from "@/user/component/auth/AuthForm";
@@ -19,6 +21,19 @@ import TranslationEditor from "@/translation/component/TranslationEditor";
 import { TranslationList } from "@/translation/component/TranslationList";
 import DocumentList from "@/document/component/DocumentList";
 import HomePage from "@/app/pages/HomePage";
+import WelcomePage from "@/app/pages/WelcomePage";
+import { 
+  IntroductionPage, 
+  QuickStartPage, 
+  ArchitecturePage, 
+  RoadmapPage, 
+  ServicesPage 
+} from "@/app/pages/docs";
+import CommonLibrariesPage from "@/app/pages/docs/CommonLibrariesPage";
+import UserServicePage from "@/app/pages/docs/services/UserServicePage";
+import CommunicationServicePage from "@/app/pages/docs/services/CommunicationServicePage";
+import DocumentServicePage from "@/app/pages/docs/services/DocumentServicePage";
+import TranslationServicePage from "@/app/pages/docs/services/TranslationServicePage";
 
 // Create auth guards with dependency injection
 const authGuards = createAuthGuards({
@@ -40,6 +55,11 @@ export const coreRoutes: RouteObject[] = [
   {
     path: ROUTE_PATHS.HOME,
     element: <HomePage />,
+  },
+  {
+    path: '/welcome',
+    element: <WelcomePage />,
+    loader: authGuards.redirectIfNotAuthenticated,
   }
 ];
 
@@ -126,6 +146,50 @@ export const documentRoutes: RouteObject[] = [
   },
 ];
 
+// Documentation routes
+export const docsRoutes: RouteObject[] = [
+  {
+    path: '/docs/introduction',
+    element: <IntroductionPage />,
+  },
+  {
+    path: '/docs/quick-start',
+    element: <QuickStartPage />,
+  },
+  {
+    path: '/docs/architecture',
+    element: <ArchitecturePage />,
+  },
+  {
+    path: '/docs/common-libraries',
+    element: <CommonLibrariesPage />,
+  },
+  {
+    path: '/docs/roadmap',
+    element: <RoadmapPage />,
+  },
+  {
+    path: '/docs/services',
+    element: <ServicesPage />,
+  },
+  {
+    path: '/docs/services/user',
+    element: <UserServicePage />,
+  },
+  {
+    path: '/docs/services/communication',
+    element: <CommunicationServicePage />,
+  },
+  {
+    path: '/docs/services/document',
+    element: <DocumentServicePage />,
+  },
+  {
+    path: '/docs/services/translation',
+    element: <TranslationServicePage />,
+  },
+];
+
 // Combined routes for the entire application
 export const allApplicationRoutes: RouteObject[] = [
   ...coreRoutes,
@@ -133,4 +197,25 @@ export const allApplicationRoutes: RouteObject[] = [
   ...communicationRoutes,
   ...translationRoutes,
   ...documentRoutes,
+  ...docsRoutes,
+  {
+    path: '*',
+    element: <div>
+      <Container className="d-flex flex-column align-items-center justify-content-center mt-5" >
+        <Row className="text-center">
+          <Col xs={12}>
+            <h2 className="d-flex justify-content-center align-items-center gap-2 mb-2">
+              <span className="display-1 fw-bold">4</span>
+              <i className="bi bi-exclamation-circle-fill text-danger display-4"></i>
+              <span className="display-1 fw-bold bsb-flip-h">4</span>
+            </h2>
+            <h3 className="h2 mb-4">Oops! You're lost.</h3>
+            <Link to="/">
+              <Button size="lg" type="submit" className="fs-6 p-3">Back To Home</Button>
+            </Link>
+          </Col>
+        </Row>
+      </Container>
+    </div>,
+  },
 ];

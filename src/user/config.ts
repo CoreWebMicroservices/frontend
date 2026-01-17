@@ -10,7 +10,7 @@ if (userMsUrl === undefined || userMsUrl === "") {
 
 export const USER_MS_BASE_URL = userMsUrl;
 
-export const ROUTE_OAUTH2_SUCCESS_PATH = APP_ROUTES.LOGIN;
+export const ROUTE_OAUTH2_SUCCESS_PATH = APP_ROUTES.WELCOME;
 
 export const OAUTH2_REDIRECT_URI = APP_BASE_URL + ROUTE_OAUTH2_SUCCESS_PATH;
 
