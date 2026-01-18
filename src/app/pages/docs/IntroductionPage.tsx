@@ -10,47 +10,94 @@ const IntroductionPage = () => {
       ]}
     >
       <p className="lead">
-        Core Microservices is an enterprise-grade toolkit that provides production-ready backend services 
-        and a modular frontend to help startups and development teams launch faster.
+        Core Microservices is a production-ready toolkit that provides enterprise-grade backend services 
+        and a modular frontend—helping teams launch applications faster without sacrificing quality or scalability.
       </p>
 
       <h2 className="h3 mt-5 mb-3">What is Core Microservices?</h2>
       <p>
-        Core Microservices (CoreMS) is a comprehensive platform that eliminates months of infrastructure 
-        setup and boilerplate code. Instead of building authentication, user management, file storage, 
-        and communication systems from scratch, you get battle-tested, production-ready services that 
-        work together seamlessly.
+        Core Microservices (CoreMS) eliminates months of infrastructure development by providing battle-tested, 
+        production-ready services that work together seamlessly. Instead of building authentication, user management, 
+        file storage, and communication systems from scratch—you get a complete foundation that scales with your business.
       </p>
 
-      <Callout type="tip" title="Perfect for">
-        Startup founders, small development teams, solo developers, and anyone who wants to focus on 
-        building unique business features instead of reinventing common infrastructure.
+      <p>
+        Built with modern enterprise patterns: microservices architecture, JWT authentication, role-based access control, 
+        message queuing, and cloud-native deployment. Everything you need to go from idea to production quickly.
+      </p>
+
+      <h2 className="h3 mt-5 mb-3">Who is this for?</h2>
+
+      <p>
+        Core Microservices is built for teams who need enterprise-grade infrastructure without enterprise complexity. 
+        Whether you're building a SaaS platform, an e-commerce site, a logistics system, or a customer portal—if you 
+        need user management, secure file storage, multi-channel communications, or internationalization, you can 
+        start here and scale as you grow.
+      </p>
+
+      <div className="row g-3 my-4">
+        <div className="col-md-4">
+          <div className="p-3 border rounded h-100">
+            <h4 className="h6 fw-bold">Development Teams</h4>
+            <p className="small mb-0">
+              Skip 3-6 months of infrastructure work. Start building business features on day one with 
+              proven architecture that scales.
+            </p>
+          </div>
+        </div>
+        <div className="col-md-4">
+          <div className="p-3 border rounded h-100">
+            <h4 className="h6 fw-bold">Product Companies</h4>
+            <p className="small mb-0">
+              Launch faster with ready-to-use services. Focus on what makes your product unique, 
+              not reinventing authentication and file storage.
+            </p>
+          </div>
+        </div>
+        <div className="col-md-4">
+          <div className="p-3 border rounded h-100">
+            <h4 className="h6 fw-bold">Technical Founders</h4>
+            <p className="small mb-0">
+              Get to market quickly with production-ready infrastructure. Build your MVP in weeks, 
+              not months.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <Callout type="info" title="Real-World Applications">
+        Perfect for e-commerce platforms, logistics systems, SaaS applications, customer portals, mobile app 
+        backends, and internal tools. Any application that needs user accounts, file management, and notifications.
+      </Callout>
+
+      <Callout type="tip" title="Free & Open Source">
+        Licensed under Apache 2.0. Use it commercially without restrictions. No vendor lock-in, no hidden costs.
       </Callout>
 
       <h2 className="h3 mt-5 mb-3">Key Benefits</h2>
       
-      <h3 className="h5 mt-4 mb-2">🚀 Launch Faster</h3>
+      <h3 className="h5 mt-4 mb-2">Launch 10x Faster</h3>
       <p>
-        Skip months of infrastructure development. Get authentication, user management, file storage, 
-        and communication features working in minutes, not months.
+        What typically takes 3-6 months to build is ready in minutes. Authentication with OAuth2, user management, 
+        file storage, email/SMS notifications, and multi-language support—all working out of the box.
       </p>
 
-      <h3 className="h5 mt-4 mb-2">🏗️ Production-Ready Architecture</h3>
+      <h3 className="h5 mt-4 mb-2">Production-Ready from Day One</h3>
       <p>
-        Built with enterprise patterns: microservices architecture, JWT authentication, role-based 
-        access control, message queuing, and cloud-native deployment.
+        Built with enterprise patterns: microservices architecture, JWT authentication, role-based access control, 
+        message queuing, and cloud-native deployment. Security, scalability, and observability included.
       </p>
 
-      <h3 className="h5 mt-4 mb-2">🔧 Modular & Flexible</h3>
+      <h3 className="h5 mt-4 mb-2">Modular & Customizable</h3>
       <p>
-        Use only what you need. Each service is independent and can be deployed separately. Add more 
-        services as your application grows.
+        Use only what you need. Each service is independent and can be deployed separately. Customize the frontend 
+        components to match your brand. Add more services as your application grows.
       </p>
 
-      <h3 className="h5 mt-4 mb-2">💰 Free & Open Source</h3>
+      <h3 className="h5 mt-4 mb-2">No Vendor Lock-In</h3>
       <p>
-        Licensed under Apache 2.0. Use it commercially without restrictions. No vendor lock-in, 
-        no hidden costs.
+        Apache 2.0 license means you own the code. Deploy anywhere—AWS, Azure, GCP, or on-premises. 
+        No subscriptions, no usage limits, no hidden costs.
       </p>
 
       <h2 className="h3 mt-5 mb-3">What's Included?</h2>
