@@ -96,7 +96,7 @@ const AppSidebar = ({ show, onHide }: AppSidebarProps) => {
 
   return (
     <>
-      <div className="d-none d-lg-block bg-body border-end" style={{ width: '250px', height: 'calc(100vh - 56px)', position: 'sticky', top: '56px', overflowY: 'auto' }}>
+      <div className="d-none d-lg-block bg-body border-end" style={{ width: '250px', height: 'calc(100vh - 56px)', position: 'sticky', top: '56px', overflowY: visible.length > 10 ? 'auto' : 'hidden' }}>
         {content}
       </div>
 

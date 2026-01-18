@@ -27,7 +27,7 @@ const AppHeader = ({ onToggleSidebar }: AppHeaderProps) => {
   const { t } = useTranslation();
 
   return (
-    <Navbar className="border-bottom">
+    <Navbar className="border-bottom" style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1030, backgroundColor: 'var(--bs-body-bg)' }}>
       <Container fluid>
         <div className="d-flex align-items-center">
           {onToggleSidebar && (

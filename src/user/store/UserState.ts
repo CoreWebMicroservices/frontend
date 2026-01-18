@@ -90,7 +90,7 @@ export async function updateUserInfo(
   }
 
   const res = await userMsApi.apiRequest<ApiSuccessfulResponse>(
-    HttpMethod.PUT,
+    HttpMethod.PATCH,
     `/api/users/${userId}`,
     cleanedData
   );

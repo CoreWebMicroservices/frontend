@@ -12,6 +12,7 @@ interface ProfileImageUploadProps {
   size?: number;
   disabled?: boolean;
   className?: string;
+  ownerUserId?: string;
 }
 
 const ProfileImageUpload: React.FC<ProfileImageUploadProps> = ({
@@ -19,7 +20,8 @@ const ProfileImageUpload: React.FC<ProfileImageUploadProps> = ({
   onImageUpdate,
   size = 96,
   disabled = false,
-  className = ''
+  className = '',
+  ownerUserId
 }) => {
   const { t } = useTranslation();
   const [isUploading, setIsUploading] = useState(false);
@@ -56,6 +58,7 @@ const ProfileImageUpload: React.FC<ProfileImageUploadProps> = ({
       const renamedFile = new File([file], profilePictureName, { type: file.type });
       
       const uploadResult = await uploadDocumentMultipart(renamedFile, {
+        ownerUserId: ownerUserId,
         visibility: 'PUBLIC',
         tags: ['profile-picture'],
         confirmReplace: true

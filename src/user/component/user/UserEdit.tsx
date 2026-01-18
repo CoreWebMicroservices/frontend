@@ -83,21 +83,10 @@ const UserEdit = () => {
   };
 
   const handleImageUpdate = async (imageUrl: string) => {
-    if (!userId || !selectedUser) return;
+    if (!userId) return;
 
-    // Create minimal user object with only the fields we want to update
-    const userData: User = {
-      userId: selectedUser.userId,
-      provider: selectedUser.provider,
-      firstName: selectedUser.firstName,
-      lastName: selectedUser.lastName,
-      email: selectedUser.email,
-      imageUrl: imageUrl,
-    };
-
-    const result = await updateUserInfo(userId, userData);
+    const result = await updateUserInfo(userId, { imageUrl } as User);
     if (result.result) {
-      // Refresh user data to show new image
       await getUserById(userId);
     }
     return Promise.resolve();
@@ -161,6 +150,7 @@ const UserEdit = () => {
           <ProfileImageUpload
             currentImageUrl={selectedUser.imageUrl}
             onImageUpdate={handleImageUpdate}
+            ownerUserId={userId}
             size={96}
             className="mb-3"
           />
