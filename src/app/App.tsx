@@ -2,6 +2,7 @@ import { Outlet } from 'react-router-dom';
 
 import AppLayout from '@/app/layout/AppLayout';
 import { I18nProvider } from '@/common/utils/i18n/I18nProvider';
+import ScrollTo from '@/common/component/ScrollTo';
 
 // Default translations - for no authorized users and initial load
 import en from '@/app/locales/en.json';
@@ -23,6 +24,7 @@ const App = () => {
       loader={fetchTranslations}
       languagesLoader={fetchAvailableLanguages}
     >
+      <ScrollTo />
       <AppLayout>
         <Outlet />
       </AppLayout>

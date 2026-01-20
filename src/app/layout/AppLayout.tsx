@@ -7,9 +7,10 @@ const AppLayout = ({ children }: PropsWithChildren) => {
   const location = useLocation();  const [showSidebar, setShowSidebar] = useState(false);
 
   const isLoginPage = location.pathname === '/login';
+  const isForgotPasswordPage = location.pathname === '/forgot-password';
   const isHomePage = location.pathname === '/';
 
-  if (isLoginPage || isHomePage) {
+  if (isLoginPage || isForgotPasswordPage || isHomePage) {
     return (
       <div className="mb-5">
         <AppHeader />
