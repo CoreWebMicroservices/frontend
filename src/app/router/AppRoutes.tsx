@@ -19,6 +19,8 @@ import UserAdd from "@/user/component/user/UserAdd";
 import { MessageList } from "@/communication/component/MessageList";
 import TranslationEditor from "@/translation/component/TranslationEditor";
 import { TranslationList } from "@/translation/component/TranslationList";
+import { TemplateList } from "@/template/component/TemplateList";
+import TemplateEditor from "@/template/component/TemplateEditor";
 import DocumentList from "@/document/component/DocumentList";
 import HomePage from "@/app/pages/HomePage";
 import WelcomePage from "@/app/pages/WelcomePage";
@@ -137,6 +139,24 @@ export const translationRoutes: RouteObject[] = [
   },
 ];
 
+export const templateRoutes: RouteObject[] = [
+  {
+    path: ROUTE_PATHS.TEMPLATES,
+    element: <TemplateList />,
+    loader: authGuards.redirectIfNotInRole([AppRoles.TemplateMsAdmin]),
+  },
+  {
+    path: ROUTE_PATHS.TEMPLATE_EDIT,
+    element: <TemplateEditor />,
+    loader: authGuards.redirectIfNotInRole([AppRoles.TemplateMsAdmin]),
+  },
+  {
+    path: ROUTE_PATHS.TEMPLATE_NEW,
+    element: <TemplateEditor />,
+    loader: authGuards.redirectIfNotInRole([AppRoles.TemplateMsAdmin]),
+  },
+];
+
 // Document module routes
 export const documentRoutes: RouteObject[] = [
   {
@@ -196,6 +216,7 @@ export const allApplicationRoutes: RouteObject[] = [
   ...userRoutes,
   ...communicationRoutes,
   ...translationRoutes,
+  ...templateRoutes,
   ...documentRoutes,
   ...docsRoutes,
   {

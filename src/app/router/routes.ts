@@ -29,6 +29,11 @@ export const APP_ROUTES = {
   TRANSLATION_NEW: "/translations/new",
   TRANSLATION_EDIT: "/translations/:realm/:lang",
 
+  // Template module routes
+  TEMPLATES: "/templates",
+  TEMPLATE_NEW: "/templates/new",
+  TEMPLATE_EDIT: "/templates/:id",
+
   // Document module routes
   DOCUMENTS: "/documents"
 } as const;

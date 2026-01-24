@@ -7,6 +7,7 @@ interface CalloutProps {
   type?: CalloutType;
   title?: string;
   children: ReactNode;
+  className?: string;
 }
 
 const calloutConfig = {
@@ -31,12 +32,13 @@ const calloutConfig = {
 export const Callout: React.FC<CalloutProps> = ({ 
   type = 'info', 
   title,
-  children 
+  children,
+  className = ''
 }) => {
   const config = calloutConfig[type];
 
   return (
-    <Alert variant={config.variant} className="my-3">
+    <Alert variant={config.variant} className={`my-3 ${className}`}>
       <div className="d-flex">
         <i className={`bi bi-${config.icon} me-2 fs-5`}></i>
         <div className="flex-grow-1">

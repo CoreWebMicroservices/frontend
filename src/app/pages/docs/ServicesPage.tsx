@@ -160,7 +160,7 @@ const ServicesPage = () => {
                 </div>
               </div>
               <p className="text-muted">
-                Payment processing with Stripe, PayPal, Klarna integration. Transaction management and webhooks.
+                Payment processing with Stripe, Vipps, Klarna Klarna integration. Transaction management and webhooks.
               </p>
             </Card.Body>
           </Card>

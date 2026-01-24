@@ -340,7 +340,7 @@ const RoadmapPage = () => {
               <Card className="h-100">
                 <Card.Body>
                   <h4 className="h6"><i className="bi bi-credit-card-fill text-info me-2"></i>Payment Service</h4>
-                  <p className="small mb-0">Stripe, PayPal, Klarna integration with webhooks and refunds</p>
+                  <p className="small mb-0">Stripe, Vipps, Klarna Klarna integration with webhooks and refunds</p>
                 </Card.Body>
               </Card>
             </Col>

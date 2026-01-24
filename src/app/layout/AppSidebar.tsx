@@ -18,10 +18,11 @@ const AppSidebar = ({ show, onHide }: AppSidebarProps) => {
   const [openDocs, setOpenDocs] = useState(true);
 
   const appNav = [
+    { icon: 'people-fill', label: t('nav.users', 'Users'), path: ROUTE_PATHS.USERS_LIST, roles: [AppRoles.UserMsAdmin] },
     { icon: 'envelope-fill', label: t('nav.communication', 'Communication'), path: ROUTE_PATHS.COMMUNICATION, auth: true },
     { icon: 'folder-fill', label: t('nav.documents', 'Documents'), path: ROUTE_PATHS.DOCUMENTS, auth: true },
-    { icon: 'people-fill', label: t('nav.users', 'Users'), path: ROUTE_PATHS.USERS_LIST, roles: [AppRoles.UserMsAdmin] },
     { icon: 'translate', label: t('nav.translations', 'Translations'), path: ROUTE_PATHS.TRANSLATIONS, roles: [AppRoles.TranslationMsAdmin] },
+    { icon: 'file-earmark-text-fill', label: t('nav.templates', 'Templates'), path: ROUTE_PATHS.TEMPLATES, roles: [AppRoles.TemplateMsAdmin] },
     { divider: true },
     { 
       icon: 'book-fill', 
@@ -80,7 +81,7 @@ const AppSidebar = ({ show, onHide }: AppSidebarProps) => {
         return (
           <NavLink
             key={i}
-            to={item.path}
+            to={item.path || '/'}
             onClick={onHide}
             className={({ isActive }) => 
               `d-flex align-items-center py-2 px-3 rounded mb-1 text-decoration-none ${isActive ? 'text-primary fw-semibold' : 'text-body'}`

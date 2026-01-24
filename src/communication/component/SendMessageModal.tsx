@@ -53,7 +53,10 @@ export const SendMessageModal: React.FC<SendMessageModalProps> = ({ show, onClos
 
   const validate = (): string[] => {
     const errs: string[] = [];
-    if (!effectiveUserId) errs.push(t('validation.userRequired', 'User is required'));
+    console.log(selectedUserId);
+    console.log(userId);
+    const currentUserId = userId || selectedUserId;
+    if (!currentUserId) errs.push(t('validation.userRequired', 'User is required'));
     if (channel === 'email') {
       if (!recipientEmail.trim()) errs.push(t('validation.recipientEmailRequired', 'Recipient email is required'));
       if (!subject.trim()) errs.push(t('validation.subjectRequired', 'Subject is required'));
@@ -156,7 +159,7 @@ export const SendMessageModal: React.FC<SendMessageModalProps> = ({ show, onClos
       onClose={handleCancel}
       onPrimary={handleSubmit}
       primaryText={isSubmitting ? t('message.sending', 'Sending...') : t('common.send', 'Send')}
-      disabledPrimary={isSubmitting || validationErrors.length > 0}
+      disabledPrimary={isSubmitting || (showValidation && validationErrors.length > 0)}
       size="lg"
       footerContent={successMessage && <span className="text-success me-auto">{successMessage}</span>}
     >
@@ -184,7 +187,11 @@ export const SendMessageModal: React.FC<SendMessageModalProps> = ({ show, onClos
                 return res;
               }}
               getOptionLabel={(u) => `${u.firstName} ${u.lastName}`}
-              getOptionValue={(u) => u.userId}
+              getOptionValue={(u) => {
+                console.log(u);
+                return u.userId;
+
+              }}
               getOptionSubtitle={(u) => u.email}
               placeholder={t('message.selectUser', 'Select a user')}
             />

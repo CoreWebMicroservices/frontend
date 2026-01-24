@@ -5,4 +5,5 @@ export enum AppRoles {
   CommunicationMsAdmin = "COMMUNICATION_MS_ADMIN",
   TranslationMsAdmin = "TRANSLATION_MS_ADMIN",
   DocumentMsAdmin = "DOCUMENT_MS_ADMIN",
+  TemplateMsAdmin = "TEMPLATE_MS_ADMIN",
 }

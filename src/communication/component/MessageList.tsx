@@ -19,6 +19,8 @@ import { Link } from "react-router-dom";
 import SendMessageModal from "@/communication/component/SendMessageModal";
 import { Container } from "react-bootstrap";
 import { APP_ROUTES } from "@/app/router/routes";
+import { hasAnyRole } from "@/user/store/AuthState";
+import { AppRoles } from "@/common/AppRoles";
 
 export const MessageList: React.FC<{ userId?: string }> = ({ userId }) => {
   const { t } = useTranslation();
@@ -30,6 +32,7 @@ export const MessageList: React.FC<{ userId?: string }> = ({ userId }) => {
   const [userNames, setUserNames] = React.useState<Record<string, string>>({});
   const [isResolvingNames, setIsResolvingNames] = React.useState(false); // loading state for user name resolution
   const [showSendModal, setShowSendModal] = React.useState(false);
+  const isAdmin = hasAnyRole([AppRoles.CommunicationMsAdmin]);
 
   // Local state for query params
   const queryParams = useHookstate(getInitialDataTableQueryParams());
@@ -186,9 +189,11 @@ export const MessageList: React.FC<{ userId?: string }> = ({ userId }) => {
   };
 
   const actions = (
-    <button className="btn btn-outline-primary d-flex align-items-center" onClick={() => setShowSendModal(true)}>
-      <Send className="me-2" /> {t('message.sendMessage', 'Send Message')}
-    </button>
+    isAdmin ?
+      <button className="btn btn-outline-primary d-flex align-items-center" onClick={() => setShowSendModal(true)}>
+        <Send className="me-2" /> {t('message.sendMessage', 'Send Message')}
+      </button>
+    : null
   );
 
   // Fetch messages on mount

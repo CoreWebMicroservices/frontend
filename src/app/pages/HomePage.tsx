@@ -311,7 +311,7 @@ cd corems-project
                   </div>
                   <h5 className="fw-bold mb-2">{t('home.features.payments', 'Payments')}</h5>
                   <p className="text-muted small mb-0">
-                    {t('home.features.paymentsDesc', 'Stripe, PayPal, and more payment gateway integrations')}
+                    {t('home.features.paymentsDesc', 'Stripe, Vipps, Klarna and more payment gateway integrations')}
                   </p>
                 </Card.Body>
               </Card>
@@ -499,7 +499,7 @@ cd corems-project
                     </li>
                     <li className="mb-2">
                       <i className="bi bi-check-circle-fill text-success me-2"></i>
-                      {t('home.clients.ecommerce.feature2', 'Integrated payment gateways (Stripe, PayPal)')}
+                      {t('home.clients.ecommerce.feature2', 'Integrated payment gateways (Stripe, Vipps, Kalarna)')}
                     </li>
                     <li className="mb-2">
                       <i className="bi bi-check-circle-fill text-success me-2"></i>
