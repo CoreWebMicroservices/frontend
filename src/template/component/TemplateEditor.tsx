@@ -5,9 +5,8 @@ import { Save, Trash } from 'react-bootstrap-icons';
 import { useTranslation } from 'react-i18next';
 import AceEditor from 'react-ace';
 import 'ace-builds/src-noconflict/mode-html';
-import 'ace-builds/src-noconflict/mode-json';
 import 'ace-builds/src-noconflict/theme-github';
-import 'ace-builds/src-noconflict/theme-monokai';
+import 'ace-builds/src-noconflict/theme-dracula';
 import 'ace-builds/src-noconflict/ext-language_tools';
 import { useTemplateState } from '@/template/store/TemplateState';
 import { useMessageState } from '@/common/utils/api/ApiResponseHandler';
@@ -321,7 +320,7 @@ export const TemplateEditor: React.FC = () => {
             <>
               <AceEditor
                 mode="html"
-                theme={theme === 'dark' ? 'monokai' : 'github'}
+                theme={theme === 'dark' ? 'dracula' : 'github'}
                 value={formData.content}
                 onChange={(value) => setFormData({ ...formData, content: value })}
                 name="content-editor"
@@ -330,6 +329,7 @@ export const TemplateEditor: React.FC = () => {
                   useWorker: false,
                   showLineNumbers: true,
                   tabSize: 2,
+                  fontSize: 18,
                 }}
                 style={{
                   width: '100%',

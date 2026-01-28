@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import AceEditor from 'react-ace';
 import 'ace-builds/src-noconflict/mode-json';
 import 'ace-builds/src-noconflict/theme-github';
-import 'ace-builds/src-noconflict/theme-monokai';
+import 'ace-builds/src-noconflict/theme-dracula';
 import 'ace-builds/src-noconflict/ext-language_tools';
 import { useTranslationState } from '@/translation/store/TranslationState';
 import { useMessageState } from '@/common/utils/api/ApiResponseHandler';
@@ -368,7 +368,7 @@ export const TranslationEditor: React.FC = () => {
             <div>
               <AceEditor
                 mode="json"
-                theme={theme === 'dark' ? 'monokai' : 'github'}
+                theme={theme === 'dark' ? 'dracula' : 'github'}
                 value={jsonText}
                 onChange={setJsonText}
                 name="json-editor"
@@ -377,6 +377,7 @@ export const TranslationEditor: React.FC = () => {
                   useWorker: false,
                   showLineNumbers: true,
                   tabSize: 2,
+                  fontSize: 18,
                 }}
                 style={{
                   width: '100%',
